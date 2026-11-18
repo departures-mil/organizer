@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1d5f74">
+<title>Organizer</title>
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<header id="top">
+  <div class="toprow">
+    <img src="img/logo.png" alt="" class="logo">
+    <div class="titles"><div id="appTitle"></div><div id="appSub"></div></div>
+    <button id="eyeBtn" class="iconbtn" aria-label="hide"></button>
+    <button id="scanBtn" class="iconbtn" aria-label="search"></button>
+  </div>
+  <div class="toprow tools">
+    <div id="langSeg" class="tbseg"></div>
+    <button id="syncBtn" class="pill" aria-label="sync"><span id="syncIcon"></span><span id="syncTxt"></span><i id="syncDot"></i></button>
+    <button id="updBtn" class="pill"><span id="updIcon"></span><span id="updTxt"></span></button>
+  </div>
+</header>
+<main id="page"></main>
+<nav id="tabs"></nav>
+<div id="layers"></div>
+<div id="toast"></div>
+<input type="file" id="camInput" accept="image/*" capture="environment" hidden>
+<input type="file" id="galInput" accept="image/*" multiple hidden>
+<script src="i18n.js"></script>
+<script src="store.js"></script>
+<script src="sync.js"></script>
+<script src="icons.js"></script>
+<script src="updater.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
