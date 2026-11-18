@@ -1,10 +1,10 @@
 {
- "surum": "2.1.0.1",
- "notlar": "Sürüm numarası yeniden başladı: v.1.0.1. Program her yerde Organizer adını kullanıyor.",
- "boyut": 156238,
- "sha256": "6aa254cf944b7a1cffd4e3d06b06701c3f539cf0e2b25e7c36c37f0c79b4395c",
- "imza": "J4BuJa8EwNZ4b11sy5Ibaa7pjZy82JGo3b+kJyk8eEWyINedFDPCGqGSZfylaA+Kl0YQlkfZIhnbVTV9DFosOBa0RkpU6g/cH6S1jr0WCs+x5C7xz6zVgKb/1n6SKbdbWDZmf2u2nbqjSIF9JkQIaCXH8BqTuzMtKUzR36hbOqugYH/v4IcU1G69ly/LAThTgW5zmJMS2aSjyVRdm/aa8/oFlyy4OJnnK1fbrHdTfch18LhK4KZnwJZw4ES0dul/mnXcIS2gMlYhaXN/Enk7rjavexyzydszQhpGkPFHJKBIEn5pyLB/NgM7GA+2BHtbyBAmF9N4zvyYquE3y/MOp6jiK45+Crvz1YdJXfjiIxvShoqIg04GYbIQmHVIPFzZS1YhGiVU+GOcv3qke4YBx+m8fOcKgOj9Ypsy3A1WDJv+ji7AihKGW5TeEZqG/N8SYQ88e/hO0LkmaJWmNc8MaB44d0b7B68K4eT3H/KqJHi0HUA127KyLPGTJ7iiuwnz",
- "yayin": "2026-11-18 00:40 UTC",
+ "surum": "2.1.0.2",
+ "notlar": "Sütunlar: 'Satın alındığı yer' artık 'Eklenme'nin solunda. Sütun arasındaki ayırıcı çubuk yeniden çalışıyor. Başlığı tutup sürükleyerek sütunların yerini değiştirebilirsiniz; düzen kaydedilir. Başlığa sağ tık: varsayılan sütun düzeni.",
+ "boyut": 156986,
+ "sha256": "d6c23edc6406e4d13c27de94a04b040707a2c007d413ea771b6668137f952647",
+ "imza": "YVTYxA0oSlQAkO4o0/cVXbHkob5TbA256adyB2NjwqTh1UG+6gL+4uWAFzHbfdj5nGVQ8Pk2PsYq1WwSFcPjP2vBOlt7Hnd9gtz69mribbfH2AyswlR3+plZLde4V+x9DCxmUjurIKcpbR9xomoV6ZJJS23vtckVtLIIcHd7p7WH97P8+n591ZfztOISFolKCpOMmAkQze+DB6K2Sz7bO8Ek3H3hk7QnpvilYSnarFjWxPZ9K5dRgo2wK3bVeJKFh4obxpjyqZoCNtPkRWgsw+gKnupStgizNg5tabB1ObKU7tcbl/rhWksk+yCntuoWcZuCJo1mPrJoo1hhVbWm1IgSZgDEp7QTFaj/Hbi5rYjGwHtUEKWreceSGVFgD38JsVkGc/mK2wpSnRixvOrwaIf7E9RFnkaX9P5rGjMomjGL7mwumdhUl+mCUhWmeqHoo0TiPTifU7HYgNfcQUWM0KOd+cpeogyVvaAT59yMHVqwNrXw5TOsGYo4VKphEeDJ",
+ "yayin": "2026-11-18 00:44 UTC",
  "sistem": 1,
- "dosya": "organizer-masaustu-2.1.0.1.zip"
+ "dosya": "organizer-masaustu-2.1.0.2.zip"
 }

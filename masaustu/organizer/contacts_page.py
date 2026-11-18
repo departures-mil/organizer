@@ -240,7 +240,7 @@ class ContactsPage(QWidget):
         self.table.verticalHeader().setDefaultSectionSize(56)
         self.table.horizontalHeader().setHighlightSections(False)
         setup_columns(self.table, db, "cols_contacts",
-                      {0: 62, 1: 110, 2: 220, 3: 190, 4: 210, 5: 160, 6: 130})
+                      {0: 62, 1: 110, 2: 220, 3: 190, 4: 210, 5: 160, 6: 130, 7: 260})
         self.csort = db.get_setting("sort_contacts") or "name_asc"
         self.header_sort = HeaderSort(
             self.table, labels,

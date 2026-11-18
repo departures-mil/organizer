@@ -376,7 +376,8 @@ class ItemsPage(QWidget):
         self.table.setWordWrap(False)
         self.table.horizontalHeader().setHighlightSections(False)
         setup_columns(self.table, db, "cols_items",
-                      {0: 62, 1: 320, 2: 70, 3: 150, 4: 150, 5: 110, 6: 110, 7: 200})
+                      {0: 62, 1: 320, 2: 70, 3: 150, 4: 150, 5: 110, 6: 110, 7: 220},
+                      order=[0, 1, 2, 3, 4, 5, 7, 6])
         self.header_sort = HeaderSort(self.table, labels, SORT_COLS, self.sort.currentData,
                                       lambda k: self.sort.setCurrentIndex(self.sort.findData(k)))
         self.table.itemSelectionChanged.connect(self._selection_changed)
