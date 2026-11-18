@@ -442,9 +442,11 @@ class Database:
             "qty": lambda d: d["quantity"], "price": lambda d: (d["currency"], d["price"]),
             "category": lambda d: norm(d["category_path"]), "location": lambda d: norm(d["location_path"]),
             "shop": lambda d: norm(d["shop_name"] or d["shop_place"] or d["shop_phone"]),
+            "place": lambda d: norm(d["shop_place"]),
         }, empty={"price": lambda d: d["price"] is None, "category": lambda d: not d["category_path"],
                   "location": lambda d: not d["location_path"],
-                  "shop": lambda d: not (d["shop_name"] or d["shop_place"] or d["shop_phone"])})
+                  "shop": lambda d: not (d["shop_name"] or d["shop_place"] or d["shop_phone"]),
+                  "place": lambda d: not (d["shop_place"] or "").strip()})
         return result
 
     def get_item(self, item_id):

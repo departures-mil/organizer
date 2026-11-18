@@ -16,11 +16,41 @@ def is_rtl():
     return LANG == "ar"
 
 
-def t(text, **kw):
-    if LANG != "tr":
+# Kullanıcının Ayarlar → Etiketler bölümünde değiştirdiği yazılar: {dil: {asıl Türkçe anahtar: yeni yazı}}
+OVERRIDES = {}
+
+
+def set_overrides(data):
+    """Ayarlardan okunan etiket değişikliklerini uygular (JSON metni ya da sözlük)."""
+    import json
+    global OVERRIDES
+    try:
+        d = json.loads(data) if isinstance(data, str) else (data or {})
+        OVERRIDES = {str(k): {str(a): str(b) for a, b in (v or {}).items() if str(b).strip()}
+                     for k, v in d.items() if isinstance(v, dict)}
+    except Exception:
+        OVERRIDES = {}
+
+
+def base_text(text, lang=None):
+    """Etiketin değiştirilmemiş (programın kendi) hali."""
+    lang = lang or LANG
+    if lang != "tr":
         pair = STRINGS.get(text)
         if pair:
-            text = pair[0] if LANG == "en" else pair[1]
+            return pair[0] if lang == "en" else pair[1]
+    return text
+
+
+def t(text, **kw):
+    key = text
+    text = base_text(text)
+    custom = OVERRIDES.get(LANG, {}).get(key)
+    if custom:
+        try:
+            return custom.format(**kw) if kw else custom
+        except Exception:
+            pass   # yer tutucusu ({n} gibi) silinmişse programın kendi yazısı kullanılır
     return text.format(**kw) if kw else text
 
 
@@ -435,8 +465,24 @@ STRINGS = {
     '🏪  Satın alındığı yer': ('🏪  Where it was bought', '🏪  مكان الشراء'),
     'Satın alındığı yer': ('Bought at', 'مكان الشراء'),
     'Satın alındığı yer:': ('Bought at:', 'مكان الشراء:'),
-    'Dükkan adı:': ('Shop name:', 'اسم المحل:'),
-    'Dükkanın yeri:': ('Shop location:', 'مكان المحل:'),
+    'Dükkan/Kişi Adı:': ('Shop/Person name:', 'اسم المحل / الشخص:'),
+    'Dükkan/Kişi Yeri:': ('Shop/Person location:', 'مكان المحل / الشخص:'),
+    'Adres': ('Address', 'العنوان'),
+    '🏷  Etiketler': ('🏷  Labels', '🏷  التسميات'),
+    '🏷  Etiketleri düzenle…': ('🏷  Edit labels…', '🏷  تعديل التسميات…'),
+    'Programdaki bütün yazıları (düğmeler, başlıklar, alan adları) kendinize göre değiştirebilirsiniz. Değişiklik yalnızca seçili dil için geçerlidir.': (
+        'You can change every text in the program (buttons, headings, field names). Changes apply to the selected language only.',
+        'يمكنك تغيير كل نصوص البرنامج (الأزرار والعناوين وأسماء الحقول). تنطبق التغييرات على اللغة المحددة فقط.'),
+    'Yeni etiket (boş = programın yazısı):': ('New label (empty = program text):', 'تسمية جديدة (فارغ = نص البرنامج):'),
+    '{n} etiket değiştirildi': ('{n} labels changed', 'تم تغيير {n} تسمية'),
+    'Etiketleri düzenle': ('Edit labels', 'تعديل التسميات'),
+    'Etiket ara…': ('Search labels…', 'ابحث في التسميات…'),
+    'Programdaki yazı': ('Program text', 'نص البرنامج'),
+    'Yeni etiket (boş = değişmesin)': ('New label (empty = unchanged)', 'تسمية جديدة (فارغ = بلا تغيير)'),
+    'Yalnızca değiştirilenler': ('Changed only', 'المعدلة فقط'),
+    'Hepsini sıfırla': ('Reset all', 'إعادة الكل'),
+    'Bütün etiketler programın kendi yazısına dönsün mü?': ('Reset all labels to the program defaults?', 'إعادة كل التسميات إلى نصوص البرنامج؟'),
+    '{x} gibi yer tutucuları silmeyin; oraya sayı ya da ad gelir.': ('Keep placeholders like {x}; a number or name goes there.', 'لا تحذف العناصر مثل {x}؛ يوضع مكانها رقم أو اسم.'),
     'İletişim numarası:': ('Contact number:', 'رقم التواصل:'),
     'Örn. Yıldız Hırdavat': ('e.g. Star Hardware', 'مثال: محل النجمة للعدد'),
     'Semt, çarşı, sokak ya da adres': ('District, market, street or address', 'الحي أو السوق أو الشارع أو العنوان'),

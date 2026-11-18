@@ -20,6 +20,7 @@ from .theme import BackgroundWidget
 
 class MainWindow(QMainWindow):
     language_changed = Signal(str)
+    labels_changed = Signal()
 
     def __init__(self, db, sync=None, updater=None):
         super().__init__()
@@ -59,6 +60,7 @@ class MainWindow(QMainWindow):
         self.settings_page = SettingsPage(db, sync, updater)
         self.settings_page.changed.connect(self.items_page.refresh)
         self.settings_page.language_changed.connect(self.language_changed)
+        self.settings_page.labels_changed.connect(self.labels_changed)
         self.pages = [self.items_page, self.contacts_page, self.settings_page]
         for p in self.pages:
             self.stack.addWidget(p)

@@ -32,7 +32,7 @@ SORTS = [
 SORT_COLS = {1: ("name_asc", "name_desc", False), 2: ("qty_asc", "qty_desc", True),
              3: ("category_asc", "category_desc", False), 4: ("location_asc", "location_desc", False),
              5: ("price_asc", "price_desc", True), 6: ("created_asc", "created_desc", True),
-             7: ("shop_asc", "shop_desc", False)}
+             7: ("shop_asc", "shop_desc", False), 8: ("place_asc", "place_desc", False)}
 UNASSIGNED = -1
 ALL = None
 
@@ -362,8 +362,8 @@ class ItemsPage(QWidget):
         tcard = Card()
         tl = QVBoxLayout(tcard)
         tl.setContentsMargins(14, 10, 14, 12)
-        self.table = QTableWidget(0, 8)
-        labels = [""] + [t(x) for x in ("Adı", "Adet", "Kategori", "Yer", "Fiyat", "Eklenme", "Satın alındığı yer")]
+        self.table = QTableWidget(0, 9)
+        labels = [""] + [t(x) for x in ("Adı", "Adet", "Kategori", "Yer", "Fiyat", "Eklenme", "Satın alındığı yer", "Adres")]
         self.table.setHorizontalHeaderLabels(labels)
         self.table.verticalHeader().hide()
         self.table.setShowGrid(False)
@@ -376,8 +376,8 @@ class ItemsPage(QWidget):
         self.table.setWordWrap(False)
         self.table.horizontalHeader().setHighlightSections(False)
         setup_columns(self.table, db, "cols_items",
-                      {0: 62, 1: 320, 2: 70, 3: 150, 4: 150, 5: 110, 6: 110, 7: 220},
-                      order=[0, 1, 2, 3, 4, 5, 7, 6])
+                      {0: 62, 1: 320, 2: 70, 3: 150, 4: 150, 5: 110, 6: 110, 7: 220, 8: 200},
+                      order=[0, 1, 2, 3, 4, 5, 7, 8, 6])
         self.header_sort = HeaderSort(self.table, labels, SORT_COLS, self.sort.currentData,
                                       lambda k: self.sort.setCurrentIndex(self.sort.findData(k)))
         self.table.itemSelectionChanged.connect(self._selection_changed)
@@ -455,11 +455,14 @@ class ItemsPage(QWidget):
             added.setToolTip(fmt_date(d["created_at"]))
             shop = QTableWidgetItem()
             shop.setToolTip(shop_tooltip(d))
-            cells = [pic, name, qty, cat, loc, price, added, shop]
+            place = QTableWidgetItem((d.get("shop_place") or "").strip() or "—")
+            if (d.get("shop_place") or "").strip():
+                place.setToolTip(d["shop_place"])
+            cells = [pic, name, qty, cat, loc, price, added, shop, place]
             for col, c in enumerate(cells):
                 self.table.setItem(row, col, c)
             if has_shop(d):
-                self.table.setCellWidget(row, 7, ShopLinks(d, cc, icon=22))
+                self.table.setCellWidget(row, 7, ShopLinks(d, cc, icon=22, name_only=True))
             else:
                 self.table.removeCellWidget(row, 7)
                 shop.setText("—")

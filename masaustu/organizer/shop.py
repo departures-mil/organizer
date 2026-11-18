@@ -126,7 +126,7 @@ class ChannelPicker(QWidget):
 class ShopLinks(QWidget):
     """Listede / ayrıntıda: dükkan adı + etkin uygulamaların renkli simgeleri (tıklayınca sohbet açılır)."""
 
-    def __init__(self, d, country_code, show_text=True, icon=24, parent=None):
+    def __init__(self, d, country_code, show_text=True, icon=24, parent=None, name_only=False):
         super().__init__(parent)
         self.setAttribute(Qt.WA_TranslucentBackground)
         lay = QHBoxLayout(self)
@@ -134,7 +134,9 @@ class ShopLinks(QWidget):
         lay.setSpacing(4)
         tip = shop_tooltip(d)
         if show_text:
-            lbl = QLabel(shop_title(d) or "—")
+            # name_only: adres ayrı sütunda gösterildiği için burada yalnızca ad (yoksa numara)
+            txt = ((d.get("shop_name") or "").strip() or (d.get("shop_phone") or "").strip()) if name_only else shop_title(d)
+            lbl = QLabel(txt or "—")
             lbl.setToolTip(tip)
             lbl.setStyleSheet("background: transparent;")
             lay.addWidget(lbl, 1)

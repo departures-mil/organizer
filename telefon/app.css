@@ -270,6 +270,7 @@ textarea.in { min-height: 84px; resize: vertical; }
 /* ---------- satın alındığı yer (1.4.0) ---------- */
 .shopline { display: flex; align-items: center; gap: 8px; margin-top: 4px; font-size: 13px; color: var(--muted); min-width: 0; }
 .shopline > span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.shopline > .shopplace { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; opacity: .9; }
 .shoplinks { display: inline-flex; gap: 6px; flex: none; }
 .shoplinks a { display: inline-flex; align-items: center; gap: 6px; text-decoration: none; color: var(--ink); }
 .shoplinks img { width: 24px; height: 24px; }
