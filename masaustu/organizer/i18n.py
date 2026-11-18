@@ -468,6 +468,12 @@ STRINGS = {
     'Dükkan/Kişi Adı:': ('Shop/Person name:', 'اسم المحل / الشخص:'),
     'Dükkan/Kişi Yeri:': ('Shop/Person location:', 'مكان المحل / الشخص:'),
     'Adres': ('Address', 'العنوان'),
+    'Dükkan/Kişi': ('Shop/Person', 'المحل/الشخص'),
+    'Konum': ('Location', 'الموقع'),
+    'Dükkan/Kişiye göre (A → Z)': ('By shop/person (A → Z)', 'حسب المحل/الشخص (أ ← ي)'),
+    'Dükkan/Kişiye göre (Z → A)': ('By shop/person (Z → A)', 'حسب المحل/الشخص (ي ← أ)'),
+    'Konuma göre (A → Z)': ('By location (A → Z)', 'حسب الموقع (أ ← ي)'),
+    'Konuma göre (Z → A)': ('By location (Z → A)', 'حسب الموقع (ي ← أ)'),
     '🏷  Etiketler': ('🏷  Labels', '🏷  التسميات'),
     '🏷  Etiketleri düzenle…': ('🏷  Edit labels…', '🏷  تعديل التسميات…'),
     'Programdaki bütün yazıları (düğmeler, başlıklar, alan adları) kendinize göre değiştirebilirsiniz. Değişiklik yalnızca seçili dil için geçerlidir.': (

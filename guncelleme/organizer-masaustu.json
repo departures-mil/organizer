@@ -1,10 +1,10 @@
 {
- "surum": "2.1.0.3",
- "notlar": "v.1.0.3: Ayarlar → Etiketler: programdaki bütün yazılar değiştirilebilir. Formda 'Dükkan/Kişi Adı' ve 'Dükkan/Kişi Yeri'. Eşya listesinde 'Satın alındığı yer' ile 'Adres' yan yana.",
- "boyut": 161340,
- "sha256": "0880ee60e0852d0c98737479deb46998586d7d949a250722368b0e5a6150fa36",
- "imza": "LTGEWsKJXBa2JkSp2cTkrP1JuQpJylnRn9VWKpPnjUBYsRD1KrW+8kLdCC91D9I7XBAMuHmiixdmb44PwAgUG2pd2KkTmNglHnFU9DTN/qjsjTu1oNj5FTVU8ZHS9wjisZIYEQoA75AZrhZVwgZnV5KXBu+fmbiW8cr3JzKQnLYQp2Pwh5I6ypyvgEHKo6QSZtjEx2vUDH5vAMxOlJPzY6xHwnt2G7fT22qe+kQJkzfvF0Z1j63O3oW4IBkj+8wKEIvpTUpRO2RWGV6od70D47JCAm2nJszWffUv57OuaM+fCw+sg1WAId5y4cONnMveLQy9Y5WejNykwRMftVuCpHbMji1AAf5XKpJ1Psa80ASfDEntyNCzNmPuqnq/uoi7vS91F+Jsb/3j2XjkSBSRyyUTIA5zNjks46ZHLqkkAVDgFkp6JcQPhu+KahXT18MPifxnapl9+Q/e+CrBeRElLFglTByIrmYvEBzFas1twUc6WhPswOSxA4VFJv3JTI2r",
- "yayin": "2026-11-18 01:02 UTC",
+ "surum": "2.1.0.4",
+ "notlar": "v.1.0.4: Eşya listesinde 'Dükkan/Kişi' ve 'Konum' iki ayrı sütun olarak yan yana; ikisine de başlığa tıklayarak sıralama. Telefonda sıralamaya 'Konum' eklendi.",
+ "boyut": 161450,
+ "sha256": "358e1515ff7eb8525bb47285bf2cf2b41e9f6c2fe0f50c99fe2447e80133196f",
+ "imza": "blq5TFwUj/O4DlSsZJUISUk0efTLaFziaV5TnhGveItOGLbHYX53s3uCs5Lj/5X+czs5w8YVSh7qQi6rcNU8jJipwFG2x2Fwc8n4Jdqag1jgO9pQg5vW/s3YnoqJ7U3/+YzS/iQYq/sTvIBcMFCd8OAybau+irejUTQ7yaFfcvKqdQafkCP6d6hWTlfb4KijkjdbUi7BUI1VX8RosP9dHUPOEvs/FLFexzLkUegT2pHYmWJBkZCvvyW2JVU08bAfXO4In3w3iRq/+DMrvuneX86ntHlsGUfCAUcT8bOi4lZvYOgupApx1tSlZ2y9lzyXKW+NGJ+Gtnxz6l5YzkpblZ2AhPh1ChulqlIO0tV/J8CCt/ohDx/jS5Z3r1JbUj9/WhBgLaC0ZzfIBGZIZlkLDLwaBFdOdgVKhD7pnJbfWQm7/eETVB9U96pEs12DBgkvyaZHYPuGnLabPoYAfZNQ2PXtSiQbSUgSRWKcrBxHwMM1m6+RNclTbdpP3f72FmGK",
+ "yayin": "2026-11-18 01:10 UTC",
  "sistem": 1,
- "dosya": "organizer-masaustu-2.1.0.3.zip"
+ "dosya": "organizer-masaustu-2.1.0.4.zip"
 }

@@ -2,7 +2,7 @@
  * tarih, not), sınıflandırma ağaçları, arama, sıralama, toplu taşıma/silme, ustalar ve dükkanlar, ayarlar, yedek, bulut. */
 "use strict";
 
-const APP_VERSION = "2.1.0.3";   // iç numara; baştaki "2." sürüm dizisi. Ekranda v.1.0.3 görünür (goster()).
+const APP_VERSION = "2.1.0.4";   // iç numara; baştaki "2." sürüm dizisi. Ekranda v.1.0.3 görünür (goster()).
 function goster(v) {
   const p = String(v === undefined ? APP_VERSION : (v || "")).trim().split(".").filter(x => x !== "");
   if (!p.length) return "";
@@ -238,7 +238,8 @@ const SORTS = [["En yeni eklenen", "created_desc"], ["En eski eklenen", "created
   ["Ada göre (Z → A)", "name_desc"], ["Kategoriye göre (A → Z)", "category_asc"], ["Kategoriye göre (Z → A)", "category_desc"],
   ["Yere göre (A → Z)", "location_asc"], ["Yere göre (Z → A)", "location_desc"],
   ["Adet (çok → az)", "qty_desc"], ["Adet (az → çok)", "qty_asc"], ["Fiyat (yüksek → düşük)", "price_desc"], ["Fiyat (düşük → yüksek)", "price_asc"],
-  ["Satın alınan yere göre (A → Z)", "shop_asc"], ["Satın alınan yere göre (Z → A)", "shop_desc"]];
+  ["Dükkan/Kişiye göre (A → Z)", "shop_asc"], ["Dükkan/Kişiye göre (Z → A)", "shop_desc"],
+  ["Konuma göre (A → Z)", "place_asc"], ["Konuma göre (Z → A)", "place_desc"]];
 
 // ====================================================================== satın alındığı yer (1.4.0)
 const SHOP_CHANNELS = [["shop_whatsapp", "whatsapp", "WhatsApp"], ["shop_telegram", "telegram", "Telegram"]];
@@ -294,7 +295,7 @@ const ItemsPage = {
       this.cat !== null || this.loc !== null ? el("button.chip.x", { text: "✕  " + t("Filtreleri temizle"), onclick: () => { this.cat = this.loc = null; App.render(); } }) : null,
     ]));
     root.append(sortBar([["Ad", "name", false], ["Adet", "qty", true], ["Kategori", "category", false], ["Yer", "location", false],
-      ["Fiyat", "price", true], ["Tarih", "created", true], ["Dükkan", "shop", false]], this.sort, setSort));
+      ["Fiyat", "price", true], ["Tarih", "created", true], ["Dükkan/Kişi", "shop", false], ["Konum", "place", false]], this.sort, setSort));
     this.summary = el("div.summary");
     this.list = el("div");
     root.append(this.summary, this.list);

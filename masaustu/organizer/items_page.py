@@ -25,8 +25,10 @@ SORTS = [
     ("Adet (az → çok)", "qty_asc"),
     ("Fiyat (yüksek → düşük)", "price_desc"),
     ("Fiyat (düşük → yüksek)", "price_asc"),
-    ("Satın alınan yere göre (A → Z)", "shop_asc"),
-    ("Satın alınan yere göre (Z → A)", "shop_desc"),
+    ("Dükkan/Kişiye göre (A → Z)", "shop_asc"),
+    ("Dükkan/Kişiye göre (Z → A)", "shop_desc"),
+    ("Konuma göre (A → Z)", "place_asc"),
+    ("Konuma göre (Z → A)", "place_desc"),
 ]
 # sütun → (artan, azalan, ilk tıklamada azalan mı)
 SORT_COLS = {1: ("name_asc", "name_desc", False), 2: ("qty_asc", "qty_desc", True),
@@ -363,7 +365,7 @@ class ItemsPage(QWidget):
         tl = QVBoxLayout(tcard)
         tl.setContentsMargins(14, 10, 14, 12)
         self.table = QTableWidget(0, 9)
-        labels = [""] + [t(x) for x in ("Adı", "Adet", "Kategori", "Yer", "Fiyat", "Eklenme", "Satın alındığı yer", "Adres")]
+        labels = [""] + [t(x) for x in ("Adı", "Adet", "Kategori", "Yer", "Fiyat", "Eklenme", "Dükkan/Kişi", "Konum")]
         self.table.setHorizontalHeaderLabels(labels)
         self.table.verticalHeader().hide()
         self.table.setShowGrid(False)
