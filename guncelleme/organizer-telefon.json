@@ -1,10 +1,10 @@
 {
- "surum": "2.1.0.2",
- "notlar": "Masaüstüyle aynı sürüm (v.1.0.2): sütun düzeni düzeltmeleri.",
- "boyut": 117729,
- "sha256": "c5f208a0585a521e700510c7abfac71876e01c3dd6d53f44f90b7237af5a8b2f",
- "imza": "W3xpuTouIi1DFjaf1GPX++DD6Ww6gOyBeEifC05gnW95ZsWxyYRqLKZu1hhuL2O/xNzxpjY3nU9HdGh0fX3sylDORykJOG0AgiBqtI5vO2JbBkzvQTr7xZSb7IOVVH/zy/yIo54nesPAMJzqD9u68C7SnuhNevm4pSL5INHrKlpAQ9XS7ZYvHyekIHDYG9mcygysQT8Kpm/mKvgp9d8ovMbuK5/qLNCAxx0VSg1D/n2MQbVFzi3qAgC0PLEkIUlH9YrOggoKTsfqszqhpt1UY98udGQ7Y4vVUwOi1BJxuwdlcI/rDH7W0Z9FWAt+N0GnuQKJDUqvDJio5pA9Yoasgd/gfCt7xgidhCoWDbY+wAKCrYac2HPus0USShXxamsSwqi2Gk3nkXiqQrbL8heE8U47LhRjmK5AbFmVrE1GfW6e/54pg2N4TnmwQGC1Ow/7OZ2q6Dz/V6K9g2hMnApth5TlNWV57LAp6UykmrIMc+bIBfNLSPeSHCyhcV5r3Mgd",
- "yayin": "2026-11-18 00:44 UTC",
+ "surum": "2.1.0.3",
+ "notlar": "v.1.0.3: Ayarlar → Etiketler: programdaki bütün yazılar değiştirilebilir. Formda 'Dükkan/Kişi Adı' ve 'Dükkan/Kişi Yeri'. Eşya listesinde 'Satın alındığı yer' ile 'Adres' yan yana.",
+ "boyut": 120244,
+ "sha256": "ccc1886a615991750dad1a662fe723aa5f47249b9052fbdf56a705bcf91cf6b8",
+ "imza": "kMIoMFpL8tyKZb1QIfzgu5dED9EemHrrIpzqevD8RG1NTFo1dZSw9TG2Lq91VuANSW91Kr/ekTq3K3yoxE66XrjbfZ+cbwzLEgK2VD05nKrY5h9DfHrjNmMn1et0Fx4K561iHKrdikQO92/mqzswwwODWKRlVB/7SAppQFpdOAAfLrtU802oRIEeR3ObE1jry9Un2rF3DY9CgmXFhR1Qw0jSv+jUxbQQceYbo8uF+FTnhIxdb6jZCfLLAzxI01SNURJ6ouX78fwRdxzlVRlSRd/dLpoDJe3O1F1yGQvss+f//us2b7lnshzKI4p0YcIIZLh8twaZnf0vLc+zl/lQrpoSxzawAMUWiVnP38CyJ2nD7ubDNXn5BlWwIOLV8u4sgWNzrs/6rPFL5zupTaL9dTaHjz7Snq+lVxZb89sRld2wyyi49ZeoBTkfSWMSgOD2gCQXDR/zUECNZPHITJL1x0+E4laPOesEyD9qwdSv++TRYm3NavCuYDPFmKhveluk",
+ "yayin": "2026-11-18 01:02 UTC",
  "kabuk": 1,
- "dosya": "organizer-telefon-2.1.0.2.zip"
+ "dosya": "organizer-telefon-2.1.0.3.zip"
 }

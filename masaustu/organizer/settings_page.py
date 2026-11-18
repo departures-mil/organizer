@@ -150,6 +150,7 @@ class TreeEditor(Card):
 class SettingsPage(QWidget):
     changed = Signal()
     language_changed = Signal(str)
+    labels_changed = Signal()
 
     def __init__(self, db, sync=None, updater=None, parent=None):
         super().__init__(parent)
@@ -203,6 +204,25 @@ class SettingsPage(QWidget):
         cc_hint.setObjectName("Muted")
         cc_hint.setWordWrap(True)
         gl.addWidget(cc_hint)
+
+        gl.addSpacing(14)
+        lt = QLabel(t("🏷  Etiketler"))
+        lt.setObjectName("SectionTitle")
+        gl.addWidget(lt)
+        lh = QLabel(t("Programdaki bütün yazıları (düğmeler, başlıklar, alan adları) kendinize göre değiştirebilirsiniz. "
+                      "Değişiklik yalnızca seçili dil için geçerlidir."))
+        lh.setObjectName("Muted")
+        lh.setWordWrap(True)
+        gl.addWidget(lh)
+        from . import labels as _labels
+        n = _labels.count()
+        if n:
+            ln = QLabel(t("{n} etiket değiştirildi", n=n))
+            ln.setObjectName("Muted")
+            gl.addWidget(ln)
+        lbtn = QPushButton(t("🏷  Etiketleri düzenle…"))
+        lbtn.clicked.connect(self._edit_labels)
+        gl.addWidget(lbtn)
 
         if sync is not None:
             gl.addSpacing(14)
@@ -376,6 +396,11 @@ class SettingsPage(QWidget):
             return
         from .cloud import AccountDialog
         AccountDialog(self.sync, self).exec()
+
+    def _edit_labels(self):
+        from .labels import LabelEditor
+        if LabelEditor(self.db, self).exec():
+            self.labels_changed.emit()
 
     def _save_cc(self):
         digits = "".join(ch for ch in self.cc.text() if ch.isdigit()) or "90"

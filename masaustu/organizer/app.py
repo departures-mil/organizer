@@ -62,6 +62,7 @@ class Controller:
         old = self.win
         self.win = MainWindow(self.db, self.sync, self.updater)
         self.win.language_changed.connect(self.change_language)
+        self.win.labels_changed.connect(self.rebuild)
         self.win.show_page(page)
         if fullscreen:
             self.win.showFullScreen()
@@ -72,6 +73,16 @@ class Controller:
         if old is not None:
             old.hide()
             old.deleteLater()
+
+    def rebuild(self):
+        """Etiketler değişince pencereyi yeni yazılarla yeniden kurar (aynı sayfada kalır)."""
+        state = (self.win.isFullScreen(), self.win.isMaximized())
+        geo = self.win.geometry()
+        page = self.win.stack.currentIndex()
+        self.app.setApplicationDisplayName(t("Organizer"))
+        self.build_window(page=page, fullscreen=state[0], maximized=state[1])
+        if not state[0] and not state[1]:
+            self.win.setGeometry(geo)
 
     def change_language(self, lang):
         old_lang = i18n.LANG
@@ -107,6 +118,8 @@ def run():
     ctl = Controller(app, db)
     from . import common
     common.PRICES_HIDDEN = db.get_setting("prices_hidden", "0") == "1"
+    from . import labels
+    labels.load(db)
     ctl.apply_language(db.get_setting("language", "tr"))
     ctl.build_window()
     os.environ["ORGANIZER_BASLADI"] = "1"   # main.py: pencere açıldı, güncelleme sağlam

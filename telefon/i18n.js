@@ -20,8 +20,22 @@ const I18N = Object.assign({
  "🏪  Satın alındığı yer": ["🏪  Where it was bought", "🏪  مكان الشراء"],
  "Satın alındığı yer": ["Bought at", "مكان الشراء"],
  "Satın alındığı yer:": ["Bought at:", "مكان الشراء:"],
- "Dükkan adı:": ["Shop name:", "اسم المحل:"],
- "Dükkanın yeri:": ["Shop location:", "مكان المحل:"],
+ "Dükkan/Kişi Adı:": ["Shop/Person name:", "اسم المحل / الشخص:"],
+ "Dükkan/Kişi Yeri:": ["Shop/Person location:", "مكان المحل / الشخص:"],
+ "Adres": ["Address", "العنوان"],
+ "🏷  Etiketler": ["🏷  Labels", "🏷  التسميات"],
+ "🏷  Etiketleri düzenle…": ["🏷  Edit labels…", "🏷  تعديل التسميات…"],
+ "Programdaki bütün yazıları (düğmeler, başlıklar, alan adları) kendinize göre değiştirebilirsiniz. Değişiklik yalnızca seçili dil için geçerlidir.": ["You can change every text in the program (buttons, headings, field names). Changes apply to the selected language only.", "يمكنك تغيير كل نصوص البرنامج (الأزرار والعناوين وأسماء الحقول). تنطبق التغييرات على اللغة المحددة فقط."],
+ "{n} etiket değiştirildi": ["{n} labels changed", "تم تغيير {n} تسمية"],
+ "Etiketleri düzenle": ["Edit labels", "تعديل التسميات"],
+ "Etiket ara…": ["Search labels…", "ابحث في التسميات…"],
+ "Yalnızca değiştirilenler": ["Changed only", "المعدلة فقط"],
+ "Hepsini sıfırla": ["Reset all", "إعادة الكل"],
+ "Bütün etiketler programın kendi yazısına dönsün mü?": ["Reset all labels to the program defaults?", "إعادة كل التسميات إلى نصوص البرنامج؟"],
+ "{x} gibi yer tutucuları silmeyin; oraya sayı ya da ad gelir.": ["Keep placeholders like {x}; a number or name goes there.", "لا تحذف العناصر مثل {x}؛ يوضع مكانها رقم أو اسم."],
+ "Yeni etiket (boş = programın yazısı):": ["New label (empty = program text):", "تسمية جديدة (فارغ = نص البرنامج):"],
+ "Programdaki yazı": ["Program text", "نص البرنامج"],
+ "Yeni etiket (boş = değişmesin)": ["New label (empty = unchanged)", "تسمية جديدة (فارغ = بلا تغيير)"],
  "İletişim numarası:": ["Contact number:", "رقم التواصل:"],
  "Örn. Yıldız Hırdavat": ["e.g. Star Hardware", "مثال: محل النجمة للعدد"],
  "Semt, çarşı, sokak ya da adres": ["District, market, street or address", "الحي أو السوق أو الشارع أو العنوان"],
@@ -1382,16 +1396,35 @@ const I18N = Object.assign({
  }
 }, {
   lang: "tr", rtl: false,
+  overrides: {},
+  /** Ayarlar → Etiketler: {dil: {asıl Türkçe anahtar: yeni yazı}} */
+  setOverrides(data) {
+    try {
+      const d = typeof data === "string" ? JSON.parse(data || "{}") : (data || {});
+      const out = {};
+      for (const [l, m] of Object.entries(d || {})) if (m && typeof m === "object") {
+        out[l] = {};
+        for (const [k, v] of Object.entries(m)) if (String(v).trim()) out[l][k] = String(v);
+      }
+      this.overrides = out;
+    } catch (e) { this.overrides = {}; }
+  },
   setLanguage(code) {
     this.lang = this.languages.some(l => l[0] === code) ? code : "tr";
     this.rtl = this.lang === "ar";
   },
 });
-function t(text, kw) {
-  if (I18N.lang !== "tr") {
+function baseText(text, lang) {
+  lang = lang || I18N.lang;
+  if (lang !== "tr") {
     const pair = I18N.strings[text];
-    if (pair) text = I18N.lang === "en" ? pair[0] : pair[1];
+    if (pair) return lang === "en" ? pair[0] : pair[1];
   }
+  return text;
+}
+function t(text, kw) {
+  const custom = (I18N.overrides[I18N.lang] || {})[text];
+  text = custom || baseText(text);
   if (kw) text = text.replace(/\{(\w+)\}/g, (m, k) => (k in kw ? String(kw[k]) : m));
   return text;
 }

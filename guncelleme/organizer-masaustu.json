@@ -1,10 +1,10 @@
 {
- "surum": "2.1.0.2",
- "notlar": "Sütunlar: 'Satın alındığı yer' artık 'Eklenme'nin solunda. Sütun arasındaki ayırıcı çubuk yeniden çalışıyor. Başlığı tutup sürükleyerek sütunların yerini değiştirebilirsiniz; düzen kaydedilir. Başlığa sağ tık: varsayılan sütun düzeni.",
- "boyut": 156986,
- "sha256": "d6c23edc6406e4d13c27de94a04b040707a2c007d413ea771b6668137f952647",
- "imza": "YVTYxA0oSlQAkO4o0/cVXbHkob5TbA256adyB2NjwqTh1UG+6gL+4uWAFzHbfdj5nGVQ8Pk2PsYq1WwSFcPjP2vBOlt7Hnd9gtz69mribbfH2AyswlR3+plZLde4V+x9DCxmUjurIKcpbR9xomoV6ZJJS23vtckVtLIIcHd7p7WH97P8+n591ZfztOISFolKCpOMmAkQze+DB6K2Sz7bO8Ek3H3hk7QnpvilYSnarFjWxPZ9K5dRgo2wK3bVeJKFh4obxpjyqZoCNtPkRWgsw+gKnupStgizNg5tabB1ObKU7tcbl/rhWksk+yCntuoWcZuCJo1mPrJoo1hhVbWm1IgSZgDEp7QTFaj/Hbi5rYjGwHtUEKWreceSGVFgD38JsVkGc/mK2wpSnRixvOrwaIf7E9RFnkaX9P5rGjMomjGL7mwumdhUl+mCUhWmeqHoo0TiPTifU7HYgNfcQUWM0KOd+cpeogyVvaAT59yMHVqwNrXw5TOsGYo4VKphEeDJ",
- "yayin": "2026-11-18 00:44 UTC",
+ "surum": "2.1.0.3",
+ "notlar": "v.1.0.3: Ayarlar → Etiketler: programdaki bütün yazılar değiştirilebilir. Formda 'Dükkan/Kişi Adı' ve 'Dükkan/Kişi Yeri'. Eşya listesinde 'Satın alındığı yer' ile 'Adres' yan yana.",
+ "boyut": 161340,
+ "sha256": "0880ee60e0852d0c98737479deb46998586d7d949a250722368b0e5a6150fa36",
+ "imza": "LTGEWsKJXBa2JkSp2cTkrP1JuQpJylnRn9VWKpPnjUBYsRD1KrW+8kLdCC91D9I7XBAMuHmiixdmb44PwAgUG2pd2KkTmNglHnFU9DTN/qjsjTu1oNj5FTVU8ZHS9wjisZIYEQoA75AZrhZVwgZnV5KXBu+fmbiW8cr3JzKQnLYQp2Pwh5I6ypyvgEHKo6QSZtjEx2vUDH5vAMxOlJPzY6xHwnt2G7fT22qe+kQJkzfvF0Z1j63O3oW4IBkj+8wKEIvpTUpRO2RWGV6od70D47JCAm2nJszWffUv57OuaM+fCw+sg1WAId5y4cONnMveLQy9Y5WejNykwRMftVuCpHbMji1AAf5XKpJ1Psa80ASfDEntyNCzNmPuqnq/uoi7vS91F+Jsb/3j2XjkSBSRyyUTIA5zNjks46ZHLqkkAVDgFkp6JcQPhu+KahXT18MPifxnapl9+Q/e+CrBeRElLFglTByIrmYvEBzFas1twUc6WhPswOSxA4VFJv3JTI2r",
+ "yayin": "2026-11-18 01:02 UTC",
  "sistem": 1,
- "dosya": "organizer-masaustu-2.1.0.2.zip"
+ "dosya": "organizer-masaustu-2.1.0.3.zip"
 }

@@ -2,7 +2,7 @@
  * tarih, not), sınıflandırma ağaçları, arama, sıralama, toplu taşıma/silme, ustalar ve dükkanlar, ayarlar, yedek, bulut. */
 "use strict";
 
-const APP_VERSION = "2.1.0.2";   // iç numara; baştaki "2." sürüm dizisi. Ekranda v.1.0.2 görünür (goster()).
+const APP_VERSION = "2.1.0.3";   // iç numara; baştaki "2." sürüm dizisi. Ekranda v.1.0.3 görünür (goster()).
 function goster(v) {
   const p = String(v === undefined ? APP_VERSION : (v || "")).trim().split(".").filter(x => x !== "");
   if (!p.length) return "";
@@ -360,7 +360,8 @@ const ItemsPage = {
       el("div.body", null, [
         el("div.name", { text: d.name }), meta,
         el("div.price", { text: [d.price != null ? fmtPrice(d.price, d.currency) : "", d.photos.length > 1 ? t("{n} fotoğraf", { n: d.photos.length }) : ""].filter(Boolean).join("  ·  ") }),
-        shopTitle(d) ? el("div.shopline", null, [el("span", { text: "🏪 " + shopTitle(d) }), shopLinks(d, false)]) : null,
+        shopTitle(d) ? el("div.shopline", null, [el("span", { text: "🏪 " + (String(d.shop_name || "").trim() || String(d.shop_phone || "").trim() || "—") }),
+          String(d.shop_place || "").trim() ? el("span.shopplace", { text: "📍 " + String(d.shop_place).trim() }) : null, shopLinks(d, false)]) : null,
       ]),
       qtyBox,
     ]);
@@ -718,8 +719,8 @@ function itemForm(uid, after) {
       el("label.f", { text: t("Bulunduğu yer:") }), nodeBtn("locations"),
       el("label.f", { text: t("Alış fiyatı:") }), el("div.hrow", null, [price, cur]),
       el("div.formsec", { text: t("🏪  Satın alındığı yer") }),
-      el("label.f", { text: t("Dükkan adı:") }), shopName, shopList,
-      el("label.f", { text: t("Dükkanın yeri:") }), shopPlace,
+      el("label.f", { text: t("Dükkan/Kişi Adı:") }), shopName, shopList,
+      el("label.f", { text: t("Dükkan/Kişi Yeri:") }), shopPlace,
       el("label.f", { text: t("İletişim numarası:") }), shopPhone,
       el("div.chtoggles", null, toggles), chanStatus,
       el("label.f", { text: t("Ekleme tarihi:") }), date,
@@ -870,6 +871,84 @@ function contactForm(uid) {
 }
 
 // ====================================================================== ayarlar
+/** '📦   Eşyalarım:' → ['📦   ', 'Eşyalarım', ':'] */
+function labelSplit(s) {
+  const m = /^([^\p{L}\p{N}_]*)([\s\S]*?)([:：…]?\s*)$/u.exec(s || "");
+  return m ? [m[1], m[2], m[3]] : ["", s || "", ""];
+}
+/** Bir etiket değişince aynı yazının simgeli / iki noktalı öbür biçimleri de değişir (masaüstü labels.propagate ile aynı). */
+function labelPropagate(keys, base, values, key, nv) {
+  const [, ck] = labelSplit(base(key));
+  const cv = nv ? labelSplit(nv)[1] : "";
+  if (nv) values[key] = nv;
+  for (const j of keys) {
+    if (j === key) continue;
+    const [pj, cj, sj] = labelSplit(base(j));
+    if (!ck || cj !== ck) continue;
+    if (nv) values[j] = pj + cv + sj; else delete values[j];
+  }
+  if (!nv) delete values[key];
+}
+
+/** Ayarlar → Etiketler: her yazıya dokununca yeni etiket yazılır; kapanınca ekran yeni yazılarla çizilir. */
+function labelEditor() {
+  const lang = I18N.lang;
+  const read = () => { try { const d = JSON.parse(Store.get("labels_v1", "{}") || "{}"); return d && typeof d === "object" ? d : {}; } catch (e) { return {}; } };
+  const keys = Object.keys(I18N.strings);
+  for (const k of Object.keys(I18N.overrides[lang] || {})) if (!keys.includes(k)) keys.push(k);
+  const norm = s => String(s || "").toLocaleLowerCase("tr").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/ı/g, "i");
+  let changed = false;
+  const save = async map => {
+    const d = read();
+    if (Object.keys(map).length) d[lang] = map; else delete d[lang];
+    await Store.set("labels_v1", JSON.stringify(d));
+    I18N.setOverrides(d);
+    changed = true;
+  };
+  fullPage({ title: t("Etiketleri düzenle"), onClose: () => { if (changed) App.render(); }, build: () => {
+    const box = el("div");
+    const search = el("input.in", { type: "search", placeholder: t("Etiket ara…") });
+    const only = el("input", { type: "checkbox" });
+    const list = el("div.tree.card", { style: { padding: "4px 8px" } });
+    const draw = () => {
+      list.innerHTML = "";
+      const q = norm(search.value.trim()), cur = I18N.overrides[lang] || {};
+      let shown = 0;
+      for (const k of keys) {
+        const base = baseText(k, lang), mine = cur[k] || "";
+        if (only.checked && !mine) continue;
+        if (q && !norm(base + " " + mine + " " + k).includes(q)) continue;
+        if (++shown > 400) break;
+        list.append(el("div.node", { onclick: async () => {
+          const v = await ask(base + "\n\n" + t("Yeni etiket (boş = programın yazısı):"), { input: true, value: mine || base, yes: t("Kaydet") });
+          if (v === null && !mine) return;
+          const m = Object.assign({}, I18N.overrides[lang] || {});
+          labelPropagate(keys, x => baseText(x, lang), m, k, v && v !== base ? v : "");
+          for (const x of Object.keys(m)) if (!m[x] || m[x] === baseText(x, lang)) delete m[x];
+          await save(m); draw();
+        } }, [
+          el("span.n", null, [el("div", { text: base, style: mine ? { textDecoration: "line-through", color: "var(--muted)", fontSize: "12px" } : null }),
+            mine ? el("div", { text: mine, style: { fontWeight: "700", color: "var(--teal-dark)" } }) : null]),
+          el("button.dots", { text: "✎" }),
+        ]));
+      }
+      if (!shown) list.append(el("div.empty", { text: "—" }));
+    };
+    search.addEventListener("input", draw);
+    only.addEventListener("change", draw);
+    box.append(el("div.hint", { style: { marginBottom: "10px", whiteSpace: "pre-line" },
+      text: t("Programdaki bütün yazıları (düğmeler, başlıklar, alan adları) kendinize göre değiştirebilirsiniz. Değişiklik yalnızca seçili dil için geçerlidir.") + "\n" + t("{x} gibi yer tutucuları silmeyin; oraya sayı ya da ad gelir.") }));
+    box.append(search);
+    box.append(el("label", { style: { display: "flex", alignItems: "center", gap: "8px", margin: "10px 2px" } }, [only, t("Yalnızca değiştirilenler")]));
+    box.append(list);
+    box.append(el("button.btn.danger.block", { text: t("Hepsini sıfırla"), style: { marginTop: "12px" }, onclick: async () => {
+      if (await ask(t("Bütün etiketler programın kendi yazısına dönsün mü?"), { yes: t("Hepsini sıfırla"), danger: true })) { await save({}); draw(); }
+    } }));
+    draw();
+    return box;
+  } });
+}
+
 function treeEditor(table) {
   const title = table === "locations" ? t("🏠  Yerler") : t("🗂  Kategoriler");
   fullPage({ title, build: () => {
@@ -980,6 +1059,13 @@ const SettingsPage = {
       el("label.f", { text: t("Varsayılan para birimi:") }), cur,
       el("label.f", { text: t("Ülke telefon kodu:") }), cc,
       el("div.hint", { text: t("WhatsApp / Telegram bağlantıları için kullanılır. Numara + ile yazılmışsa kendi kodu geçerlidir.") }),
+    ]));
+    const nLab = Object.keys(I18N.overrides[I18N.lang] || {}).length;
+    root.append(el("div.card.section", null, [
+      el("h3", { text: t("🏷  Etiketler") }),
+      el("div.hint", { text: t("Programdaki bütün yazıları (düğmeler, başlıklar, alan adları) kendinize göre değiştirebilirsiniz. Değişiklik yalnızca seçili dil için geçerlidir.") }),
+      nLab ? el("div.hint", { text: t("{n} etiket değiştirildi", { n: nLab }) }) : null,
+      el("button.btn.block", { text: t("🏷  Etiketleri düzenle…"), style: { textAlign: "start", marginTop: "8px" }, onclick: labelEditor }),
     ]));
     const nLoc = Store.treeRows("locations").length, nCat = Store.treeRows("categories").length;
     root.append(el("div.card.section", null, [
@@ -1096,6 +1182,7 @@ const App = {
   async start() {
     await Store.open();
     I18N.setLanguage(Store.get("language", "tr"));
+    I18N.setOverrides(Store.get("labels_v1", "{}"));
     await Store.seed(I18N.lang);
     await Icons.init();
     await Icons.warm();

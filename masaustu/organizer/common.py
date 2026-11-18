@@ -221,6 +221,13 @@ def setup_columns(table, db, key, widths, fixed=(0,), order=None):
         try:
             modes()
             sira = [c for c in sira if 0 <= c < n]
+            # Kayıtta olmayan (yeni eklenmiş) sütunlar varsayılan sıradaki komşusunun hemen sağına girer
+            for c in default_order:
+                if c in sira or not (0 <= c < n):
+                    continue
+                i = default_order.index(c)
+                prev = next((p for p in reversed(default_order[:i]) if p in sira), None)
+                sira.insert(sira.index(prev) + 1 if prev is not None else len(sira), c)
             sira += [c for c in range(n) if c not in sira]
             for vis, col in enumerate(sira):
                 cur = h.visualIndex(col)
