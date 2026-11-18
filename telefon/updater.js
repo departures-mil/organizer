@@ -150,7 +150,7 @@ const Updater = {
         if (err) throw new Error(err);
         this.state = "ready";
         this.emit();
-        toast(t("{n} kuruldu. Uygulama yeniden başlatılıyor…", { n: this.manifest.surum }));
+        toast(t("{n} kuruldu. Uygulama yeniden başlatılıyor…", { n: goster(this.manifest.surum) }));
         setTimeout(() => this.restart(), 1500);
         return;
       }
@@ -186,7 +186,7 @@ const Updater = {
     const grid = el("div.dl-grid");
     box.append(head, bar, grid);
     box.draw = () => {
-      $(".dl-title", box).textContent = t("Güncelleme indiriliyor: {n}", { n: (this.manifest || {}).surum || "" });
+      $(".dl-title", box).textContent = t("Güncelleme indiriliyor: {n}", { n: goster((this.manifest || {}).surum || "") });
       $(".dl-pct", box).textContent = "%" + this.percent();
       $(".dl-bar i", box).style.width = this.percent() + "%";
       grid.textContent = "";
@@ -207,17 +207,17 @@ const Updater = {
     const btn = el("button.btn.block");
     const draw = () => {
       const man = this.manifest || {};
-      let text = t("Sürüm {v}", { v: APP_VERSION }), label = t("🔄  Güncellemeleri denetle"), primary = false, enabled = true;
-      if (this.state === "checking") { text = t("Sürüm {v} · Güncellemeler denetleniyor…", { v: APP_VERSION }); enabled = false; }
-      else if (this.state === "none") text = t("Sürüm {v} · Program güncel.", { v: APP_VERSION });
+      let text = t("Sürüm {v}", { v: goster() }), label = t("🔄  Güncellemeleri denetle"), primary = false, enabled = true;
+      if (this.state === "checking") { text = t("Sürüm {v} · Güncellemeler denetleniyor…", { v: goster() }); enabled = false; }
+      else if (this.state === "none") text = t("Sürüm {v} · Program güncel.", { v: goster() });
       else if (this.state === "available") {
-        text = t("Sürüm {v} · Yeni sürüm hazır: {n}", { v: APP_VERSION, n: man.surum }) + (man.notlar ? "\n" + man.notlar : "");
+        text = t("Sürüm {v} · Yeni sürüm hazır: {n}", { v: goster(), n: goster(man.surum) }) + (man.notlar ? "\n" + man.notlar : "");
         if (this.needsApk()) text += "\n" + t("Bu güncellemede Android bir kez \"Güncelle\" onayı isteyecek.");
-        label = t("⬆  Şimdi güncelle ({n})", { n: man.surum }); primary = true;
-      } else if (this.state === "installing") { text = t("Sürüm {v}", { v: APP_VERSION }); enabled = false; label = t("⬇  İndiriliyor %{p}", { p: this.percent() }); }
-      else if (this.state === "ready") { text = t("{n} kuruldu. Uygulama yeniden başlatılıyor…", { n: man.surum }); label = t("↻  Yeniden başlat"); primary = true; }
+        label = t("⬆  Şimdi güncelle ({n})", { n: goster(man.surum) }); primary = true;
+      } else if (this.state === "installing") { text = t("Sürüm {v}", { v: goster() }); enabled = false; label = t("⬇  İndiriliyor %{p}", { p: this.percent() }); }
+      else if (this.state === "ready") { text = t("{n} kuruldu. Uygulama yeniden başlatılıyor…", { n: goster(man.surum) }); label = t("↻  Yeniden başlat"); primary = true; }
       else if (this.state === "error") {
-        text = t("Sürüm {v}", { v: APP_VERSION }) + "\n⚠ " + this.message;
+        text = t("Sürüm {v}", { v: goster() }) + "\n⚠ " + this.message;
       }
       status.textContent = text;
       prog.style.display = this.state === "installing" ? "" : "none";

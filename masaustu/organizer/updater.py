@@ -30,7 +30,7 @@ from pathlib import Path
 
 from PySide6.QtCore import QObject, QThread, Signal
 
-from . import __version__
+from . import __version__, goster
 from .sync import FirebaseClient, SyncError
 
 KIND = "organizer-masaustu"
@@ -318,7 +318,7 @@ class Updater(QObject):
 
     @property
     def version(self):
-        return __version__
+        return goster(__version__)
 
     def busy(self):
         return self._w is not None and self._w.isRunning()

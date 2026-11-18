@@ -1,4 +1,4 @@
-/* Otomatik üretildi: tools/export_i18n.py — elle düzenlemeyin, duzenli_evim/i18n.py'yi düzenleyin. */
+/* Otomatik üretildi: tools/export_i18n.py — elle düzenlemeyin, organizer/i18n.py'yi düzenleyin. */
 "use strict";
 const I18N = Object.assign({
  "languages": [

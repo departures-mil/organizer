@@ -1,4 +1,4 @@
-/* Organizer — Firebase (Firestore) eşitlemesi. Masaüstündeki duzenli_evim/sync.py ile birebir aynı biçim. */
+/* Organizer — Firebase (Firestore) eşitlemesi. Masaüstündeki organizer/sync.py ile birebir aynı biçim. */
 "use strict";
 
 const MAX_PHOTO_BYTES = 900000;

@@ -4,6 +4,7 @@ from PySide6.QtWidgets import (QButtonGroup, QFrame, QHBoxLayout, QLabel, QMainW
                                QPushButton, QStackedWidget, QVBoxLayout)
 
 from .contacts_page import ContactsPage
+from . import goster
 from . import common
 from .topbar import TopBar
 from .updater import fmt_mb, fmt_speed, fmt_eta
@@ -189,7 +190,7 @@ class MainWindow(QMainWindow):
     # ------------------------------------------------------------ güncelleme
     def _update_state(self):
         u = self.updater
-        new = (u.manifest or {}).get("surum", "")
+        new = goster((u.manifest or {}).get("surum", ""))
         tb = self.topbar
         if u.state == "available":
             tb.set_update(t("Güncelle: {n}", n=new), t("Yeni sürüm hazır. Kurmak için tıklayın."), highlight=True)

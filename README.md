@@ -1,4 +1,4 @@
-# Organizer (Düzenli Evim)
+# Organizer
 
 Ev eşyaları arşivi: Windows masaüstü programı + Android telefon uygulaması. Kayıtlar cihazlar arasında
 kullanıcının Firebase hesabı üzerinden eşitlenir; **kayıtlar bu depoda bulunmaz**.
@@ -12,6 +12,9 @@ kullanıcının Firebase hesabı üzerinden eşitlenir; **kayıtlar bu depoda bu
 
 ## Yeni sürüm
 1. Kaynakta değişikliği yap; sürümü iki tarafta aynı artır (`masaustu/organizer/__init__.py`, `telefon/app.js` 5. satır).
+   Sürüm numarası: ekranda **v.1.0.1, v.1.0.2 …** görünür. İç numara başına sürüm dizisi `2.` eklenmiş halidir
+   (`2.1.0.1` → v.1.0.1, `2.1.0.2` → v.1.0.2). Eski 1.x dizisi 1.4.0'da bitti; dizi öneki eski kurulumların
+   yeni sürümü "daha yeni" olarak görmesini sağlar. Ekrana çeviri `goster()` ile yapılır.
 2. `ANAHTAR=<gizli anahtar> python3 araclar/yayinla.py masaustu masaustu "notlar"`
 3. `ANAHTAR=<gizli anahtar> python3 araclar/yayinla.py telefon telefon "notlar" --kabuk 1`
 4. `git add -A && git commit -m "Organizer X.Y.Z" && git push`

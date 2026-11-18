@@ -8,7 +8,7 @@ from PySide6.QtWidgets import (QAbstractItemView, QComboBox, QFileDialog, QFormL
                                QTreeWidget, QTreeWidgetItem, QVBoxLayout, QWidget)
 
 from .common import Card, NewNodeDialog, confirm, info
-from . import __version__
+from . import __version__, goster
 from .db import CURRENCIES
 from . import i18n
 from .i18n import LANGUAGES, t
@@ -289,7 +289,7 @@ class SettingsPage(QWidget):
         gl.addWidget(open_btn)
         gl.addWidget(backup_btn)
         gl.addStretch()
-        about = QLabel(t("Organizer {v}\nF11: tam ekran aç / kapat · Ctrl+F: ara · Ctrl+N: yeni kayıt · Ctrl+P: döküm", v=__version__))
+        about = QLabel(t("Organizer {v}\nF11: tam ekran aç / kapat · Ctrl+F: ara · Ctrl+N: yeni kayıt · Ctrl+P: döküm", v=goster()))
         about.setObjectName("Muted")
         gl.addWidget(about)
         scroll = QScrollArea()
@@ -313,7 +313,7 @@ class SettingsPage(QWidget):
         u = self.updater
         v = u.version
         man = u.manifest or {}
-        new = man.get("surum", "")
+        new = goster(man.get("surum", ""))
         btn, enabled, primary = t("🔄  Güncellemeleri denetle"), True, False
         if u.state == "checking":
             text, enabled = t("Sürüm {v} · Güncellemeler denetleniyor…", v=v), False
@@ -328,7 +328,7 @@ class SettingsPage(QWidget):
             text, enabled = t("Sürüm {v}", v=v), False
             btn = t("⬇  İndiriliyor %{p}", p=u.percent())
         elif u.state == "ready":
-            text = t("{n} kuruldu. Program yeniden başlatılıyor…", n=u.installed)
+            text = t("{n} kuruldu. Program yeniden başlatılıyor…", n=goster(u.installed))
             btn, primary = t("↻  Yeniden başlat"), True
         elif u.state == "error":
             if u.message == "cloud":
