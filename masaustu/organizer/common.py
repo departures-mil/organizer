@@ -187,51 +187,102 @@ def icon_size(n):
     return QSize(n, n)
 
 
-def setup_columns(table, db, key, widths, fixed=(0,)):
-    """Excel gibi sütunlar: başlıktaki ayırıcıyı tutup sürükle, çift tıkla → içeriğe göre otomatik genişlik.
-    Genişlikler ayarlarda saklanır (key), program yeniden açılınca geri gelir."""
-    from PySide6.QtCore import QByteArray, QTimer
-    from PySide6.QtWidgets import QAbstractItemView, QHeaderView
+def setup_columns(table, db, key, widths, fixed=(0,), order=None):
+    """Excel gibi sütunlar:
+    - başlıktaki ayırıcıyı tutup sürükle → genişlik değişir, çift tıkla → içeriğe göre otomatik genişlik;
+    - başlığı tutup sağa/sola sürükle → sütunun yeri değişir;
+    - başlığa sağ tıkla → "Varsayılan sütun düzeni".
+    Düzen ayarlarda JSON olarak saklanır ({key}_v2): {"sira": [mantıksal sütunlar], "gen": {sütun: px}}.
+    order: varsayılan görsel sıra (mantıksal sütun numaraları)."""
+    import json
+    from PySide6.QtCore import QTimer
+    from PySide6.QtWidgets import QAbstractItemView, QHeaderView, QMenu
+    from .i18n import t
     h = table.horizontalHeader()
-    h.setSectionsMovable(False)
+    n = table.columnCount()
+    skey = key + "_v2"
+    default_order = list(order) if order else list(range(n))
     h.setMinimumSectionSize(40)
-    h.setSectionResizeMode(QHeaderView.Interactive)
-    for col in fixed:
-        h.setSectionResizeMode(col, QHeaderView.Fixed)
-    h.setStretchLastSection(True)
+    h.setStretchLastSection(False)
+    h.setSectionsMovable(True)
+    h.setDragEnabled(True)
+    h.setFirstSectionMovable(False)
     table.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
     table.setHorizontalScrollMode(QAbstractItemView.ScrollPerPixel)
-    for col, w in widths.items():
-        table.setColumnWidth(col, w)
-    saved = db.get_setting(key)
-    if saved:
+    busy = [False]
+
+    def modes():
+        # Bütün sütunlar elle ayarlanabilir (eski sürümde kaydedilen "esnek" mod ayırıcıyı kilitliyordu)
+        for col in range(n):
+            h.setSectionResizeMode(col, QHeaderView.Fixed if col in fixed else QHeaderView.Interactive)
+
+    def apply(sira, gen):
+        busy[0] = True
         try:
-            h.restoreState(QByteArray.fromBase64(saved.encode()))
-            for col in fixed:
-                h.setSectionResizeMode(col, QHeaderView.Fixed)
-                table.setColumnWidth(col, widths.get(col, 62))
-        except Exception:
-            pass
+            modes()
+            sira = [c for c in sira if 0 <= c < n]
+            sira += [c for c in range(n) if c not in sira]
+            for vis, col in enumerate(sira):
+                cur = h.visualIndex(col)
+                if cur != vis:
+                    h.moveSection(cur, vis)
+            for col in range(n):
+                w = gen.get(col, gen.get(str(col), widths.get(col, 120)))
+                if col in fixed:
+                    w = widths.get(col, 62)
+                h.resizeSection(col, max(40, int(w)))
+        finally:
+            busy[0] = False
+
+    def save():
+        state = {"sira": [h.logicalIndex(v) for v in range(n)],
+                 "gen": {str(c): h.sectionSize(c) for c in range(n)}}
+        db.set_setting(skey, json.dumps(state))
+
+    saved = None
+    try:
+        raw = db.get_setting(skey)
+        saved = json.loads(raw) if raw else None
+    except Exception:
+        saved = None
+    if saved:
+        apply(saved.get("sira") or default_order, saved.get("gen") or {})
+    else:
+        apply(default_order, widths)
+
     timer = QTimer(table, singleShot=True, interval=400)
-    timer.timeout.connect(lambda: db.set_setting(key, bytes(h.saveState().toBase64()).decode()))
-    h.sectionResized.connect(lambda *_: timer.start())
+    timer.timeout.connect(save)
+
+    def changed(*_):
+        if not busy[0]:
+            timer.start()
+    h.sectionResized.connect(changed)
+    h.sectionMoved.connect(changed)
 
     def autosize(col):
         if col in fixed:
             return
         table.resizeColumnToContents(col)
-    # QTableView çift tıklamayı zaten resizeColumnToContents'e bağlar; açıkça da bağlayalım
     try:
         h.sectionHandleDoubleClicked.disconnect()
     except Exception:
         pass
     h.sectionHandleDoubleClicked.connect(autosize)
+
+    def menu(pos):
+        m = QMenu(h)
+        a = m.addAction(t("Varsayılan sütun düzeni"))
+        if m.exec(h.mapToGlobal(pos)) == a:
+            apply(default_order, widths)
+            save()
+    h.setContextMenuPolicy(Qt.CustomContextMenu)
+    h.customContextMenuRequested.connect(menu)
     return h
 
 
 def t_cols():
     from .i18n import t
-    return t("Sütun genişliği: ayırıcı çizgiyi sürükleyin · çift tıklayınca otomatik ayarlanır")
+    return t("Sütun genişliği: ayırıcı çizgiyi sürükleyin · çift tıklayınca otomatik ayarlanır · Sütunun yerini değiştirmek için başlığı sürükleyin")
 
 
 class HeaderSort:
@@ -267,7 +318,7 @@ class HeaderSort:
             elif cur == desc:
                 texts[col] += "  ▼"
         self.table.setHorizontalHeaderLabels(texts)
-        tip = t("Sıralamak için tıklayın, yeniden tıklayınca ters sıralanır · Genişlik: ayırıcıyı sürükleyin, çift tıklayınca otomatik")
+        tip = t("Sıralamak için tıklayın, yeniden tıklayınca ters sıralanır · Genişlik: ayırıcıyı sürükleyin, çift tıklayınca otomatik · Yer değiştirmek için başlığı sürükleyin · Sağ tık: varsayılan düzen")
         for col in self.cols:
             it = self.table.horizontalHeaderItem(col)
             if it:

@@ -1,10 +1,10 @@
 {
- "surum": "2.1.0.1",
- "notlar": "Sürüm numarası yeniden başladı: v.1.0.1. Program her yerde Organizer adını kullanıyor.",
+ "surum": "2.1.0.2",
+ "notlar": "Masaüstüyle aynı sürüm (v.1.0.2): sütun düzeni düzeltmeleri.",
  "boyut": 117729,
- "sha256": "d8ff0583cb6fe8666d94320481b652dd3105bfbde3624f6f11188a6e74468872",
- "imza": "gJ9YmqS64WB/zWqTVb1zOHvLpHTDxxCM2VTkjzh3oewceMObFf5cnq8nYM7WaEc9YqWzbAd6/5HpkK3Q4p5QPENko0UY616vXGVZROGfxp2a4cwlOWRtl/916D45uV2PXsolkS1Dadt8zaLExm5GTb+BPTCnZEExwUWe0WOIm9gowufBPSwlKDEifh5JKUehkFyynhrhcqJHEVGm3YpjyQFL+t9p88G4sPn5pNaHKVlhc1SSldKAaYuD30mpqgXjEEkdbKIiVwvpIrfcZGD/gf34AmJA2UZHiqS9D0FpGZKtZGc13sG7duMvEaHbzlhFOh5fCsrj17BCzA3fnj3DwVfs6bFKRVwE//j4ndivIaz0e7T11Wf1rorb/NhfS+tBbinnjeWIQMZCEoTbqQEHoIMEOucNQFgAc/bs2kPgEpw9tLAieUoQ+KTV8R9T1pRGM2BzzodOo4OLmXfJHMNXq5jsse1Y2gH0LpEe4pUCca4J6/jFaTmIxZTX0HK+zrEq",
- "yayin": "2026-11-18 00:40 UTC",
+ "sha256": "c5f208a0585a521e700510c7abfac71876e01c3dd6d53f44f90b7237af5a8b2f",
+ "imza": "W3xpuTouIi1DFjaf1GPX++DD6Ww6gOyBeEifC05gnW95ZsWxyYRqLKZu1hhuL2O/xNzxpjY3nU9HdGh0fX3sylDORykJOG0AgiBqtI5vO2JbBkzvQTr7xZSb7IOVVH/zy/yIo54nesPAMJzqD9u68C7SnuhNevm4pSL5INHrKlpAQ9XS7ZYvHyekIHDYG9mcygysQT8Kpm/mKvgp9d8ovMbuK5/qLNCAxx0VSg1D/n2MQbVFzi3qAgC0PLEkIUlH9YrOggoKTsfqszqhpt1UY98udGQ7Y4vVUwOi1BJxuwdlcI/rDH7W0Z9FWAt+N0GnuQKJDUqvDJio5pA9Yoasgd/gfCt7xgidhCoWDbY+wAKCrYac2HPus0USShXxamsSwqi2Gk3nkXiqQrbL8heE8U47LhRjmK5AbFmVrE1GfW6e/54pg2N4TnmwQGC1Ow/7OZ2q6Dz/V6K9g2hMnApth5TlNWV57LAp6UykmrIMc+bIBfNLSPeSHCyhcV5r3Mgd",
+ "yayin": "2026-11-18 00:44 UTC",
  "kabuk": 1,
- "dosya": "organizer-telefon-2.1.0.1.zip"
+ "dosya": "organizer-telefon-2.1.0.2.zip"
 }
