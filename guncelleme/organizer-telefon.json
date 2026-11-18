@@ -1,10 +1,10 @@
 {
- "surum": "1.4.0",
- "notlar": "Eşyaya satın alındığı yer: dükkan adı, yeri, numara; numaranın yanında WhatsApp / Telegram düğmeleri. Güncellemeler artık GitHub'dan gelir.",
- "boyut": 117619,
- "sha256": "1d89ae3639d563217d7b092147ecb7b5e7fa594a64bb61dc97e2f09e126f96c9",
- "imza": "iwY1Rf0wNcpwyfvByKFuKkwpLJRubQDCnUDrfkpenTls+O5Znbm0sa1Uet3drDIhZvwuvoLBVzB48ZDXM8iBfodAoaFXzwYJydMP8hTjSBitiD6ZwhZ/YL1ZedO5+tKxuAyM1exsxMb9Yf8zdkXGIDo0y4aXHGmsG6kqN0rKeCB7jk2iZoUm6e4zN3x4tUk4ytQ+coXRCLIPQS9OIynyraKM/evpz/34QOOywOjJnvCAfEwMyWbqc7/znOLyFzcti88oACwQHBtPmnH5GUOUFLmKqRGklEr3cGt498fzPdGs2iJb0ZrTcwRh9kbsyhk9ttiu/J8QctWd/iHtN/Z+s4h3xudQoCk/DY9b1CLixZS6mYYN+MypDkfEfRdisouow47nQu8XEGaMI01aeFaj8dP96Hb3pxfidKsoOgemhE3Jbhy+ciZxHxbpiYwbPrQUV6PyhPo1/YAG9pooqEI0OdJYpITsqmz2eeYoohCZySz/m43IjbaEq4su6+G4mANo",
- "yayin": "2026-11-18 00:35 UTC",
+ "surum": "2.1.0.1",
+ "notlar": "Sürüm numarası yeniden başladı: v.1.0.1. Program her yerde Organizer adını kullanıyor.",
+ "boyut": 117729,
+ "sha256": "d8ff0583cb6fe8666d94320481b652dd3105bfbde3624f6f11188a6e74468872",
+ "imza": "gJ9YmqS64WB/zWqTVb1zOHvLpHTDxxCM2VTkjzh3oewceMObFf5cnq8nYM7WaEc9YqWzbAd6/5HpkK3Q4p5QPENko0UY616vXGVZROGfxp2a4cwlOWRtl/916D45uV2PXsolkS1Dadt8zaLExm5GTb+BPTCnZEExwUWe0WOIm9gowufBPSwlKDEifh5JKUehkFyynhrhcqJHEVGm3YpjyQFL+t9p88G4sPn5pNaHKVlhc1SSldKAaYuD30mpqgXjEEkdbKIiVwvpIrfcZGD/gf34AmJA2UZHiqS9D0FpGZKtZGc13sG7duMvEaHbzlhFOh5fCsrj17BCzA3fnj3DwVfs6bFKRVwE//j4ndivIaz0e7T11Wf1rorb/NhfS+tBbinnjeWIQMZCEoTbqQEHoIMEOucNQFgAc/bs2kPgEpw9tLAieUoQ+KTV8R9T1pRGM2BzzodOo4OLmXfJHMNXq5jsse1Y2gH0LpEe4pUCca4J6/jFaTmIxZTX0HK+zrEq",
+ "yayin": "2026-11-18 00:40 UTC",
  "kabuk": 1,
- "dosya": "organizer-telefon-1.4.0.zip"
+ "dosya": "organizer-telefon-2.1.0.1.zip"
 }

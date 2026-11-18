@@ -1,10 +1,10 @@
 {
- "surum": "1.4.0",
- "notlar": "Eşyaya satın alındığı yer: dükkan adı, yeri, numara; numaranın yanında WhatsApp / Telegram düğmeleri. Güncellemeler artık GitHub'dan gelir.",
- "boyut": 155902,
- "sha256": "94ecb1fece69154165b6c8a1f628d1e2d21b46f82395cc22f42068d91600ef76",
- "imza": "UB2Zss9IPVgaM/2n0MV7hQvyWudTxUBYozXfHy5I3yOo3Qxb8TNP0q1Hnx5bMkxXosoSi7BZa1haa6uroTac7Ptqd/p7YlVXJl3uaPV6dFIBN4v31QWmmbwK31BhBjZ+YQOeXSP7PqnRCtGvezU03Ivwcz2ugED9++4+19Vxh9e3XRiLNkAP77WeBkDxUqRUoIVR6HkDCHe+NBR+0zr7V8zqBG6ZXNuneaB6Pa42x8DiBrqj0/dImjnyAWydsSMtYhHurPcr00a4P7kpLhEzYcz95aHgl1Yr4ImPDMxn4M0zBHrtHAzwXUdpQYMLKAOXN7xwwI3Cr5Qoq7iBY3tR3LWpHr4xpqb2QiSAqCrn1UQzph5dsQZUbPCoB9JmSlh+76eAdl3b06btO++vyLg6lYvbjaI1n+7PiGG17asMibplyMV/iPlHm652H/Bw1GMJ/jhpuqSk4zt7W0nmEldBR+OwA1ya1iDKWq05vpGaOl19dTack9g5XxT503IBCaXO",
- "yayin": "2026-11-18 00:35 UTC",
+ "surum": "2.1.0.1",
+ "notlar": "Sürüm numarası yeniden başladı: v.1.0.1. Program her yerde Organizer adını kullanıyor.",
+ "boyut": 156238,
+ "sha256": "6aa254cf944b7a1cffd4e3d06b06701c3f539cf0e2b25e7c36c37f0c79b4395c",
+ "imza": "J4BuJa8EwNZ4b11sy5Ibaa7pjZy82JGo3b+kJyk8eEWyINedFDPCGqGSZfylaA+Kl0YQlkfZIhnbVTV9DFosOBa0RkpU6g/cH6S1jr0WCs+x5C7xz6zVgKb/1n6SKbdbWDZmf2u2nbqjSIF9JkQIaCXH8BqTuzMtKUzR36hbOqugYH/v4IcU1G69ly/LAThTgW5zmJMS2aSjyVRdm/aa8/oFlyy4OJnnK1fbrHdTfch18LhK4KZnwJZw4ES0dul/mnXcIS2gMlYhaXN/Enk7rjavexyzydszQhpGkPFHJKBIEn5pyLB/NgM7GA+2BHtbyBAmF9N4zvyYquE3y/MOp6jiK45+Crvz1YdJXfjiIxvShoqIg04GYbIQmHVIPFzZS1YhGiVU+GOcv3qke4YBx+m8fOcKgOj9Ypsy3A1WDJv+ji7AihKGW5TeEZqG/N8SYQ88e/hO0LkmaJWmNc8MaB44d0b7B68K4eT3H/KqJHi0HUA127KyLPGTJ7iiuwnz",
+ "yayin": "2026-11-18 00:40 UTC",
  "sistem": 1,
- "dosya": "organizer-masaustu-1.4.0.zip"
+ "dosya": "organizer-masaustu-2.1.0.1.zip"
 }

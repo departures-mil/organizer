@@ -2,7 +2,13 @@
  * tarih, not), sınıflandırma ağaçları, arama, sıralama, toplu taşıma/silme, ustalar ve dükkanlar, ayarlar, yedek, bulut. */
 "use strict";
 
-const APP_VERSION = "1.4.0";
+const APP_VERSION = "2.1.0.1";   // iç numara; baştaki "2." sürüm dizisi. Ekranda v.1.0.1 görünür (goster()).
+function goster(v) {
+  const p = String(v === undefined ? APP_VERSION : (v || "")).trim().split(".").filter(x => x !== "");
+  if (!p.length) return "";
+  if (p.length === 4 && p[0] === "2") p.shift();
+  return "v." + p.join(".");
+}
 const Native = window.Native || null;   // Android kabuğunun sağladığı köprü (kopyala, paylaş, bağlantı aç)
 const $ = (sel, root) => (root || document).querySelector(sel);
 
@@ -1007,7 +1013,7 @@ const SettingsPage = {
       el("div.hint", { text: t("Kayıtlar ve fotoğraflar bu telefonda saklanır. Bulut hesabı bağlıysa bilgisayarla da eşitlenir.") }),
       el("button.btn.block", { text: t("💾  Yedek al (.json) ve paylaş"), onclick: backup }),
     ]));
-    root.append(el("div.about", null, [el("img", { src: "img/logo.png", alt: "" }), el("div", { text: `${"Organizer"} ${APP_VERSION}` }),
+    root.append(el("div.about", null, [el("img", { src: "img/logo.png", alt: "" }), el("div", { text: `Organizer ${goster()}` }),
       el("div", { text: t("Evdeki her şey yerli yerinde") })]));
   },
 };
@@ -1067,7 +1073,7 @@ const TopBar = {
   drawUpdate() {
     const u = Updater, b = $("#updBtn");
     if (!b) return;
-    const n = (u.manifest || {}).surum || "";
+    const n = goster((u.manifest || {}).surum || "");
     let txt = t("Güncelle"), hot = false, dis = false;
     if (u.state === "available") { txt = t("Güncelle: {n}", { n }); hot = true; }
     else if (u.state === "installing") {
@@ -1078,7 +1084,7 @@ const TopBar = {
     $("#updTxt").textContent = txt;
     b.classList.toggle("hot", hot);
     b.disabled = dis;
-    b.title = u.state === "none" ? t("Program güncel (sürüm {v}).", { v: APP_VERSION }) : "";
+    b.title = u.state === "none" ? t("Program güncel (sürüm {v}).", { v: goster() }) : "";
   },
 };
 

@@ -1,4 +1,4 @@
-/* Meslek simgeleri (masaüstündeki duzenli_evim/professions.py ile aynı mantık).
+/* Meslek simgeleri (masaüstündeki organizer/professions.py ile aynı mantık).
  * 1) Bilinen meslekler programla gelen simgelerle eşleşir (img/meslek_simgeleri.json).
  * 2) Yeni bir meslek için simge internetten kendiliğinden bulunur (MyMemory çevirisi + Iconify) ve telefonda saklanır.
  * 3) Bulunamazsa usta için baretli adam, dükkan için dükkan simgesi gösterilir. */
