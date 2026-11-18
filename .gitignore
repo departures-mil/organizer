@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+# GİZLİ: imza anahtarları ve veritabanları depoya asla girmez
+*.pem
+*.p12
+*.db
+anahtarlar/
+yedek/
