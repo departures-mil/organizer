@@ -319,8 +319,9 @@ const Store = {
     return sortRecords(out, sort, {
       created: d => d.created_at, name: d => norm(d.name), qty: d => d.quantity,
       price: d => [d.currency, d.price], category: d => norm(d.category_path), location: d => norm(d.location_path),
-      shop: d => norm(shopTitle(d)),
-    }, { price: d => d.price == null, category: d => !d.category_path, location: d => !d.location_path, shop: d => !shopTitle(d) });
+      shop: d => norm(shopTitle(d)), place: d => norm(d.shop_place || ""),
+    }, { price: d => d.price == null, category: d => !d.category_path, location: d => !d.location_path, shop: d => !shopTitle(d),
+      place: d => !String(d.shop_place || "").trim() });
   },
 
   /** Daha önce girilmiş dükkanlar (eşyalardan ve dükkan kayıtlarından): ad → yer / numara / uygulamalar */
