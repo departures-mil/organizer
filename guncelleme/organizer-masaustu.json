@@ -1,10 +1,10 @@
 {
- "surum": "2.1.0.4",
- "notlar": "v.1.0.4: Eşya listesinde 'Dükkan/Kişi' ve 'Konum' iki ayrı sütun olarak yan yana; ikisine de başlığa tıklayarak sıralama. Telefonda sıralamaya 'Konum' eklendi.",
- "boyut": 161450,
- "sha256": "358e1515ff7eb8525bb47285bf2cf2b41e9f6c2fe0f50c99fe2447e80133196f",
- "imza": "blq5TFwUj/O4DlSsZJUISUk0efTLaFziaV5TnhGveItOGLbHYX53s3uCs5Lj/5X+czs5w8YVSh7qQi6rcNU8jJipwFG2x2Fwc8n4Jdqag1jgO9pQg5vW/s3YnoqJ7U3/+YzS/iQYq/sTvIBcMFCd8OAybau+irejUTQ7yaFfcvKqdQafkCP6d6hWTlfb4KijkjdbUi7BUI1VX8RosP9dHUPOEvs/FLFexzLkUegT2pHYmWJBkZCvvyW2JVU08bAfXO4In3w3iRq/+DMrvuneX86ntHlsGUfCAUcT8bOi4lZvYOgupApx1tSlZ2y9lzyXKW+NGJ+Gtnxz6l5YzkpblZ2AhPh1ChulqlIO0tV/J8CCt/ohDx/jS5Z3r1JbUj9/WhBgLaC0ZzfIBGZIZlkLDLwaBFdOdgVKhD7pnJbfWQm7/eETVB9U96pEs12DBgkvyaZHYPuGnLabPoYAfZNQ2PXtSiQbSUgSRWKcrBxHwMM1m6+RNclTbdpP3f72FmGK",
- "yayin": "2026-11-18 01:10 UTC",
+ "surum": "2.1.0.5",
+ "notlar": "v.1.0.5: Telefon güncelleme döngüsü düzeltmesiyle aynı sürüm (masaüstünde değişiklik yok).",
+ "boyut": 161451,
+ "sha256": "01478a2704956e11c0e25dea35156e73433749d5a51b95001ad5951ae3d6f21a",
+ "imza": "HQAXnt6WtQD0ne5T4eZOGB2Axw5/d9Gs8tEYnSVlNFu0pDmkG+cViuA8sS4L/Ri/bvwNhcxHQ81yMrj9mjJd9o2dl/ZL/Zwm62JXeBe1SnhtSJw38MMiSwTkbqusPDU+gb2Ul13MZew01nZ12cXkDQKaJjDk87IfldrZg3OrXk/WwqD4D87AKWVVp/OPVehoLyAzmmoL2d1Ndcyx3ayjVsEiKZIjI0RzfV3eGnsKj77odTE7NkmVCaRWji4GqkNGk1ahiXFtbrefpq5e31EImM3Pk+c5cPVnlU3b0rBzF57Jltpcv1ETkb9O8sBNA6Nk0BEMyZn/aZc1gtsLaW/MwKiIi+FMZtkWCXQG4U1dAYGAk7Tg57nhcw22sPpdE3ZYEFOj9mv/oUSM4JDOZbZyKDNGilTP96SRNUHybfmeUwx5z8CNKkJnYLOfbSz/dV9jZNkI22s+9yvYcHiVium5CmhrShurXWiNN8XpM7Veu271gI8GtWjwh69a6vCJDJDN",
+ "yayin": "2026-11-20 01:47 UTC",
  "sistem": 1,
- "dosya": "organizer-masaustu-2.1.0.4.zip"
+ "dosya": "organizer-masaustu-2.1.0.5.zip"
 }
