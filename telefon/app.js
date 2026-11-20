@@ -2,7 +2,7 @@
  * tarih, not), sınıflandırma ağaçları, arama, sıralama, toplu taşıma/silme, ustalar ve dükkanlar, ayarlar, yedek, bulut. */
 "use strict";
 
-const APP_VERSION = "2.1.0.5";   // iç numara; baştaki "2." sürüm dizisi. Ekranda v.1.0.5 görünür (goster()).
+const APP_VERSION = "2.1.0.6";   // iç numara; baştaki "2." sürüm dizisi. Ekranda v.1.0.5 görünür (goster()).
 function goster(v) {
   const p = String(v === undefined ? APP_VERSION : (v || "")).trim().split(".").filter(x => x !== "");
   if (!p.length) return "";
@@ -241,6 +241,10 @@ const SORTS = [["En yeni eklenen", "created_desc"], ["En eski eklenen", "created
   ["Dükkan/Kişiye göre (A → Z)", "shop_asc"], ["Dükkan/Kişiye göre (Z → A)", "shop_desc"],
   ["Konuma göre (A → Z)", "place_asc"], ["Konuma göre (Z → A)", "place_desc"]];
 
+const CSORTS = [["İsme göre (A → Z)", "name_asc"], ["İsme göre (Z → A)", "name_desc"], ["Türe göre", "kind_asc"],
+  ["Mesleğe göre (A → Z)", "prof_asc"], ["Mesleğe göre (Z → A)", "prof_desc"], ["Yere göre (A → Z)", "place_asc"],
+  ["Yere göre (Z → A)", "place_desc"], ["Telefona göre", "phone_asc"]];
+
 // ====================================================================== satın alındığı yer (1.4.0)
 const SHOP_CHANNELS = [["shop_whatsapp", "whatsapp", "WhatsApp"], ["shop_telegram", "telegram", "Telegram"]];
 
@@ -294,8 +298,6 @@ const ItemsPage = {
         this.cat !== null || this.loc === null ? this.cat : this.loc) }),
       this.cat !== null || this.loc !== null ? el("button.chip.x", { text: "✕  " + t("Filtreleri temizle"), onclick: () => { this.cat = this.loc = null; App.render(); } }) : null,
     ]));
-    root.append(sortBar([["Ad", "name", false], ["Adet", "qty", true], ["Kategori", "category", false], ["Yer", "location", false],
-      ["Fiyat", "price", true], ["Tarih", "created", true], ["Dükkan/Kişi", "shop", false], ["Konum", "place", false]], this.sort, setSort));
     this.summary = el("div.summary");
     this.list = el("div");
     root.append(this.summary, this.list);
@@ -751,8 +753,12 @@ const ContactsPage = {
     root.append(el("div.search", null, input));
     root.append(el("div.seg", { style: { marginTop: "10px" } }, [[null, t("Hepsi")], ["usta", t("🔧  Ustalar")], ["dukkan", t("🏪  Dükkanlar")]].map(([k, l]) =>
       el("button" + (this.kind === k ? ".on" : ""), { text: l, onclick: () => { this.kind = k; App.render(); } }))));
-    root.append(sortBar([["İsim", "name", false], ["Tür", "kind", false], ["Meslek", "prof", false], ["Yer", "place", false],
-      ["Telefon", "phone", false]], this.sort, k => { this.sort = k; Store.set("sort_contacts", k); App.render(); }));
+    if (!CSORTS.some(s => s[1] === this.sort)) this.sort = "name_asc";
+    const setSort = k => { this.sort = k; Store.set("sort_contacts", k); App.render(); };
+    root.append(el("div.chips", null, [
+      el("button.chip", { style: { gridColumn: "1 / -1" }, text: "⇅  " + t(CSORTS.find(s => s[1] === this.sort)[0]),
+        onclick: () => menu(t("Sırala:"), CSORTS.map(([l, k]) => [(k === this.sort ? "✓  " : "") + t(l), () => setSort(k)])) }),
+    ]));
     this.summary = el("div.summary");
     this.list = el("div");
     root.append(this.summary, this.list);
@@ -1111,6 +1117,7 @@ const TB_ICONS = {
   eyeOff: '<path d="M3 3l18 18"/><path d="M10.6 5.1A10 10 0 0 1 12 5c6.4 0 10 7 10 7a17 17 0 0 1-3.2 4.1"/><path d="M6.6 6.6C3.8 8.4 2 12 2 12s3.6 7 10 7a9.6 9.6 0 0 0 5.4-1.6"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/>',
   scan: '<path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3"/><path d="M7 12h10"/>',
   lang: '<path d="M4 5h9M8.5 3v2M11 5c-1 4-3.6 7-7 8.5"/><path d="M6 8.5c1.3 2 3 3.4 5 4.3"/><path d="M13 21l4-9 4 9M14.4 18h5.2"/>',
+  sync: '<path d="M20 11a8 8 0 0 0-14.3-4.9L4 8"/><path d="M4 4v4h4"/><path d="M4 13a8 8 0 0 0 14.3 4.9L20 16"/><path d="M20 20v-4h-4"/>',
   cloud: '<path d="M7 18a4.5 4.5 0 0 1-.6-9A6 6 0 0 1 18 8.6 4.7 4.7 0 0 1 17.5 18z"/>',
   download: '<path d="M12 4v11M7.5 10.5 12 15l4.5-4.5"/><path d="M4 17v2a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2"/>',
 };
@@ -1138,7 +1145,7 @@ const TopBar = {
       else if (u.state === "ready") u.restart();
       else u.check();
     };
-    $("#syncIcon").innerHTML = svgIcon("cloud");
+    $("#syncIcon").innerHTML = svgIcon("sync");
     $("#updIcon").innerHTML = svgIcon("download");
   },
   draw() {
@@ -1154,24 +1161,30 @@ const TopBar = {
     for (const [code, label] of [["tr", "TR"], ["en", "EN"], ["ar", "AR"]]) {
       seg.append(el("button" + (I18N.lang === code ? ".on" : ""), { text: label, onclick: () => App.changeLanguage(code) }));
     }
-    $("#syncTxt").textContent = Cloud.busy ? t("Eşitleniyor…") : t("Eşitle");
+    $("#syncBtn").setAttribute("aria-label", t("Eşitle"));
     this.drawUpdate();
   },
   drawUpdate() {
     const u = Updater, b = $("#updBtn");
     if (!b) return;
     const n = goster((u.manifest || {}).surum || "");
-    let txt = t("Güncelle"), hot = false, dis = false;
-    if (u.state === "available") { txt = t("Güncelle: {n}", { n }); hot = true; }
+    let title = t("Güncelle"), hot = false, dis = false, prog = null, fill = 0;
+    if (u.state === "available") { title = t("Güncelle: {n}", { n }); hot = true; }
     else if (u.state === "installing") {
-      txt = t("%{p} · {a}/{b} MB", { p: u.percent(), a: u.mb(u.done), b: u.mb(u.total) }) + " · " + u.rows()[2][1];
-      hot = true;
-    } else if (u.state === "ready") { txt = t("Yeniden başlatılıyor…"); hot = true; }
-    else if (u.state === "checking") { txt = t("Denetleniyor…"); dis = true; }
-    $("#updTxt").textContent = txt;
+      prog = t("%{p} · {a}/{b} MB", { p: u.percent(), a: u.mb(u.done), b: u.mb(u.total) })
+        + " · " + t("Kalan") + " " + t("{a} MB", { a: u.mb(Math.max(u.total - u.done, 0)) }) + " · " + u.rows()[2][1];
+      fill = u.percent(); hot = true;
+    } else if (u.state === "ready") { prog = t("Yeniden başlatılıyor…"); fill = 100; hot = true; }
+    else if (u.state === "checking") { title = t("Denetleniyor…"); dis = true; }
+    else if (u.state === "none") title = t("Program güncel (sürüm {v}).", { v: goster() });
+    $("#updIcon").classList.toggle("spin", u.state === "checking");
     b.classList.toggle("hot", hot);
     b.disabled = dis;
-    b.title = u.state === "none" ? t("Program güncel (sürüm {v}).", { v: goster() }) : "";
+    b.title = title;
+    b.setAttribute("aria-label", title);
+    const box = $("#updProg");
+    box.hidden = prog === null;
+    if (prog !== null) { $("#updTxt").textContent = prog; $("#updFill").style.width = Math.max(0, Math.min(100, +fill || 0)) + "%"; }
   },
 };
 
@@ -1242,7 +1255,6 @@ const App = {
     dot.className = !Cloud.isConnected() ? "" : Cloud.busy ? "busy" : Cloud.lastError ? "err" : "ok";
     icon.classList.toggle("spin", Cloud.busy);
     $("#syncBtn").title = text;
-    $("#syncTxt").textContent = Cloud.busy ? t("Eşitleniyor…") : t("Eşitle");
     if (this.tab === 2 && SettingsPage.cloudDraw) SettingsPage.cloudDraw();
   },
 
