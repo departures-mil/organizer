@@ -1,10 +1,10 @@
 {
- "surum": "2.1.0.5",
- "notlar": "v.1.0.5: Telefon güncelleme döngüsü düzeltmesiyle aynı sürüm (masaüstünde değişiklik yok).",
- "boyut": 161451,
- "sha256": "01478a2704956e11c0e25dea35156e73433749d5a51b95001ad5951ae3d6f21a",
- "imza": "HQAXnt6WtQD0ne5T4eZOGB2Axw5/d9Gs8tEYnSVlNFu0pDmkG+cViuA8sS4L/Ri/bvwNhcxHQ81yMrj9mjJd9o2dl/ZL/Zwm62JXeBe1SnhtSJw38MMiSwTkbqusPDU+gb2Ul13MZew01nZ12cXkDQKaJjDk87IfldrZg3OrXk/WwqD4D87AKWVVp/OPVehoLyAzmmoL2d1Ndcyx3ayjVsEiKZIjI0RzfV3eGnsKj77odTE7NkmVCaRWji4GqkNGk1ahiXFtbrefpq5e31EImM3Pk+c5cPVnlU3b0rBzF57Jltpcv1ETkb9O8sBNA6Nk0BEMyZn/aZc1gtsLaW/MwKiIi+FMZtkWCXQG4U1dAYGAk7Tg57nhcw22sPpdE3ZYEFOj9mv/oUSM4JDOZbZyKDNGilTP96SRNUHybfmeUwx5z8CNKkJnYLOfbSz/dV9jZNkI22s+9yvYcHiVium5CmhrShurXWiNN8XpM7Veu271gI8GtWjwh69a6vCJDJDN",
- "yayin": "2026-11-20 01:51 UTC",
+ "surum": "2.1.0.6",
+ "notlar": "v.1.0.6: Telefon başlık yenilemesiyle aynı sürüm (yeni dil metinleri).",
+ "boyut": 161552,
+ "sha256": "6a20cde8f54533d35284e10c8f3c52a1a2e4285c08e74af83d2750aba91b46f0",
+ "imza": "hX9fiVGjLllLBWoNqL5t5z1iX8w+qea1el8fW0eZPXO/9PUmKeUH+sUD30YRqK8OxSu/9D8osjKt7ngyBod5GGAkg5HXt1AI7u9ElsOGPD67qAWwNgkyFRifpjhQSRWbYr1AYaxPo8t0nIeuNGsHBeZq0dfUHxwPCSNL/QV6/4Vp4VkLWfStnVW2HPM0X316yz1d/LDQZlVwsok4+n1dm/wETvT2SsFXCXFLZS1SWwoQtxJ1fwfgPGgNxOUgCTSF17Ej4RAF4lYI5ImWdEdJJ9t8NTLnW32GFbYa7T007rv7SuS2QFuXdzbw/uRUARhirrk6RR9Y0pcY/IyItSMFoQOmvZ03NhUKuHbvPhJKZpKRwHFFmzHdtqPGWZdk897ej0mL7uvRWR2wZJGtV+wEXRRERelUrYTTB/lxGssC9lLYxnxGvT45fMWnw+Q81qluRnhbDmbx2xVCM4yxCsxTUvAabNt2DPBWwtKl+EovTCjgPi+TdIsLNgXZvI2ygLc2",
+ "yayin": "2026-11-20 02:14 UTC",
  "sistem": 1,
- "dosya": "organizer-masaustu-2.1.0.5.zip"
+ "dosya": "organizer-masaustu-2.1.0.6.zip"
 }

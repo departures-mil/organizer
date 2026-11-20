@@ -17,40 +17,46 @@ body {
 button, input, select, textarea { font: inherit; color: inherit; }
 button { cursor: pointer; }
 
-/* ---------- üst çubuk ---------- */
+/* ---------- üst çubuk (1.0.6: tek satır simgeler + dil şeridi) ---------- */
 #top {
-  position: sticky; top: 0; z-index: 20; display: flex; flex-direction: column; gap: 8px;
-  padding: 10px 12px; color: #fff;
+  position: sticky; top: 0; z-index: 20; display: flex; flex-direction: column; gap: 6px;
+  padding: 8px 10px 8px; color: #fff;
   background: linear-gradient(135deg, var(--teal-dark), var(--teal-deep));
   box-shadow: 0 2px 10px rgba(20, 63, 77, .25);
 }
-#top .toprow { display: flex; align-items: center; gap: 8px; direction: ltr; }
-#top .toprow.tools { justify-content: flex-end; flex-wrap: wrap; }
-#top .titles { direction: inherit; }
-html[dir=rtl] #top .titles { direction: rtl; text-align: right; }
-#top .iconbtn { width: 40px; height: 40px; display: grid; place-items: center; padding: 0; }
-#top .iconbtn.on { background: rgba(255,255,255,.30); }
-#top svg { width: 20px; height: 20px; display: block; }
-.tbseg { display: flex; align-items: center; gap: 2px; background: rgba(255,255,255,.14); border-radius: 12px; padding: 3px; }
-.tbseg .gl { padding: 0 4px 0 5px; opacity: .8; }
-.tbseg button { flex: none; white-space: nowrap; min-width: 34px; border: 0; background: none; color: #cfe6e8; font-weight: 700; font-size: 13px; padding: 6px 8px; border-radius: 9px; }
-.tbseg button.on { background: #fff; color: var(--teal-dark); }
-.pill { position: relative; display: flex; align-items: center; gap: 6px; border: 0; height: 38px; padding: 0 12px;
-  border-radius: 12px; background: rgba(255,255,255,.14); color: #fff; font-weight: 600; font-size: 13.5px; white-space: nowrap; }
-.pill svg { width: 18px; height: 18px; }
-.pill:disabled { opacity: .7; }
-#updBtn.hot { background: var(--orange); }
-#top .logo { width: 40px; height: 40px; border-radius: 10px; }
+#top .toprow { display: flex; align-items: center; gap: 8px; }
+#top .logo { width: 38px; height: 38px; border-radius: 10px; flex: none; }
 #top .titles { flex: 1; min-width: 0; }
-#appTitle { font-size: 19px; font-weight: 700; }
-#appSub { font-size: 12px; opacity: .8; }
-.iconbtn { position: relative; background: rgba(255,255,255,.14); border: 0; color: #fff; width: 44px; height: 44px;
-  border-radius: 12px; font-size: 20px; }
-#syncDot { position: absolute; width: 10px; height: 10px; border-radius: 5px; right: 4px; top: 4px;
-  background: #9fb8bd; border: 2px solid var(--teal-dark); }
+#appTitle { font-size: 18px; font-weight: 700; line-height: 1.15; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#appSub { font-size: 11.5px; opacity: .8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#top .tbtns { display: flex; gap: 6px; flex: none; }
+.iconbtn { position: relative; background: rgba(255,255,255,.14); border: 0; color: #fff; width: 38px; height: 38px;
+  border-radius: 11px; display: grid; place-items: center; padding: 0; flex: none; }
+.iconbtn:active { background: rgba(255,255,255,.28); }
+.iconbtn.on { background: rgba(255,255,255,.30); }
+.iconbtn:disabled { opacity: .75; }
+#top svg { width: 20px; height: 20px; display: block; }
+#top .iconbtn > span { display: grid; place-items: center; }
+#top .langrow { justify-content: center; }
+.tbseg { display: flex; align-items: center; gap: 2px; background: rgba(255,255,255,.12); border-radius: 11px; padding: 2px; }
+.tbseg .gl { padding: 0 4px 0 6px; opacity: .8; display: grid; place-items: center; }
+.tbseg .gl svg { width: 17px !important; height: 17px !important; }
+.tbseg button { flex: none; white-space: nowrap; min-width: 44px; border: 0; background: none; color: #cfe6e8;
+  font-weight: 700; font-size: 13px; padding: 5px 10px; border-radius: 9px; }
+.tbseg button.on { background: #fff; color: var(--teal-dark); }
+#syncDot, #updDot { position: absolute; width: 9px; height: 9px; border-radius: 5px; top: 4px; inset-inline-end: 4px;
+  border: 2px solid var(--teal-dark); display: none; }
+#syncDot.ok, #syncDot.err, #syncDot.busy { display: block; }
 #syncDot.ok { background: #6ee7b7; } #syncDot.err { background: #f87171; } #syncDot.busy { background: var(--sand); }
-#syncIcon.spin { display: inline-block; animation: spin 1s linear infinite; }
+#updBtn.hot { background: var(--orange); }
+#updBtn.hot #updDot { display: block; background: #fff; border-color: var(--orange); }
+#syncIcon.spin, #updIcon.spin { animation: spin 1s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
+#updProg { font-size: 12px; }
+#updProg .upt { display: flex; justify-content: center; font-weight: 600; font-variant-numeric: tabular-nums; opacity: .95;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#updProg .upbar { height: 4px; border-radius: 2px; background: rgba(255,255,255,.2); overflow: hidden; margin-top: 4px; }
+#updProg .upbar i { display: block; height: 100%; width: 0; background: var(--sand); transition: width .3s; }
 
 /* ---------- alt sekmeler ---------- */
 #tabs { position: fixed; bottom: 0; left: 0; right: 0; z-index: 20; display: flex; background: #fff;
@@ -257,15 +263,6 @@ textarea.in { min-height: 84px; resize: vertical; }
 .dl-grid { display: grid; grid-template-columns: auto 1fr; column-gap: 14px; row-gap: 3px; font-size: 14px; }
 .dl-grid .k { color: var(--muted); white-space: nowrap; }
 .dl-grid .v { font-weight: 600; white-space: nowrap; font-variant-numeric: tabular-nums; }
-
-/* ---------- sıralama şeridi (başlığa dokun → sırala) ---------- */
-.sortbar { display: flex; overflow-x: auto; background: #2f3e46; border-radius: 12px; margin: 10px 0 4px;
-  scrollbar-width: none; }
-.sortbar::-webkit-scrollbar { display: none; }
-.sortbar button { flex: 1 0 auto; border: 0; background: none; color: #fff; font-weight: 700; font-size: 13px;
-  padding: 10px 12px; border-inline-end: 2px solid #fff; white-space: nowrap; }
-.sortbar button:last-child { border-inline-end: 0; }
-.sortbar button.on { background: rgba(255,255,255,.16); }
 
 /* ---------- satın alındığı yer (1.4.0) ---------- */
 .shopline { display: flex; align-items: center; gap: 8px; margin-top: 4px; font-size: 13px; color: var(--muted); min-width: 0; }

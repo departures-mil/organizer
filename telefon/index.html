@@ -12,14 +12,15 @@
   <div class="toprow">
     <img src="img/logo.png" alt="" class="logo">
     <div class="titles"><div id="appTitle"></div><div id="appSub"></div></div>
-    <button id="eyeBtn" class="iconbtn" aria-label="hide"></button>
-    <button id="scanBtn" class="iconbtn" aria-label="search"></button>
+    <div class="tbtns">
+      <button id="updBtn" class="iconbtn" aria-label="update"><span id="updIcon"></span><i id="updDot"></i></button>
+      <button id="syncBtn" class="iconbtn" aria-label="sync"><span id="syncIcon"></span><i id="syncDot"></i></button>
+      <button id="eyeBtn" class="iconbtn" aria-label="hide"></button>
+      <button id="scanBtn" class="iconbtn" aria-label="search"></button>
+    </div>
   </div>
-  <div class="toprow tools">
-    <div id="langSeg" class="tbseg"></div>
-    <button id="syncBtn" class="pill" aria-label="sync"><span id="syncIcon"></span><span id="syncTxt"></span><i id="syncDot"></i></button>
-    <button id="updBtn" class="pill"><span id="updIcon"></span><span id="updTxt"></span></button>
-  </div>
+  <div class="toprow langrow"><div id="langSeg" class="tbseg"></div></div>
+  <div id="updProg" hidden><div class="upt"><span id="updTxt"></span></div><div class="upbar"><i id="updFill"></i></div></div>
 </header>
 <main id="page"></main>
 <nav id="tabs"></nav>

@@ -16,6 +16,12 @@ const I18N = Object.assign({
   ]
  ],
  "strings": {
+ "İsme göre (A → Z)": ["By name (A → Z)", "حسب الاسم (أ ← ي)"],
+ "İsme göre (Z → A)": ["By name (Z → A)", "حسب الاسم (ي ← أ)"],
+ "Türe göre": ["By type", "حسب النوع"],
+ "Mesleğe göre (A → Z)": ["By trade (A → Z)", "حسب المهنة (أ ← ي)"],
+ "Mesleğe göre (Z → A)": ["By trade (Z → A)", "حسب المهنة (ي ← أ)"],
+ "Telefona göre": ["By phone", "حسب الهاتف"],
  "Güncelleme sunucusuna ulaşılamadı. İnternet bağlantısını denetleyin.": ["Could not reach the update server. Check your internet connection.", "تعذّر الوصول إلى خادم التحديثات. تحقّق من اتصال الإنترنت."],
  "🏪  Satın alındığı yer": ["🏪  Where it was bought", "🏪  مكان الشراء"],
  "Satın alındığı yer": ["Bought at", "مكان الشراء"],

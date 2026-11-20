@@ -1,10 +1,10 @@
 {
- "surum": "2.1.0.5",
- "notlar": "v.1.0.5: Telefonda 'Güncelle'ye basınca uygulamanın yeniden açılıp aynı güncellemeyi tekrar göstermesi (sonsuz döngü) düzeltildi. Bu sefer Android bir kez 'Güncelle' onayı ister; sonraki güncellemeler yine tek tuşla kurulur.",
- "boyut": 120710,
- "sha256": "2e525febfb5638abfd6fd7c41414bcbd7535c30566621d9fadae4853426234c1",
- "imza": "DKRd4zoFvCmgiOCe7mYhiZCtW9WdCmaL8XySmaqiGQlQ/oyZY8NJExneEFLNVjOPD2nRd31HU6WLJDNk3Sgpp4Bprrw/Xi+rbaqVyNbglXenkuqSbV0jWECry8uUbaNliDmJHP1AJNqMrw7NAM6zG70qzvve2F5O3vln04C4nKoJ+vY9cOK5suiCxEdkSaGMHaCXtCCAwHSqVXPwoBTW9HDyeUrqnV0jYzph0umlNPY0aBSsCgKzmhlfOlHm7tUL7kdjciZxNN9E8uPFJtYBwnoiAdXoAmGfA/1jhyEGh9mtXi/2GIhK3V4mRfSN6nLVSpmGHLRY+uPVOwEmm0CS0VSqlickfVIznQj433AxNSuMcHLI++B6yDjYs9uvKD9UM4mMQHCMpmIAEb1I2fGN2j4NXXrKIDn9CYsEtbCvBSSJKqzfdsSsqMShU/suxmf+4PBtlzlyhjzv37KDrmx3I7LPU5NHJi9gk4il8nzuSTOVTbdg7l3pMFdJHawLV90O",
- "yayin": "2026-11-20 01:51 UTC",
+ "surum": "2.1.0.6",
+ "notlar": "v.1.0.6: Üst başlık yenilendi — güncelleme, eşitleme, göz ve arama tek satırda simge olarak; dil seçici altta ortada; indirme ilerlemesi başlıkta ince çubukla (yüzde, MB, kalan, hız). Liste üstündeki koyu sütun çubuğu kaldırıldı; sıralama 'Sırala' düğmesinden.",
+ "boyut": 121042,
+ "sha256": "7b3cfec96e382c74bbc440044e8740b305f70dd453286fc63eadd1a30c89c5a1",
+ "imza": "gnFtv/qH/msXQjYB3pi5fh47jCosdo2R4/SK2UtGkWjn9bFJEmxtvwG4446hf6ro4e93WO0Tzu5SAHgJPN5kLUrvWPt7BZkNIT87pX37hVCeK9dtlIRn16Q1VxOymSd7q/XmWc9WbFPsogarYKS64MRvcorYkQIcpXRytt13G5jVgBfLSCs2FAB78ux8j3IIUL7Ywol1mDtKZ03zg68l3ilTBwiPVPu1oITwHwWQ/UqsMjbUxAlQrWGI9HnB8fQYCM422VJKhzQ3Seqns61Okz3Lbaxp8fSX3+WL0BypWcI9ZoZ0fL6JL8Tq+an46g+2MrOdijNKBnb4ZHIy+0zaE9I9EwtQ5hGpJ8ddRDlsWZusr4TmJfLC/NxnL2IFUXtHx54bDsdRycbTyyIeFx29CDDmTD+MRaK23vav8JVoQjY/CG51MgZh6mvQtKCuNaCKaMYVB3lUAxYuz4a06JEJDZIE6Twp7RBQ9pisVsx9FmGEOr2sCIUio41A0/Of67ta",
+ "yayin": "2026-11-20 02:14 UTC",
  "kabuk": 2,
- "dosya": "organizer-telefon-2.1.0.5.zip"
+ "dosya": "organizer-telefon-2.1.0.6.zip"
 }
