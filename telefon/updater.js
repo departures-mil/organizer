@@ -28,7 +28,11 @@ const Updater = {
     return false;
   },
   skipped() { const n = this.native(); return n && n.skipped ? n.skipped().split(/\s+/) : []; },
-  needsApk() { return !!this.manifest && (parseInt(this.manifest.kabuk, 10) || 1) > this.kabuk(); },
+  forceApk: false,  // web paketi kurulduğu hâlde açılmadıysa (döngü koruması) tam APK ile güncellenir
+  needsApk() { return !!this.manifest && (this.forceApk || (parseInt(this.manifest.kabuk, 10) || 1) > this.kabuk()); },
+  /** Son kurulan sürüm yeniden başlatmadan sonra açılmadıysa aynı yolu bir daha deneme (sonsuz döngü olmasın). */
+  _lastTry() { try { return localStorage.getItem("ota_son_kurulum") || ""; } catch (e) { return ""; } },
+  _setTry(v) { try { if (v) localStorage.setItem("ota_son_kurulum", v); else localStorage.removeItem("ota_son_kurulum"); } catch (e) { /* yok */ } },
 
   async client() {
     const c = new FirebaseClient(Cloud.config());
@@ -44,7 +48,7 @@ const Updater = {
     return man;
   },
 
-  async manifest(kind) {
+  async fetchManifest(kind) {   // (eskiden adı "manifest" idi; this.manifest özelliğiyle çakışıp APK yolunu bozuyordu)
     try {
       return await this.ghJson(kind);
     } catch (e) {
@@ -59,8 +63,11 @@ const Updater = {
     if (this.state === "checking" || this.state === "installing" || this.state === "ready") return;
     this.state = "checking"; this.message = ""; this.emit();
     try {
-      const man = await this.manifest("organizer-telefon");
+      const man = await this.fetchManifest("organizer-telefon");
       const ok = man && man.surum && this.newer(man.surum, APP_VERSION) && !this.skipped().includes(man.surum);
+      const last = this._lastTry();
+      if (last && !this.newer(last, APP_VERSION)) this._setTry("");          // kurulan sürüm açıldı
+      this.forceApk = !!(ok && last && last === man.surum);                   // kuruldu ama açılmadı → APK ile kur
       this.manifest = ok ? man : null;
       this.state = ok ? "available" : "none";
     } catch (e) {
@@ -138,7 +145,7 @@ const Updater = {
     try {
       const c = () => this.client();
       if (this.needsApk()) {
-        const apk = await this.manifest("organizer-telefon-apk");
+        const apk = await this.fetchManifest("organizer-telefon-apk");
         if (!apk || !apk.surum) throw new Error(t("Bu güncelleme için gereken paket bulunamadı."));
         const b64 = await this._download(c, "organizer-telefon-apk", apk);
         const err = nat && nat.installApk ? await nat.installApk(b64, apk.imza || "") : t("Bu cihazda kurulamaz.");
@@ -148,6 +155,7 @@ const Updater = {
         const b64 = await this._download(c, "organizer-telefon", this.manifest);
         const err = nat ? await nat.installWeb(this.manifest.surum, b64, this.manifest.imza || "") : t("Bu cihazda kurulamaz.");
         if (err) throw new Error(err);
+        this._setTry(this.manifest.surum);
         this.state = "ready";
         this.emit();
         toast(t("{n} kuruldu. Uygulama yeniden başlatılıyor…", { n: goster(this.manifest.surum) }));

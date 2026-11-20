@@ -2,7 +2,7 @@
  * tarih, not), sınıflandırma ağaçları, arama, sıralama, toplu taşıma/silme, ustalar ve dükkanlar, ayarlar, yedek, bulut. */
 "use strict";
 
-const APP_VERSION = "2.1.0.4";   // iç numara; baştaki "2." sürüm dizisi. Ekranda v.1.0.3 görünür (goster()).
+const APP_VERSION = "2.1.0.5";   // iç numara; baştaki "2." sürüm dizisi. Ekranda v.1.0.5 görünür (goster()).
 function goster(v) {
   const p = String(v === undefined ? APP_VERSION : (v || "")).trim().split(".").filter(x => x !== "");
   if (!p.length) return "";

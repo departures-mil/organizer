@@ -1,10 +1,10 @@
 {
- "surum": "2.1.0.4",
- "notlar": "v.1.0.4: Eşya listesinde 'Dükkan/Kişi' ve 'Konum' iki ayrı sütun olarak yan yana; ikisine de başlığa tıklayarak sıralama. Telefonda sıralamaya 'Konum' eklendi.",
- "boyut": 120359,
- "sha256": "51ea7271ab6944e4986e007db2cfc5edb1918e31c4ab6ca68f7ad134669ec11e",
- "imza": "aNmyqUbPkfcXf3Q7p+w+1kNBi7FrQNui0H2et8M515fSYjI3NtcGJXYel+qiDiLCVaWTr5MG9ftfLI4BifpZmBk8kFKOF6KWbgMkJtOlfpJbo7jvPZZ57ujeOKvCja1g88fTWp4TQBtfn89XEQ3SRptTuwPlFoCIMhbzkbieC/AoFdbDDV/ki5JxI1enxRzuGUVRnwhL7o501jnUOwk8EzY2mCjpIdyJNmO3VXEyMZOOBpJY47uzjeMxIx3vl40t8AcfNGtTQ3/+jBRIItjviK4utC2A1xYE8Zkma7o+nnKQm8TbQBR3zM5KQP/xtcbH4HxQOTCk0Xj58u2rhnFbqR+dXD99ri2fwf60RXOi1UnsDugbqRAdSFli0FjPHLiu7p2jE/LC1VmpWMHGUYWpu3ilq/hXInejuiYd/mVmSaInw4hWDXl6L7hc+GNJQCwsyZjylnOza4SOjTzW3CVNzDkKlRGOgY8tDIj7cW1FRJmLJ+QbmWl+XFPNz3TjYwnR",
- "yayin": "2026-11-18 01:10 UTC",
- "kabuk": 1,
- "dosya": "organizer-telefon-2.1.0.4.zip"
+ "surum": "2.1.0.5",
+ "notlar": "v.1.0.5: Telefonda 'Güncelle'ye basınca uygulamanın yeniden açılıp aynı güncellemeyi tekrar göstermesi (sonsuz döngü) düzeltildi. Bu sefer Android bir kez 'Güncelle' onayı ister; sonraki güncellemeler yine tek tuşla kurulur.",
+ "boyut": 120710,
+ "sha256": "2e525febfb5638abfd6fd7c41414bcbd7535c30566621d9fadae4853426234c1",
+ "imza": "DKRd4zoFvCmgiOCe7mYhiZCtW9WdCmaL8XySmaqiGQlQ/oyZY8NJExneEFLNVjOPD2nRd31HU6WLJDNk3Sgpp4Bprrw/Xi+rbaqVyNbglXenkuqSbV0jWECry8uUbaNliDmJHP1AJNqMrw7NAM6zG70qzvve2F5O3vln04C4nKoJ+vY9cOK5suiCxEdkSaGMHaCXtCCAwHSqVXPwoBTW9HDyeUrqnV0jYzph0umlNPY0aBSsCgKzmhlfOlHm7tUL7kdjciZxNN9E8uPFJtYBwnoiAdXoAmGfA/1jhyEGh9mtXi/2GIhK3V4mRfSN6nLVSpmGHLRY+uPVOwEmm0CS0VSqlickfVIznQj433AxNSuMcHLI++B6yDjYs9uvKD9UM4mMQHCMpmIAEb1I2fGN2j4NXXrKIDn9CYsEtbCvBSSJKqzfdsSsqMShU/suxmf+4PBtlzlyhjzv37KDrmx3I7LPU5NHJi9gk4il8nzuSTOVTbdg7l3pMFdJHawLV90O",
+ "yayin": "2026-11-20 01:47 UTC",
+ "kabuk": 2,
+ "dosya": "organizer-telefon-2.1.0.5.zip"
 }
