@@ -353,6 +353,7 @@ const Store = {
       notes: data.notes || "", created_at: data.created_at || nowStr(), updated_at: nowStr(),
       shop_name: (data.shop_name || "").trim(), shop_place: (data.shop_place || "").trim(), shop_phone: (data.shop_phone || "").trim(),
       shop_whatsapp: !!data.shop_whatsapp, shop_telegram: !!data.shop_telegram,
+      price_auto: !!data.price_auto && !(data.price == null || data.price === ""),
       photos: photos, mtime: nowUtc(), deleted: false, dirty: true,
     };
     await this.save("items", rec);
@@ -495,7 +496,12 @@ const Store = {
     const dropPhotos = [];
     for (const rec of records) {
       const cur = this.t[table].get(rec.uid);
-      if (cur && cur.mtime >= (rec.mtime || "")) continue;
+      if (cur && cur.mtime >= (rec.mtime || "")) {
+        // aynı sürüm: eski sürümün düşürdüğü "otomatik fiyat" işaretini tamamla
+        if (table === "items" && cur.mtime === rec.mtime && "price_auto" in rec && !!cur.price_auto !== !!rec.price_auto)
+          accepted.push({ ...cur, price_auto: !!rec.price_auto });
+        continue;
+      }
       let r;
       if (TREE_TABLES.includes(table)) {
         r = { uid: rec.uid, name: rec.name || "", parent: rec.parent === rec.uid ? "" : (rec.parent || ""),
@@ -511,6 +517,9 @@ const Store = {
         const src = "shop_name" in rec ? rec : (cur || {});
         Object.assign(r, { shop_name: src.shop_name || "", shop_place: src.shop_place || "", shop_phone: src.shop_phone || "",
           shop_whatsapp: !!src.shop_whatsapp, shop_telegram: !!src.shop_telegram });
+        // otomatik (tahmini) fiyat işareti; bilmeyen eski sürümden gelirse fiyat aynıysa eldeki işaret korunur
+        r.price_auto = r.price != null && ("price_auto" in rec ? !!rec.price_auto
+          : !!(cur && cur.price_auto && cur.price != null && Math.abs(cur.price - r.price) < 1e-9));
       } else {
         // 4.0 sürümünden gelen kayıtlarda "photos" alanı yoktur; o zaman eldeki fotoğraflar kalır
         const photos = rec.deleted ? [] : ("photos" in rec ? (rec.photos || []) : (cur ? (cur.photos || []) : []));

@@ -56,6 +56,21 @@ def t(text, **kw):
 
 # Türkçe: (English, العربية)
 STRINGS = {
+    "⚡ Otomatik fiyat — henüz kontrol edilmedi": ("⚡ Automatic price — not checked yet", "⚡ سعر تلقائي — لم تتم مراجعته بعد"),
+    "İşareti kaldırırsanız ya da fiyatı değiştirirseniz bu fiyat sizin girdiğiniz fiyat sayılır (✎).": ("If you untick this or change the price, it counts as a price you entered (✎).", "إذا أزلت العلامة أو غيّرت السعر، يُعتبر هذا السعر سعرًا أدخلته أنت (✎)."),
+    "⚡ otomatik — kontrol edilmedi": ("⚡ automatic — not checked", "⚡ تلقائي — لم تتم مراجعته"),
+    "Yalnızca otomatik girilmiş, henüz kontrol etmediğiniz fiyatları göster\n⚡ = otomatik fiyat · ✎ = sizin girdiğiniz fiyat": ("Show only automatically entered prices you have not checked yet\n⚡ = automatic price · ✎ = price you entered", "عرض الأسعار المُدخلة تلقائيًا التي لم تراجعها بعد فقط\n⚡ = سعر تلقائي · ✎ = سعر أدخلته أنت"),
+    "⚡ Kontrol edilmemiş fiyatlar ({n})": ("⚡ Unchecked prices ({n})", "⚡ أسعار غير مُراجَعة ({n})"),
+    "⚡ Otomatik (tahmini) fiyat — henüz kontrol edilmedi.\nDüzenleyip fiyatı değiştirince ya da sağ tık → \"Fiyatı onayla\" deyince sizin fiyatınız olur.": ("⚡ Automatic (estimated) price — not checked yet.\nIt becomes your price when you edit it or right-click → \"Confirm price\".", "⚡ سعر تلقائي (تقديري) — لم تتم مراجعته بعد.\nيصبح سعرك عند تعديله أو بالنقر الأيمن ← \"تأكيد السعر\"."),
+    "✎ Sizin girdiğiniz fiyat": ("✎ Price you entered", "✎ سعر أدخلته أنت"),
+    "Kontrol edilmemiş otomatik fiyat kalmadı. ✓": ("No unchecked automatic prices left. ✓", "لم يبقَ أي سعر تلقائي غير مُراجَع. ✓"),
+    " · ⚡ {n} fiyat otomatik (kontrol edilmedi) · ✎ sizin girdiğiniz": (" · ⚡ {n} prices automatic (not checked) · ✎ entered by you", " · ⚡ {n} سعر تلقائي (غير مُراجَع) · ✎ أدخلته أنت"),
+    "✎  Fiyatı onayla (benim fiyatım)": ("✎  Confirm price (my price)", "✎  تأكيد السعر (سعري)"),
+    "⚡  Otomatik fiyat olarak işaretle": ("⚡  Mark as automatic price", "⚡  تعليم كسعر تلقائي"),
+    "⚡ Otomatik (tahmini) fiyat — henüz kontrol edilmedi": ("⚡ Automatic (estimated) price — not checked yet", "⚡ سعر تلقائي (تقديري) — لم تتم مراجعته بعد"),
+    "⚡ Otomatik fiyat olarak işaretlendi": ("⚡ Marked as automatic price", "⚡ تم التعليم كسعر تلقائي"),
+    "✎ Fiyat onaylandı": ("✎ Price confirmed", "✎ تم تأكيد السعر"),
+    "✎ Onayla": ("✎ Confirm", "✎ تأكيد"),
     # sağ üst çubuk
     "Fiyatları gizle / göster": ("Hide / show prices", "إخفاء / إظهار الأسعار"),
     "Hızlı ara / barkod okuyucu (Ctrl+F)": ("Quick search / barcode reader (Ctrl+F)", "بحث سريع / قارئ الباركود (Ctrl+F)"),

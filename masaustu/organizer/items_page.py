@@ -1,5 +1,5 @@
 from PySide6.QtCore import QSize, Qt, QTimer, Signal
-from PySide6.QtGui import QFont, QPixmap
+from PySide6.QtGui import QColor, QFont, QPixmap
 from PySide6.QtWidgets import (QAbstractItemView, QComboBox, QGridLayout, QHBoxLayout,
                                QHeaderView, QLabel, QLineEdit, QListView, QListWidget,
                                QListWidgetItem, QMenu, QPushButton, QSplitter,
@@ -11,6 +11,16 @@ from .i18n import t
 from .item_dialog import ItemDialog, PhotoViewer
 from .report import ReportDialog
 from .shop import ShopLinks, has_shop, shop_title, shop_tooltip
+
+AUTO_COLOR = "#8a969c"   # otomatik (tahmini) fiyatların rengi
+
+
+def price_text(d):
+    """Listede fiyat: otomatik girilmiş fiyat "⚡", kullanıcının girdiği "✎" işaretiyle."""
+    if d["price"] is None:
+        return "—"
+    return ("⚡ " if d.get("price_auto") else "✎ ") + fmt_price(d["price"], d["currency"])
+
 
 SORTS = [
     ("En yeni eklenen", "created_desc"),
@@ -232,7 +242,13 @@ class ItemDetail(Card):
         self.fields["quantity"].setText(str(it["quantity"]))
         self.fields["category"].setText(it["category_path"] or "—")
         self.fields["location"].setText(it["location_path"] or "—")
-        self.fields["price"].setText(fmt_price(it["price"], it["currency"]))
+        if it["price"] is not None and it.get("price_auto"):
+            self.fields["price"].setText(fmt_price(it["price"], it["currency"]) + "   " +
+                                         t("⚡ otomatik — kontrol edilmedi"))
+            self.fields["price"].setStyleSheet(f"color: {AUTO_COLOR};")
+        else:
+            self.fields["price"].setText(price_text(it) if it["price"] is not None else "—")
+            self.fields["price"].setStyleSheet("")
         self.fields["created"].setText(fmt_date(it["created_at"]))
         self.notes.setText(it["notes"])
         self._show_shop(it)
@@ -330,6 +346,12 @@ class ItemsPage(QWidget):
         report_btn.setToolTip(t("Seçili kategori ya da yerdeki bütün eşyaların listesi (yazdır / PDF)"))
         report_btn.clicked.connect(lambda: self.open_report())
         header.addWidget(report_btn)
+        self.auto_btn = QPushButton()
+        self.auto_btn.setCheckable(True)
+        self.auto_btn.setToolTip(t("Yalnızca otomatik girilmiş, henüz kontrol etmediğiniz fiyatları göster\n"
+                                   "⚡ = otomatik fiyat · ✎ = sizin girdiğiniz fiyat"))
+        self.auto_btn.toggled.connect(lambda _: self.reload_items())
+        header.addWidget(self.auto_btn)
         header.addWidget(new_btn)
         root.addLayout(header)
 
@@ -424,6 +446,10 @@ class ItemsPage(QWidget):
         selected = {selected} if isinstance(selected, int) else set(selected)
         cat_ids, loc_ids = self.cat_tree.filter_ids(), self.loc_tree.filter_ids()
         self.items = self.db.list_items(self.search.text(), cat_ids, loc_ids, self.sort.currentData())
+        n_auto = sum(1 for d in self.items if d["price_auto"] and d["price"] is not None)
+        self.auto_btn.setText(t("⚡ Kontrol edilmemiş fiyatlar ({n})", n=n_auto))
+        if self.auto_btn.isChecked():
+            self.items = [d for d in self.items if d["price_auto"] and d["price"] is not None]
 
         cc = self.db.get_setting("country_code", "90")
         self.table.blockSignals(True)
@@ -447,8 +473,17 @@ class ItemsPage(QWidget):
             if d["quantity"] == 0:
                 qty.setForeground(Qt.red)
                 qty.setToolTip(t("Kalmadı"))
-            price = QTableWidgetItem(fmt_price(d["price"], d["currency"]))
+            price = QTableWidgetItem(price_text(d))
             price.setTextAlignment(Qt.AlignRight | Qt.AlignVCenter)
+            if d["price"] is not None and d["price_auto"]:
+                price.setForeground(QColor(AUTO_COLOR))
+                pf = price.font()
+                pf.setItalic(True)
+                price.setFont(pf)
+                price.setToolTip(t("⚡ Otomatik (tahmini) fiyat — henüz kontrol edilmedi.\n"
+                                   "Düzenleyip fiyatı değiştirince ya da sağ tık → \"Fiyatı onayla\" deyince sizin fiyatınız olur."))
+            elif d["price"] is not None:
+                price.setToolTip(t("✎ Sizin girdiğiniz fiyat"))
             cat = QTableWidgetItem(d["category_path"].split(" › ")[-1] or "—")
             cat.setToolTip(d["category_path"])
             loc = QTableWidgetItem(d["location_path"].split(" › ")[-1] or "—")
@@ -476,7 +511,9 @@ class ItemsPage(QWidget):
         self.table.setVisible(has)
         self.empty.setVisible(not has)
         if not has:
-            if self.db.count_items() == 0:
+            if self.auto_btn.isChecked():
+                self.empty.setText(t("Kontrol edilmemiş otomatik fiyat kalmadı. ✓"))
+            elif self.db.count_items() == 0:
                 self.empty.setText(t("Henüz eşya eklenmemiş.\n\n„＋ Yeni Eşya“ düğmesiyle ilk eşyanızı ekleyin."))
             else:
                 self.empty.setText(t("Aramanıza uyan eşya bulunamadı."))
@@ -485,6 +522,8 @@ class ItemsPage(QWidget):
         text = t("{n} eşya listeleniyor · toplam {q} adet", n=len(self.items), q=sum(d["quantity"] for d in self.items))
         if totals:
             text += t(" · Değer: ") + "  +  ".join(fmt_price(v, c) for c, v in totals.items())
+        if n_auto:
+            text += t(" · ⚡ {n} fiyat otomatik (kontrol edilmedi) · ✎ sizin girdiğiniz", n=n_auto)
         self.summary.setText(text)
 
         parts = []
@@ -582,9 +621,18 @@ class ItemsPage(QWidget):
             sub.addAction(t("— Belirtilmemiş —"), lambda f=field: self._move(ids, f, None))
             for nid, name, depth, path in self.db.tree_ordered(table):
                 sub.addAction(("    " * depth) + name, lambda f=field, n=nid: self._move(ids, f, n))
+        priced = [d["id"] for d in self.items if d["id"] in ids and d["price"] is not None]
+        if priced:
+            menu.addSeparator()
+            menu.addAction(t("✎  Fiyatı onayla (benim fiyatım)"), lambda: self._set_auto(priced, 0))
+            menu.addAction(t("⚡  Otomatik fiyat olarak işaretle"), lambda: self._set_auto(priced, 1))
         menu.addSeparator()
         menu.addAction(t("Sil"), lambda: self.delete_items(ids))
         menu.exec(self.table.viewport().mapToGlobal(pos))
+
+    def _set_auto(self, ids, value):
+        self.db.update_items_field(ids, "price_auto", value)
+        self.reload_items(keep_id=ids)
 
     def _move(self, ids, field, node_id):
         self.db.update_items_field(ids, field, node_id)

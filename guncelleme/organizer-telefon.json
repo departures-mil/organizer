@@ -1,10 +1,10 @@
 {
- "surum": "2.1.0.6",
- "notlar": "v.1.0.6: Üst başlık yenilendi — güncelleme, eşitleme, göz ve arama tek satırda simge olarak; dil seçici altta ortada; indirme ilerlemesi başlıkta ince çubukla (yüzde, MB, kalan, hız). Liste üstündeki koyu sütun çubuğu kaldırıldı; sıralama 'Sırala' düğmesinden.",
- "boyut": 121042,
- "sha256": "7b3cfec96e382c74bbc440044e8740b305f70dd453286fc63eadd1a30c89c5a1",
- "imza": "gnFtv/qH/msXQjYB3pi5fh47jCosdo2R4/SK2UtGkWjn9bFJEmxtvwG4446hf6ro4e93WO0Tzu5SAHgJPN5kLUrvWPt7BZkNIT87pX37hVCeK9dtlIRn16Q1VxOymSd7q/XmWc9WbFPsogarYKS64MRvcorYkQIcpXRytt13G5jVgBfLSCs2FAB78ux8j3IIUL7Ywol1mDtKZ03zg68l3ilTBwiPVPu1oITwHwWQ/UqsMjbUxAlQrWGI9HnB8fQYCM422VJKhzQ3Seqns61Okz3Lbaxp8fSX3+WL0BypWcI9ZoZ0fL6JL8Tq+an46g+2MrOdijNKBnb4ZHIy+0zaE9I9EwtQ5hGpJ8ddRDlsWZusr4TmJfLC/NxnL2IFUXtHx54bDsdRycbTyyIeFx29CDDmTD+MRaK23vav8JVoQjY/CG51MgZh6mvQtKCuNaCKaMYVB3lUAxYuz4a06JEJDZIE6Twp7RBQ9pisVsx9FmGEOr2sCIUio41A0/Of67ta",
- "yayin": "2026-11-20 02:14 UTC",
+ "surum": "2.1.0.7",
+ "notlar": "v.1.0.7: Otomatik (tahmini) fiyatlar ⚡ ile, sizin girdiğiniz fiyatlar ✎ ile işaretlenir. 'Kontrol edilmemiş fiyatlar' filtresi; fiyatı değiştirince ya da 'Fiyatı onayla' deyince işaret kalkar.",
+ "boyut": 123064,
+ "sha256": "e806afa89b9aaefed082f1482b8cd103f221a627bab2352bbf291b53cbb57147",
+ "imza": "kKy0bt1rl1L82WyfWoNyUXF8MqJKO3VrLlv5f47H6KH/MVKHJU1Gx33SdGWSkB5Em/3gw7FWXmuVqQTS4qB8a6CMiOGnPtEGIzZvj5AIKGufktGMwJtqu5KA1BvIBvI5iTa2nkW6fnV1GUQdqORvaKChVXGJfXBxi+R1nSvqxLxWRoRcg2cIaAgZYSKlm98aCMFtrjXEUBudQ6wFiYavoVutQVKNqsLbElnW0Mr7YmtlSwjTXKb/38XugwqE3GTbJ+qDJQ3KOZRbVc3beHtof11iLVbBsf7MvIfo+N11Q4A/dwxukHzzTepl4zdm7l1+x/i30lywtBZrTJ9fkFKimsnDC09bnWeQEm74OwoJTazsxhQWWffy3lCHgBidfy1MwjWi7zynXsFGAUSUcdtOcj3beBDK/HNRK0VIAzoQv8KbHzZ2LIJo0HUZbJ0MWXubKDUTWhdQtT1HNogUcmrEoQXHuDNBkfXB8S2PUvafUkedUZZmmCA6O3SW2KtL+6JA",
+ "yayin": "2026-11-21 08:15 UTC",
  "kabuk": 2,
- "dosya": "organizer-telefon-2.1.0.6.zip"
+ "dosya": "organizer-telefon-2.1.0.7.zip"
 }

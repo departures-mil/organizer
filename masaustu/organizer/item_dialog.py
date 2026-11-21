@@ -3,7 +3,7 @@ from pathlib import Path
 
 from PySide6.QtCore import QDateTime, QSize, Qt
 from PySide6.QtGui import QIcon, QKeySequence, QPixmap, QShortcut
-from PySide6.QtWidgets import (QComboBox, QCompleter, QFrame, QDateTimeEdit, QDialog, QDialogButtonBox,
+from PySide6.QtWidgets import (QCheckBox, QComboBox, QCompleter, QFrame, QDateTimeEdit, QDialog, QDialogButtonBox,
                                QDoubleSpinBox, QFileDialog, QFormLayout, QHBoxLayout, QLabel,
                                QLineEdit, QListView, QListWidget, QListWidgetItem, QPlainTextEdit,
                                QPushButton, QSpinBox, QVBoxLayout, QWidget)
@@ -175,6 +175,12 @@ class ItemDialog(QDialog):
         price_row.addWidget(self.currency)
         price_row.addStretch()
         form.addRow(t("Alış fiyatı:"), price_row)
+        # otomatik (tahmini) girilmiş fiyat: kullanıcı fiyatı değiştirince ya da işareti kaldırınca "sizin" olur
+        self.price_auto = QCheckBox(t("⚡ Otomatik fiyat — henüz kontrol edilmedi"))
+        self.price_auto.setToolTip(t("İşareti kaldırırsanız ya da fiyatı değiştirirseniz bu fiyat sizin girdiğiniz fiyat sayılır (✎)."))
+        self.price_auto.setStyleSheet("color: #b7791f; font-weight: 600;")
+        self.price_auto.hide()
+        form.addRow("", self.price_auto)
 
         # ---- satın alındığı yer
         sep = QLabel(t("🏪  Satın alındığı yer"))
@@ -239,6 +245,9 @@ class ItemDialog(QDialog):
             self.location.set_current_id(item["location_id"])
             self.price.setValue(item["price"] or 0)
             default_currency = item["currency"]
+            if item.get("price_auto") and item["price"] is not None:
+                self.price_auto.setChecked(True)
+                self.price_auto.show()
             self.created.setDateTime(QDateTime.fromString(item["created_at"], "yyyy-MM-dd HH:mm:ss"))
             self.notes.setPlainText(item["notes"])
             self.photos.set_existing(item["photos"])
@@ -250,6 +259,8 @@ class ItemDialog(QDialog):
             self.category.set_current_id(defaults.get("category_id"))
             self.location.set_current_id(defaults.get("location_id"))
         self.currency.setCurrentIndex(max(0, self.currency.findData(default_currency)))
+        self.price.valueChanged.connect(lambda _: self.price_auto.setChecked(False))
+        self.currency.currentIndexChanged.connect(lambda _: self.price_auto.setChecked(False))
         self._draw_status()
         self.name.setFocus()
 
@@ -310,6 +321,7 @@ class ItemDialog(QDialog):
             "shop_place": self.shop_place.text().strip(),
             "shop_phone": self.shop_phone.text().strip(),
             **self.channels.values(),
+            "price_auto": not self.price_auto.isHidden() and self.price_auto.isChecked() and price > 0,
         }
 
     def photo_entries(self):
