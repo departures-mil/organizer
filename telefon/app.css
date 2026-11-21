@@ -285,3 +285,9 @@ textarea.in { min-height: 84px; resize: vertical; }
 .chstatus.on { color: #1f9d55; font-weight: 700; }
 .facts div span.shoplinks.big { display: flex; flex-wrap: wrap; width: auto; white-space: normal; }
 .facts .shoplinks.big a { flex: none; white-space: nowrap; word-break: normal; }
+
+/* fiyatın kaynağı: ⚡ otomatik (tahmini) · ✎ kullanıcının girdiği */
+.price .autoprice { color: #8a969c; font-style: italic; font-weight: 500; }
+.price .myprice { color: var(--teal-dark); }
+.autorow { display: flex; align-items: center; gap: 8px; margin-top: 8px; color: #b7791f; font-weight: 600; font-size: 14px; }
+.autorow input { width: 20px; height: 20px; }

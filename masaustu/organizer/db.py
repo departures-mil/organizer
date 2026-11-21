@@ -75,6 +75,7 @@ CREATE TABLE IF NOT EXISTS items(
     shop_phone TEXT NOT NULL DEFAULT '',
     shop_whatsapp INTEGER NOT NULL DEFAULT 0,
     shop_telegram INTEGER NOT NULL DEFAULT 0,
+    price_auto INTEGER NOT NULL DEFAULT 0,
     {SYNC_COLS}
 );
 CREATE TABLE IF NOT EXISTS item_photos(
@@ -115,6 +116,11 @@ SYNC_TABLES = ("locations", "categories", "items", "contacts")
 SHOP_TEXT = ("shop_name", "shop_place", "shop_phone")
 SHOP_FLAGS = ("shop_whatsapp", "shop_telegram")
 SHOP_FIELDS = SHOP_TEXT + SHOP_FLAGS
+
+# price_auto = 1: fiyat otomatik (tahminle) girildi, kullanıcı henüz kontrol etmedi.
+# 2026-11-18 ~00:10 UTC'de fiyatı boş eşyalara toplu tahmini fiyat yazıldı; o işlemin yedeği:
+AUTO_PRICE_BACKUP = "organizer-yedek-fiyatlardan-once-2026-11-18.db"
+AUTO_PRICE_BATCH = ("2026-11-17T23:30", "2026-11-18T00:30")   # toplu işlemin mtime aralığı (UTC)
 
 _UPPER_TR = str.maketrans({"İ": "i", "I": "ı"})
 _FOLD_TR = str.maketrans("ıçğöşüâîûأإآٱةى", "icgosuaiuااااهي")
@@ -202,6 +208,7 @@ class Database:
         self.conn.executescript(SCHEMA)
         self._seed()
         self._fill_uids()
+        self._mark_auto_prices()
 
     # ------------------------------------------------------------------ kurulum / göç
     def _migrate_columns(self):
@@ -221,7 +228,7 @@ class Database:
                 for col in SHOP_TEXT:
                     if col not in cols:
                         self.conn.execute(f"ALTER TABLE items ADD COLUMN {col} TEXT NOT NULL DEFAULT ''")
-                for col in SHOP_FLAGS:
+                for col in SHOP_FLAGS + ("price_auto",):
                     if col not in cols:
                         self.conn.execute(f"ALTER TABLE items ADD COLUMN {col} INTEGER NOT NULL DEFAULT 0")
         self.conn.commit()
@@ -246,6 +253,56 @@ class Database:
                     self.conn.execute(f"UPDATE {table} SET uid=? WHERE id=?", (uid, r["id"]))
             for table in SYNC_TABLES:
                 self.conn.execute(f"CREATE UNIQUE INDEX IF NOT EXISTS ux_{table}_uid ON {table}(uid)")
+
+    def _backup_candidates(self):
+        import sys
+        roots = [self.data_dir]
+        try:
+            exe = Path(sys.argv[0]).resolve()
+            roots += list(exe.parents)[:5]
+        except Exception:
+            pass
+        for base in (Path("C:/Claude Programlarım"), Path.home() / "Claude Programlarım"):
+            if base.is_dir():
+                roots.append(base)
+                roots += [p for p in base.iterdir() if p.is_dir()]
+        seen = set()
+        for r in roots:
+            for p in (r / "_gelistirme" / AUTO_PRICE_BACKUP, r / AUTO_PRICE_BACKUP):
+                if p not in seen:
+                    seen.add(p)
+                    if p.is_file():
+                        yield p
+
+    def _mark_auto_prices(self):
+        """Bir kerelik: 2026-11-18'de toplu girilen tahmini fiyatları "otomatik" olarak işaretler.
+
+        Yedek veritabanı bulunursa: o gün fiyatı boş olup şimdi fiyatı olan ve o günden beri
+        değiştirilmemiş eşyalar. Yedek yoksa: mtime'ı toplu işlem aralığında kalan fiyatlı eşyalar.
+        İşaretlenen kayıt eşitlenir (telefon da görsün)."""
+        if self.get_setting("price_auto_v1"):
+            return
+        start, end = AUTO_PRICE_BATCH
+        rows = self.conn.execute("SELECT id, uid, mtime FROM items WHERE deleted=0 AND price IS NOT NULL "
+                                 "AND price_auto=0").fetchall()
+        marked = []
+        backup = next(self._backup_candidates(), None)
+        if backup is not None:
+            try:
+                b = sqlite3.connect(f"file:{backup}?mode=ro", uri=True)
+                empty = {r[0] for r in b.execute("SELECT uid FROM items WHERE price IS NULL AND uid IS NOT NULL")}
+                b.close()
+                marked = [r["id"] for r in rows if r["uid"] in empty and (r["mtime"] or "")[:16] <= end]
+            except Exception:
+                backup = None
+        if backup is None:
+            marked = [r["id"] for r in rows if start <= (r["mtime"] or "")[:16] <= end]
+        with self.conn:
+            ts = now_utc()
+            self.conn.executemany("UPDATE items SET price_auto=1, mtime=?, dirty=1 WHERE id=?",
+                                  [(ts, i) for i in marked])
+            self.conn.execute("INSERT OR REPLACE INTO settings VALUES ('price_auto_v1', ?)",
+                              (f"{len(marked)} {'yedek' if backup else 'zaman'}",))
 
     def _seed(self):
         if self.get_setting("seeded"):
@@ -477,8 +534,9 @@ class Database:
         shop_name, shop_place, shop_phone, shop_whatsapp, shop_telegram.
         photos: [("existing", dosya_adı) | ("new", kaynak_yol)] ya da None (dokunma)."""
         fields = ("name", "quantity", "location_id", "category_id", "price", "currency",
-                  "notes", "created_at") + SHOP_FIELDS
+                  "notes", "created_at") + SHOP_FIELDS + ("price_auto",)
         values = [data.get(f) for f in fields]
+        values[-1] = int(bool(data.get("price_auto")) and data.get("price") is not None)
         for i, f in enumerate(fields):
             if f in SHOP_TEXT:
                 values[i] = (values[i] or "").strip()
@@ -532,7 +590,7 @@ class Database:
             self.conn.execute("INSERT OR REPLACE INTO photo_sync VALUES (?, 'delete')", (fname,))
 
     def update_items_field(self, item_ids, field, value):
-        if field not in ("category_id", "location_id"):
+        if field not in ("category_id", "location_id", "price_auto"):
             raise ValueError(field)
         with self.conn:
             self.conn.executemany(
@@ -672,6 +730,7 @@ class Database:
                 "created_at": r["created_at"], "photos": [] if r["deleted"] else self.item_photos(r["id"]),
                 "shop_name": r["shop_name"], "shop_place": r["shop_place"], "shop_phone": r["shop_phone"],
                 "shop_whatsapp": bool(r["shop_whatsapp"]), "shop_telegram": bool(r["shop_telegram"]),
+                "price_auto": bool(r["price_auto"]),
                 "mtime": r["mtime"], "deleted": bool(r["deleted"])})
         out["contacts"] = [{
             "uid": r["uid"], "kind": r["kind"], "name": r["name"], "profession": r["profession"],
@@ -694,9 +753,14 @@ class Database:
         for rec in records:
             cur = local.get(rec["uid"])
             if cur is not None and cur["mtime"] >= rec.get("mtime", ""):
+                if table == "items" and cur["mtime"] == rec.get("mtime") and "price_auto" in rec:
+                    # aynı sürüm: yalnızca otomatik fiyat işaretini (eski sürümün düşürdüğü alan) tamamla
+                    self.conn.execute("UPDATE items SET price_auto=? WHERE uid=?",
+                                      (int(bool(rec["price_auto"])), rec["uid"]))
                 continue
             accepted.append(rec)
         if not accepted:
+            self.conn.commit()
             return 0
         with self.conn:
             if table in TREE_TABLES:
@@ -724,25 +788,32 @@ class Database:
                         old = self.conn.execute("SELECT " + ", ".join(SHOP_FIELDS) + " FROM items WHERE uid=?",
                                                 (rec["uid"],)).fetchone()
                         rec = {**rec, **dict(old)}
+                    if "price_auto" not in rec and rec["uid"] in local:
+                        # işareti bilmeyen eski sürümden gelen kayıt: fiyat aynıysa yereldeki işaret korunur
+                        old = self.conn.execute("SELECT price, price_auto FROM items WHERE uid=?",
+                                                (rec["uid"],)).fetchone()
+                        same = old["price"] is not None and price is not None and abs(old["price"] - float(price)) < 1e-9
+                        rec = {**rec, "price_auto": bool(old["price_auto"]) and same}
                     vals = (rec.get("name", ""), int(rec.get("quantity") or 0),
                             locs.get(rec.get("location") or ""), cats.get(rec.get("category") or ""),
                             None if price is None else float(price), rec.get("currency") or "TRY",
                             rec.get("notes", ""), rec.get("created_at") or now_str(),
                             rec["mtime"], int(bool(rec.get("deleted"))),
                             *[str(rec.get(f) or "") for f in SHOP_TEXT],
-                            *[int(bool(rec.get(f))) for f in SHOP_FLAGS])
+                            *[int(bool(rec.get(f))) for f in SHOP_FLAGS],
+                            int(bool(rec.get("price_auto")) and price is not None))
                     if rec["uid"] in local:
                         item_id = local[rec["uid"]]["id"]
                         self.conn.execute(
                             "UPDATE items SET name=?, quantity=?, location_id=?, category_id=?, price=?, currency=?, "
                             "notes=?, created_at=?, mtime=?, deleted=?, shop_name=?, shop_place=?, shop_phone=?, "
-                            "shop_whatsapp=?, shop_telegram=?, dirty=0 WHERE id=?", (*vals, item_id))
+                            "shop_whatsapp=?, shop_telegram=?, price_auto=?, dirty=0 WHERE id=?", (*vals, item_id))
                     else:
                         item_id = self.conn.execute(
                             "INSERT INTO items(name, quantity, location_id, category_id, price, currency, notes, "
                             "created_at, mtime, deleted, shop_name, shop_place, shop_phone, shop_whatsapp, "
-                            "shop_telegram, dirty, uid, updated_at) "
-                            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?)",
+                            "shop_telegram, price_auto, dirty, uid, updated_at) "
+                            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?)",
                             (*vals, rec["uid"], now_str())).lastrowid
                     old = set(self.item_photos(item_id))
                     new = [] if rec.get("deleted") else list(rec.get("photos") or [])

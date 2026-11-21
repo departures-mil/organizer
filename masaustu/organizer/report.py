@@ -86,7 +86,8 @@ def build_report(db, table, node_id, with_photos=True):
                       f'{escape(fmt_date(d["created_at"]))}</span></td>',
                       f'<td><b>{d["quantity"]}</b></td>',
                       f'<td>{escape(d[other_path] or "—")}</td>',
-                      f'<td>{escape(fmt_price(d["price"], d["currency"]))}</td>',
+                      f'<td>{escape(fmt_price(d["price"], d["currency"]))}'
+                      f'{" ⚡" if d.get("price_auto") and d["price"] is not None else ""}</td>',
                       f'<td>{escape(d["notes"]).replace(chr(10), "<br>")}</td>']
             h.append("<tr>" + "".join(cells) + "</tr>")
         h.append("</table>")

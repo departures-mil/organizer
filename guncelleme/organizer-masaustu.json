@@ -1,10 +1,10 @@
 {
- "surum": "2.1.0.6",
- "notlar": "v.1.0.6: Telefon başlık yenilemesiyle aynı sürüm (yeni dil metinleri).",
- "boyut": 161552,
- "sha256": "6a20cde8f54533d35284e10c8f3c52a1a2e4285c08e74af83d2750aba91b46f0",
- "imza": "hX9fiVGjLllLBWoNqL5t5z1iX8w+qea1el8fW0eZPXO/9PUmKeUH+sUD30YRqK8OxSu/9D8osjKt7ngyBod5GGAkg5HXt1AI7u9ElsOGPD67qAWwNgkyFRifpjhQSRWbYr1AYaxPo8t0nIeuNGsHBeZq0dfUHxwPCSNL/QV6/4Vp4VkLWfStnVW2HPM0X316yz1d/LDQZlVwsok4+n1dm/wETvT2SsFXCXFLZS1SWwoQtxJ1fwfgPGgNxOUgCTSF17Ej4RAF4lYI5ImWdEdJJ9t8NTLnW32GFbYa7T007rv7SuS2QFuXdzbw/uRUARhirrk6RR9Y0pcY/IyItSMFoQOmvZ03NhUKuHbvPhJKZpKRwHFFmzHdtqPGWZdk897ej0mL7uvRWR2wZJGtV+wEXRRERelUrYTTB/lxGssC9lLYxnxGvT45fMWnw+Q81qluRnhbDmbx2xVCM4yxCsxTUvAabNt2DPBWwtKl+EovTCjgPi+TdIsLNgXZvI2ygLc2",
- "yayin": "2026-11-20 02:14 UTC",
+ "surum": "2.1.0.7",
+ "notlar": "v.1.0.7: Otomatik (tahmini) fiyatlar ⚡ ile, sizin girdiğiniz fiyatlar ✎ ile işaretlenir. 'Kontrol edilmemiş fiyatlar' filtresi; fiyatı değiştirince ya da 'Fiyatı onayla' deyince işaret kalkar.",
+ "boyut": 164615,
+ "sha256": "43580cded2a24c53fd020103a917519fb17af14b3459781466f2ff380e385d44",
+ "imza": "bOqWuKbxzjU5Rrz+4Zqv9VqlR7A2lEKYzDmN/WuBxSVCbrgcw+xThpAikOMvNp5jdyqjgH7BMDfOg/NXwY9sAw5Mu/GlhKie9rBYQ3CgPpLBCWD/C0Ax+oF6BW1LsM2XnplLBH4voqCXG3c0i7EM3ZDAjZ3IV9wfMNffUhihjAFu4TwbJ02funFcv7A31orDAGB48HeCLM74QXjWDP7D2ilSiCHR/pVb6FEp4XFhtHUSxFbhlGvNe6PgTDHdknouKc9X+hOENN/A//MJdsNgajcallovqA6oNl8QvNUcXC8jTyVCtY83IOAjbek9P5U4UQzSuFHWR8Wp9NJ5AHWcuvVUyGvxGz1C+mQDwUwNHYK7Hj+GxuuAKiimXTi8cENjj9JbB00aYhTvCyph+z3+eUkJqTZCJKFdxNaxdJIXVn/Y8rJ0Jfq9yaU+rE0Xkwq0fFvtK47gUP1myKUIdiqFH5pUC5A0fYRSoNkvfD1ga4jolbrmKwfxOmEQUddmfnH2",
+ "yayin": "2026-11-21 08:15 UTC",
  "sistem": 1,
- "dosya": "organizer-masaustu-2.1.0.6.zip"
+ "dosya": "organizer-masaustu-2.1.0.7.zip"
 }

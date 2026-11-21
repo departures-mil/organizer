@@ -2,7 +2,7 @@
  * tarih, not), sınıflandırma ağaçları, arama, sıralama, toplu taşıma/silme, ustalar ve dükkanlar, ayarlar, yedek, bulut. */
 "use strict";
 
-const APP_VERSION = "2.1.0.6";   // iç numara; baştaki "2." sürüm dizisi. Ekranda v.1.0.5 görünür (goster()).
+const APP_VERSION = "2.1.0.7";   // iç numara; baştaki "2." sürüm dizisi. Ekranda v.1.0.7 görünür (goster()).
 function goster(v) {
   const p = String(v === undefined ? APP_VERSION : (v || "")).trim().split(".").filter(x => x !== "");
   if (!p.length) return "";
@@ -48,6 +48,16 @@ function fmtPrice(price, cur) {
   if (PRICES_HIDDEN) return "••••••";
   const s = fmtNum(price, 2);
   return cur === "USD" ? `$${s}` : cur === "SYP" ? `${s} SYP` : `${s} ₺`;
+}
+/** Fiyatın kaynağı: ⚡ otomatik (tahmini, kontrol edilmedi) · ✎ kullanıcının girdiği */
+const isAutoPrice = d => d.price != null && !!d.price_auto;
+function priceMark(d) { return d.price == null ? "" : (isAutoPrice(d) ? "⚡ " : "✎ "); }
+async function setAutoPrice(uids, on) {
+  const list = uids.filter(u => { const d = Store.t.items.get(u); return d && d.price != null; });
+  if (!list.length) return;
+  await Store.updateItems(list, "price_auto", !!on);
+  Cloud.soon();
+  toast(on ? t("⚡ Otomatik fiyat olarak işaretlendi") : t("✎ Fiyat onaylandı"));
 }
 
 function fmtDate(v) {
@@ -271,7 +281,7 @@ function sortBar(cols, cur, onPick) {
 }
 
 const ItemsPage = {
-  search: "", cat: null, loc: null, sort: null, sel: new Set(), scroll: 0,
+  search: "", cat: null, loc: null, sort: null, sel: new Set(), scroll: 0, onlyAuto: false,
 
   render(root) {
     const paths = { categories: Store.treePaths("categories"), locations: Store.treePaths("locations") };
@@ -296,6 +306,8 @@ const ItemsPage = {
       el("button.chip", { text: "⇅  " + sortLabel, onclick: () => menu(t("Sırala:"), SORTS.map(([l, k]) => [(k === this.sort ? "✓  " : "") + t(l), () => setSort(k)])) }),
       el("button.chip", { text: t("🖨  Döküm"), onclick: () => reportPage(this.cat !== null || this.loc === null ? "categories" : "locations",
         this.cat !== null || this.loc === null ? this.cat : this.loc) }),
+      el("button.chip" + (this.onlyAuto ? ".on" : ""), { text: t("⚡ Kontrol edilmemiş fiyatlar ({n})",
+        { n: fmtNum(Store.liveItems().filter(isAutoPrice).length) }), onclick: () => { this.onlyAuto = !this.onlyAuto; App.render(); } }),
       this.cat !== null || this.loc !== null ? el("button.chip.x", { text: "✕  " + t("Filtreleri temizle"), onclick: () => { this.cat = this.loc = null; App.render(); } }) : null,
     ]));
     this.summary = el("div.summary");
@@ -321,8 +333,9 @@ const ItemsPage = {
   },
 
   items() {
-    return Store.listItems({ search: this.search, sort: this.sort,
+    const all = Store.listItems({ search: this.search, sort: this.sort,
       categories: this.filterSet("categories", this.cat), locations: this.filterSet("locations", this.loc) });
+    return this.onlyAuto ? all.filter(isAutoPrice) : all;
   },
 
   renderList() {
@@ -333,9 +346,12 @@ const ItemsPage = {
     const totals = Store.totals(items);
     const parts = CURRENCIES.filter(([c]) => c in totals).map(([c]) => fmtPrice(totals[c], c));
     if (parts.length) sum += t(" · Değer: ") + parts.join(" + ");
+    const nAuto = items.filter(isAutoPrice).length;
+    if (nAuto) sum += t(" · ⚡ {n} fiyat otomatik (kontrol edilmedi) · ✎ sizin girdiğiniz", { n: fmtNum(nAuto) });
     this.summary.textContent = sum;
     if (!items.length) {
       const none = !Store.liveItems().length;
+      if (this.onlyAuto && !none) { this.list.append(el("div.empty", { text: t("Kontrol edilmemiş otomatik fiyat kalmadı. ✓") })); return; }
       this.list.append(el("div.empty", { text: none ? t("Henüz eşya eklenmemiş.\n\n„＋ Yeni Eşya“ düğmesiyle ilk eşyanızı ekleyin.")
         : t("Aramanıza uyan eşya bulunamadı.") }));
     }
@@ -362,7 +378,10 @@ const ItemsPage = {
       thumb,
       el("div.body", null, [
         el("div.name", { text: d.name }), meta,
-        el("div.price", { text: [d.price != null ? fmtPrice(d.price, d.currency) : "", d.photos.length > 1 ? t("{n} fotoğraf", { n: d.photos.length }) : ""].filter(Boolean).join("  ·  ") }),
+        el("div.price", null, [
+          d.price != null ? el("span" + (isAutoPrice(d) ? ".autoprice" : ".myprice"), { text: priceMark(d) + fmtPrice(d.price, d.currency),
+            title: isAutoPrice(d) ? t("⚡ Otomatik (tahmini) fiyat — henüz kontrol edilmedi") : t("✎ Sizin girdiğiniz fiyat") }) : null,
+          d.photos.length > 1 ? el("span", { text: (d.price != null ? "  ·  " : "") + t("{n} fotoğraf", { n: d.photos.length }) }) : null]),
         shopTitle(d) ? el("div.shopline", null, [el("span", { text: "🏪 " + (String(d.shop_name || "").trim() || String(d.shop_phone || "").trim() || "—") }),
           String(d.shop_place || "").trim() ? el("span.shopplace", { text: "📍 " + String(d.shop_place).trim() }) : null, shopLinks(d, false)]) : null,
       ]),
@@ -404,6 +423,8 @@ const ItemsPage = {
       el("button", { text: t("Tümünü seç"), onclick: () => { for (const d of this.items()) this.sel.add(d.uid); this.renderList(); } }),
       el("button", { text: t("Kategori"), onclick: () => moveItems(ids(), "categories") }),
       el("button", { text: t("Yer"), onclick: () => moveItems(ids(), "locations") }),
+      el("button", { text: t("✎ Onayla"), title: t("✎  Fiyatı onayla (benim fiyatım)"),
+        onclick: async () => { await setAutoPrice(ids(), false); this.clearSel(); } }),
       el("button.danger", { text: t("Sil"), onclick: () => deleteItems(ids()) }),
       el("button", { text: "✕", onclick: () => this.clearSel() }),
     ]));
@@ -465,7 +486,8 @@ function itemDetail(uid) {
         el("div", null, [el("span", { text: t("Adet:") }), el("span", null, stepper)]),
         fact(t("Kategori:"), paths.c.get(d.category) || t("Belirtilmedi")),
         fact(t("Bulunduğu yer:"), paths.l.get(d.location) || t("Belirtilmedi")),
-        fact(t("Alış fiyatı:"), fmtPrice(d.price, d.currency)),
+        fact(t("Alış fiyatı:"), d.price == null ? fmtPrice(d.price, d.currency)
+          : priceMark(d) + fmtPrice(d.price, d.currency) + (isAutoPrice(d) ? "  ·  " + t("⚡ otomatik — kontrol edilmedi") : "")),
         fact(t("Ekleme tarihi:"), fmtDate(d.created_at)),
         shopTitle(d) ? el("div", null, [el("span", { text: t("Satın alındığı yer:") }), el("span", null, [
           [d.shop_name, d.shop_place, d.shop_phone ? "☎ " + d.shop_phone : ""].filter(Boolean).join("\n"),
@@ -479,6 +501,11 @@ function itemDetail(uid) {
       box.append(el("div.hrow", { style: { marginTop: "8px" } }, [
         el("button.btn.grow", { text: t("Kategoriye taşı"), onclick: async () => { await moveItems([uid], "categories"); draw(); } }),
         el("button.btn.grow", { text: t("Yere taşı"), onclick: async () => { await moveItems([uid], "locations"); draw(); } }),
+      ]));
+      if (d.price != null) box.append(el("div.hrow", { style: { marginTop: "8px" } }, [
+        isAutoPrice(d)
+          ? el("button.btn.primary.grow", { text: t("✎  Fiyatı onayla (benim fiyatım)"), onclick: async () => { await setAutoPrice([uid], false); draw(); } })
+          : el("button.btn.grow", { text: t("⚡  Otomatik fiyat olarak işaretle"), onclick: async () => { await setAutoPrice([uid], true); draw(); } }),
       ]));
     };
     draw();
@@ -642,6 +669,12 @@ function itemForm(uid, after) {
   const price = el("input.in.grow", { type: "number", inputmode: "decimal", step: "0.01", min: 0, value: d && d.price != null ? d.price : "", placeholder: "0.00" });
   const cur = el("select.in", { style: { width: "auto" } }, CURRENCIES.map(([c, sym, n]) => el("option", { value: c, text: `${sym}  ${t(n)}` })));
   cur.value = d ? d.currency : Store.get("default_currency", "TRY");
+  // otomatik (tahmini) fiyat: fiyat ya da para birimi değişince ya da işaret kaldırılınca kullanıcının fiyatı olur
+  const autoChk = el("input", { type: "checkbox" });
+  autoChk.checked = !!(d && isAutoPrice(d));
+  const autoRow = d && isAutoPrice(d) ? el("label.autorow", null, [autoChk, el("span", { text: t("⚡ Otomatik fiyat — henüz kontrol edilmedi") })]) : null;
+  price.addEventListener("input", () => { autoChk.checked = false; });
+  cur.addEventListener("change", () => { autoChk.checked = false; });
   const date = el("input.in", { type: "datetime-local", value: localInputValue(d && d.created_at) });
   const notes = el("textarea.in", { placeholder: t("Ölçü, marka, nereden alındığı gibi notlar…") });
   notes.value = d ? d.notes : "";
@@ -702,7 +735,8 @@ function itemForm(uid, after) {
         const dv = date.value ? date.value.replace("T", " ") + ":00" : nowStr();
         await Store.saveItem({ name: name.value, quantity: qty.value, category: st.category, location: st.location,
           price: price.value === "" ? null : parseFloat(price.value), currency: cur.value, notes: notes.value, created_at: dv,
-          shop_name: shopName.value, shop_place: shopPlace.value, shop_phone: shopPhone.value, ...chan }, names, uid);
+          shop_name: shopName.value, shop_place: shopPlace.value, shop_phone: shopPhone.value, ...chan,
+          price_auto: !!autoRow && autoChk.checked }, names, uid);
         Cloud.soon();
         close();
         toast(t("Kaydedildi"));
@@ -720,7 +754,7 @@ function itemForm(uid, after) {
       el("div.stepper", null, [el("button", { text: "−", onclick: () => step(-1) }), qty, el("button", { text: "+", onclick: () => step(1) })]),
       el("label.f", { text: t("Kategori:") }), nodeBtn("categories"),
       el("label.f", { text: t("Bulunduğu yer:") }), nodeBtn("locations"),
-      el("label.f", { text: t("Alış fiyatı:") }), el("div.hrow", null, [price, cur]),
+      el("label.f", { text: t("Alış fiyatı:") }), el("div.hrow", null, [price, cur]), autoRow,
       el("div.formsec", { text: t("🏪  Satın alındığı yer") }),
       el("label.f", { text: t("Dükkan/Kişi Adı:") }), shopName, shopList,
       el("label.f", { text: t("Dükkan/Kişi Yeri:") }), shopPlace,
@@ -1202,6 +1236,11 @@ const App = {
     await Icons.warm();
     PhotoInput.init();
     PRICES_HIDDEN = Store.get("prices_hidden", "0") === "1";
+    if (!Store.get("price_auto_v1", null)) {
+      // bir kerelik: eşyaları buluttan yeniden al ki otomatik fiyat işaretleri (⚡) gelsin
+      await Store.set("sync_cursor_items", null);
+      await Store.set("price_auto_v1", "1");
+    }
     TopBar.init();
     $("#syncBtn").onclick = () => {
       if (Cloud.isConnected()) { Cloud.syncNow(); toast(Cloud.statusText()); } else { this.tab = 2; this.render(); accountForm(); }
