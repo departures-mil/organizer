@@ -2,7 +2,7 @@
  * tarih, not), sınıflandırma ağaçları, arama, sıralama, toplu taşıma/silme, ustalar ve dükkanlar, ayarlar, yedek, bulut. */
 "use strict";
 
-const APP_VERSION = "2.1.0.7";   // iç numara; baştaki "2." sürüm dizisi. Ekranda v.1.0.7 görünür (goster()).
+const APP_VERSION = "2.1.0.8";   // iç numara; baştaki "2." sürüm dizisi. Ekranda v.1.0.7 görünür (goster()).
 function goster(v) {
   const p = String(v === undefined ? APP_VERSION : (v || "")).trim().split(".").filter(x => x !== "");
   if (!p.length) return "";
@@ -1084,6 +1084,36 @@ async function backup() {
   }
 }
 
+/* Admin ile iletişim: mesaj FormSubmit üzerinden yöneticinin e-postasına gider; adres programda görünmez. */
+function contactCard() {
+  const name = el("input.in", { maxLength: 80, dir: "auto", placeholder: t("Adınız (isteğe bağlı)") });
+  const mail = el("input.in.ltr", { type: "email", maxLength: 120, placeholder: t("E-posta (yanıt için, isteğe bağlı)") });
+  const msg = el("textarea.in", { maxLength: 5000, dir: "auto", rows: 5, placeholder: t("Mesajınız") });
+  let busy = false;
+  const send = el("button.btn.block", { text: t("✉  Gönder"), onclick: async () => {
+    if (busy) return;
+    const m = msg.value.trim(), e = mail.value.trim();
+    if (!m) { toast(t("Lütfen mesajınızı yazın.")); return; }
+    if (e && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e)) { toast(t("E-posta adresi geçerli değil.")); return; }
+    const to = atob("").split("").reverse().join("");
+    const body = { _subject: "Organizer: yeni mesaj", _template: "table", _captcha: "false", Ad: name.value.trim() || "-", Mesaj: m, Surum: goster(), Cihaz: "Android", Dil: I18N.lang };
+    if (e) { body.email = e; body._replyto = e; }
+    busy = true; send.disabled = true;
+    try {
+      const r = await fetch("https://formsubmit.co/ajax/" + to, { method: "POST", headers: { "Content-Type": "application/json", Accept: "application/json" }, body: JSON.stringify(body) });
+      const j = await r.json().catch(() => ({}));
+      if ((r.ok && String(j.success) !== "false") || /activat/i.test(j.message || "")) { msg.value = ""; toast(t("Mesajınız yöneticiye iletildi. Teşekkürler!")); }
+      else toast(t("Mesaj gönderilemedi. İnternet bağlantınızı kontrol edip tekrar deneyin."));
+    } catch (x) { toast(t("Mesaj gönderilemedi. İnternet bağlantınızı kontrol edip tekrar deneyin.")); }
+    busy = false; send.disabled = false;
+  } });
+  return el("div.card.section", null, [
+    el("h3", { text: t("✉ Admin ile iletişime geç") }),
+    el("div.hint", { text: t("Programı geliştirmemiz için öneri, istek ve hata bildirimlerinizi yazın; mesajınız doğrudan yöneticiye ulaşır.") }),
+    el("div", { style: { display: "grid", gap: "8px", marginTop: "8px" } }, [name, mail, msg, send]),
+  ]);
+}
+
 const SettingsPage = {
   render(root) {
     root.append(el("div.pagetitle", { text: t("Ayarlar") }));
@@ -1140,6 +1170,7 @@ const SettingsPage = {
       el("div.hint", { text: t("Kayıtlar ve fotoğraflar bu telefonda saklanır. Bulut hesabı bağlıysa bilgisayarla da eşitlenir.") }),
       el("button.btn.block", { text: t("💾  Yedek al (.json) ve paylaş"), onclick: backup }),
     ]));
+    root.append(contactCard());
     root.append(el("div.about", null, [el("img", { src: "img/logo.png", alt: "" }), el("div", { text: `Organizer ${goster()}` }),
       el("div", { text: t("Evdeki her şey yerli yerinde") })]));
   },
