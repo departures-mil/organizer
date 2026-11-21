@@ -364,7 +364,7 @@ const Cloud = {
     if (!this.isConnected() || this.busy) return null;
     this.busy = true;
     this.emit();
-    let result = null;
+    let result = null, netFail = false;
     try {
       const c = new FirebaseClient(this.config());
       await c.resume(Store.get("fb_refresh"));
@@ -375,10 +375,13 @@ const Cloud = {
       this.lastError = "";
     } catch (e) {
       this.lastError = e instanceof SyncError ? syncErrorText(e) : t("Eşitleme hatası: {m}", { m: String(e) });
+      netFail = e instanceof SyncError && e.code === "network";
     } finally {
       this.busy = false;
       this.emit();
     }
+    // internet yok: daha önce eşleşilen bilgisayar aynı ağdaysa onunla sessizce eşitle (v.1.0.8)
+    if (netFail && typeof Lan !== "undefined" && Lan.peer() && Lan.available()) Lan.run({ quiet: true });
     return result;
   },
 

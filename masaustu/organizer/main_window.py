@@ -21,12 +21,14 @@ from .theme import BackgroundWidget
 class MainWindow(QMainWindow):
     language_changed = Signal(str)
     labels_changed = Signal()
+    theme_changed = Signal(str)
 
-    def __init__(self, db, sync=None, updater=None):
+    def __init__(self, db, sync=None, updater=None, lan=None):
         super().__init__()
         self.db = db
         self.sync = sync
         self.updater = updater
+        self.lan = lan
         self.setWindowTitle(t("Organizer"))
         self.setMinimumSize(1100, 700)
 
@@ -57,7 +59,8 @@ class MainWindow(QMainWindow):
         self.stack = QStackedWidget()
         self.items_page = ItemsPage(db)
         self.contacts_page = ContactsPage(db)
-        self.settings_page = SettingsPage(db, sync, updater)
+        self.settings_page = SettingsPage(db, sync, updater, lan)
+        self.settings_page.theme_changed.connect(self.theme_changed)
         self.settings_page.changed.connect(self.items_page.refresh)
         self.settings_page.language_changed.connect(self.language_changed)
         self.settings_page.labels_changed.connect(self.labels_changed)
@@ -120,6 +123,8 @@ class MainWindow(QMainWindow):
 
         QShortcut(QKeySequence(Qt.Key_F11), self, activated=self.toggle_fullscreen)
         QShortcut(QKeySequence.Find, self, activated=self._focus_search)
+        QShortcut(QKeySequence.Undo, self, activated=lambda: self.stack.currentWidget() is self.items_page
+                  and not self.items_page.search.hasFocus() and self.items_page.undo())
         QShortcut(QKeySequence.New, self, activated=self._new)
         QShortcut(QKeySequence.Print, self, activated=lambda: (self.show_page(0), self.items_page.open_report()))
         self.show_page(0)

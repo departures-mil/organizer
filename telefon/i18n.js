@@ -16,1578 +16,577 @@ const I18N = Object.assign({
   ]
  ],
  "strings": {
-  "⚡ Otomatik fiyat — henüz kontrol edilmedi": [
-   "⚡ Automatic price — not checked yet",
-   "⚡ سعر تلقائي — لم تتم مراجعته بعد"
-  ],
-  "İşareti kaldırırsanız ya da fiyatı değiştirirseniz bu fiyat sizin girdiğiniz fiyat sayılır (✎).": [
-   "If you untick this or change the price, it counts as a price you entered (✎).",
-   "إذا أزلت العلامة أو غيّرت السعر، يُعتبر هذا السعر سعرًا أدخلته أنت (✎)."
-  ],
-  "⚡ otomatik — kontrol edilmedi": [
-   "⚡ automatic — not checked",
-   "⚡ تلقائي — لم تتم مراجعته"
-  ],
-  "Yalnızca otomatik girilmiş, henüz kontrol etmediğiniz fiyatları göster\n⚡ = otomatik fiyat · ✎ = sizin girdiğiniz fiyat": [
-   "Show only automatically entered prices you have not checked yet\n⚡ = automatic price · ✎ = price you entered",
-   "عرض الأسعار المُدخلة تلقائيًا التي لم تراجعها بعد فقط\n⚡ = سعر تلقائي · ✎ = سعر أدخلته أنت"
-  ],
-  "⚡ Kontrol edilmemiş fiyatlar ({n})": [
-   "⚡ Unchecked prices ({n})",
-   "⚡ أسعار غير مُراجَعة ({n})"
-  ],
-  "⚡ Otomatik (tahmini) fiyat — henüz kontrol edilmedi.\nDüzenleyip fiyatı değiştirince ya da sağ tık → \"Fiyatı onayla\" deyince sizin fiyatınız olur.": [
-   "⚡ Automatic (estimated) price — not checked yet.\nIt becomes your price when you edit it or right-click → \"Confirm price\".",
-   "⚡ سعر تلقائي (تقديري) — لم تتم مراجعته بعد.\nيصبح سعرك عند تعديله أو بالنقر الأيمن ← \"تأكيد السعر\"."
-  ],
-  "✎ Sizin girdiğiniz fiyat": [
-   "✎ Price you entered",
-   "✎ سعر أدخلته أنت"
-  ],
-  "Kontrol edilmemiş otomatik fiyat kalmadı. ✓": [
-   "No unchecked automatic prices left. ✓",
-   "لم يبقَ أي سعر تلقائي غير مُراجَع. ✓"
-  ],
-  " · ⚡ {n} fiyat otomatik (kontrol edilmedi) · ✎ sizin girdiğiniz": [
-   " · ⚡ {n} prices automatic (not checked) · ✎ entered by you",
-   " · ⚡ {n} سعر تلقائي (غير مُراجَع) · ✎ أدخلته أنت"
-  ],
-  "✎  Fiyatı onayla (benim fiyatım)": [
-   "✎  Confirm price (my price)",
-   "✎  تأكيد السعر (سعري)"
-  ],
-  "⚡  Otomatik fiyat olarak işaretle": [
-   "⚡  Mark as automatic price",
-   "⚡  تعليم كسعر تلقائي"
-  ],
-  "⚡ Otomatik (tahmini) fiyat — henüz kontrol edilmedi": [
-   "⚡ Automatic (estimated) price — not checked yet",
-   "⚡ سعر تلقائي (تقديري) — لم تتم مراجعته بعد"
-  ],
-  "⚡ Otomatik fiyat olarak işaretlendi": [
-   "⚡ Marked as automatic price",
-   "⚡ تم التعليم كسعر تلقائي"
-  ],
-  "✎ Fiyat onaylandı": [
-   "✎ Price confirmed",
-   "✎ تم تأكيد السعر"
-  ],
-  "✎ Onayla": [
-   "✎ Confirm",
-   "✎ تأكيد"
-  ],
-  "İsme göre (A → Z)": [
-   "By name (A → Z)",
-   "حسب الاسم (أ ← ي)"
-  ],
-  "İsme göre (Z → A)": [
-   "By name (Z → A)",
-   "حسب الاسم (ي ← أ)"
-  ],
-  "Türe göre": [
-   "By type",
-   "حسب النوع"
-  ],
-  "Mesleğe göre (A → Z)": [
-   "By trade (A → Z)",
-   "حسب المهنة (أ ← ي)"
-  ],
-  "Mesleğe göre (Z → A)": [
-   "By trade (Z → A)",
-   "حسب المهنة (ي ← أ)"
-  ],
-  "Telefona göre": [
-   "By phone",
-   "حسب الهاتف"
-  ],
-  "Güncelleme sunucusuna ulaşılamadı. İnternet bağlantısını denetleyin.": [
-   "Could not reach the update server. Check your internet connection.",
-   "تعذّر الوصول إلى خادم التحديثات. تحقّق من اتصال الإنترنت."
-  ],
-  "🏪  Satın alındığı yer": [
-   "🏪  Where it was bought",
-   "🏪  مكان الشراء"
-  ],
-  "Satın alındığı yer": [
-   "Bought at",
-   "مكان الشراء"
-  ],
-  "Satın alındığı yer:": [
-   "Bought at:",
-   "مكان الشراء:"
-  ],
-  "Dükkan/Kişi Adı:": [
-   "Shop/Person name:",
-   "اسم المحل / الشخص:"
-  ],
-  "Dükkan/Kişi Yeri:": [
-   "Shop/Person location:",
-   "مكان المحل / الشخص:"
-  ],
-  "Adres": [
-   "Address",
-   "العنوان"
-  ],
-  "Dükkan/Kişi": [
-   "Shop/Person",
-   "المحل/الشخص"
-  ],
-  "Konum": [
-   "Location",
-   "الموقع"
-  ],
-  "Dükkan/Kişiye göre (A → Z)": [
-   "By shop/person (A → Z)",
-   "حسب المحل/الشخص (أ ← ي)"
-  ],
-  "Dükkan/Kişiye göre (Z → A)": [
-   "By shop/person (Z → A)",
-   "حسب المحل/الشخص (ي ← أ)"
-  ],
-  "Konuma göre (A → Z)": [
-   "By location (A → Z)",
-   "حسب الموقع (أ ← ي)"
-  ],
-  "Konuma göre (Z → A)": [
-   "By location (Z → A)",
-   "حسب الموقع (ي ← أ)"
-  ],
-  "🏷  Etiketler": [
-   "🏷  Labels",
-   "🏷  التسميات"
-  ],
-  "🏷  Etiketleri düzenle…": [
-   "🏷  Edit labels…",
-   "🏷  تعديل التسميات…"
-  ],
-  "Programdaki bütün yazıları (düğmeler, başlıklar, alan adları) kendinize göre değiştirebilirsiniz. Değişiklik yalnızca seçili dil için geçerlidir.": [
-   "You can change every text in the program (buttons, headings, field names). Changes apply to the selected language only.",
-   "يمكنك تغيير كل نصوص البرنامج (الأزرار والعناوين وأسماء الحقول). تنطبق التغييرات على اللغة المحددة فقط."
-  ],
-  "{n} etiket değiştirildi": [
-   "{n} labels changed",
-   "تم تغيير {n} تسمية"
-  ],
-  "Etiketleri düzenle": [
-   "Edit labels",
-   "تعديل التسميات"
-  ],
-  "Etiket ara…": [
-   "Search labels…",
-   "ابحث في التسميات…"
-  ],
-  "Yalnızca değiştirilenler": [
-   "Changed only",
-   "المعدلة فقط"
-  ],
-  "Hepsini sıfırla": [
-   "Reset all",
-   "إعادة الكل"
-  ],
-  "Bütün etiketler programın kendi yazısına dönsün mü?": [
-   "Reset all labels to the program defaults?",
-   "إعادة كل التسميات إلى نصوص البرنامج؟"
-  ],
-  "{x} gibi yer tutucuları silmeyin; oraya sayı ya da ad gelir.": [
-   "Keep placeholders like {x}; a number or name goes there.",
-   "لا تحذف العناصر مثل {x}؛ يوضع مكانها رقم أو اسم."
-  ],
-  "Yeni etiket (boş = programın yazısı):": [
-   "New label (empty = program text):",
-   "تسمية جديدة (فارغ = نص البرنامج):"
-  ],
-  "Programdaki yazı": [
-   "Program text",
-   "نص البرنامج"
-  ],
-  "Yeni etiket (boş = değişmesin)": [
-   "New label (empty = unchanged)",
-   "تسمية جديدة (فارغ = بلا تغيير)"
-  ],
-  "İletişim numarası:": [
-   "Contact number:",
-   "رقم التواصل:"
-  ],
-  "Örn. Yıldız Hırdavat": [
-   "e.g. Star Hardware",
-   "مثال: محل النجمة للعدد"
-  ],
-  "Semt, çarşı, sokak ya da adres": [
-   "District, market, street or address",
-   "الحي أو السوق أو الشارع أو العنوان"
-  ],
-  "Satın alınan yere göre (A → Z)": [
-   "By shop (A → Z)",
-   "حسب مكان الشراء (أ ← ي)"
-  ],
-  "Satın alınan yere göre (Z → A)": [
-   "By shop (Z → A)",
-   "حسب مكان الشراء (ي ← أ)"
-  ],
-  "Dükkan: {x}": [
-   "Shop: {x}",
-   "المحل: {x}"
-  ],
-  "Yeri: {x}": [
-   "Location: {x}",
-   "المكان: {x}"
-  ],
-  "Numara: {x}": [
-   "Number: {x}",
-   "الرقم: {x}"
-  ],
-  "Çalışan: {x}": [
-   "Works on: {x}",
-   "يعمل على: {x}"
-  ],
-  "WhatsApp / Telegram işaretlenmemiş": [
-   "WhatsApp / Telegram not marked",
-   "لم يتم تحديد واتساب / تيليجرام"
-  ],
-  "{app} açılıyor…": [
-   "Opening {app}…",
-   "جارٍ فتح {app}…"
-  ],
-  "{app} ile yaz: {p}": [
-   "Message on {app}: {p}",
-   "راسل عبر {app}: {p}"
-  ],
-  "{app} bu numarada çalışıyor. Kapatmak için tıklayın.": [
-   "{app} works on this number. Click to turn off.",
-   "{app} يعمل على هذا الرقم. انقر للإيقاف."
-  ],
-  "{app} bu numarada çalışıyorsa tıklayıp etkinleştirin.": [
-   "If {app} works on this number, click to enable.",
-   "إذا كان {app} يعمل على هذا الرقم فانقر للتفعيل."
-  ],
-  "Bu numara için WhatsApp / Telegram seçilmedi. Çalışanın düğmesine tıklayın.": [
-   "No WhatsApp / Telegram selected for this number. Click the one that works.",
-   "لم يتم اختيار واتساب / تيليجرام لهذا الرقم. انقر على الذي يعمل."
-  ],
-  "Bu numarada çalışan: {x}": [
-   "Works on this number: {x}",
-   "يعمل على هذا الرقم: {x}"
-  ],
-  "(numara yazılmadı)": [
-   "(no number entered)",
-   "(لم يُكتب رقم)"
-  ],
-  "Güncellemeler GitHub'dan denetleniyor…": [
-   "Checking GitHub for updates…",
-   "جارٍ البحث عن تحديثات في GitHub…"
-  ],
-  "Dükkan": [
-   "Shop",
-   "محل"
-  ],
-  "Fiyatları gizle / göster": [
-   "Hide / show prices",
-   "إخفاء / إظهار الأسعار"
-  ],
-  "Ad": [
-   "Name",
-   "الاسم"
-  ],
-  "Tarih": [
-   "Date",
-   "التاريخ"
-  ],
-  "Meslek": [
-   "Trade",
-   "المهنة"
-  ],
-  "Kategoriye göre (A → Z)": [
-   "By category (A → Z)",
-   "حسب الفئة (أ ← ي)"
-  ],
-  "Kategoriye göre (Z → A)": [
-   "By category (Z → A)",
-   "حسب الفئة (ي ← أ)"
-  ],
-  "Yere göre (A → Z)": [
-   "By location (A → Z)",
-   "حسب المكان (أ ← ي)"
-  ],
-  "Yere göre (Z → A)": [
-   "By location (Z → A)",
-   "حسب المكان (ي ← أ)"
-  ],
-  "Fiyat (düşük → yüksek)": [
-   "Price (low → high)",
-   "السعر (من الأقل إلى الأعلى)"
-  ],
-  "Hızlı ara": [
-   "Quick search",
-   "بحث سريع"
-  ],
-  "Eşitle": [
-   "Sync",
-   "مزامنة"
-  ],
-  "Güncelle": [
-   "Update",
-   "تحديث"
-  ],
-  "Güncelle: {n}": [
-   "Update: {n}",
-   "تحديث: {n}"
-  ],
-  "%{p} · {a}/{b} MB": [
-   "{p}% · {a}/{b} MB",
-   "%{p} · {a}/{b} MB"
-  ],
-  "Yeniden başlatılıyor…": [
-   "Restarting…",
-   "جارٍ إعادة التشغيل…"
-  ],
-  "Denetleniyor…": [
-   "Checking…",
-   "جارٍ التحقق…"
-  ],
-  "Program güncel (sürüm {v}).": [
-   "Up to date (version {v}).",
-   "البرنامج محدّث (الإصدار {v})."
-  ],
-  "Organizer": [
-   "Organizer",
-   "Organizer"
-  ],
-  "Evdeki her şey yerli yerinde": [
-   "Everything at home in its place",
-   "كل شيء في البيت في مكانه"
-  ],
-  "Evet": [
-   "Yes",
-   "نعم"
-  ],
-  "Vazgeç": [
-   "Cancel",
-   "إلغاء"
-  ],
-  "Tamam": [
-   "OK",
-   "حسناً"
-  ],
-  "Kaydet": [
-   "Save",
-   "حفظ"
-  ],
-  "Sil": [
-   "Delete",
-   "حذف"
-  ],
-  "Ekle": [
-   "Add",
-   "إضافة"
-  ],
-  "✎  Düzenle": [
-   "✎  Edit",
-   "✎  تعديل"
-  ],
-  "Kapat": [
-   "Close",
-   "إغلاق"
-  ],
-  "— Seçilmedi —": [
-   "— Not selected —",
-   "— غير محدد —"
-  ],
-  "— En üst seviye —": [
-   "— Top level —",
-   "— المستوى الأعلى —"
-  ],
-  "— Belirtilmemiş —": [
-   "— Unspecified —",
-   "— غير محدد —"
-  ],
-  "Resimler": [
-   "Images",
-   "الصور"
-  ],
-  "📦   Eşyalarım": [
-   "📦   My Items",
-   "📦   أغراضي"
-  ],
-  "🔧   Ustalar && Dükkanlar": [
-   "🔧   Craftsmen && Shops",
-   "🔧   الحرفيون والمحلات"
-  ],
-  "⚙   Ayarlar": [
-   "⚙   Settings",
-   "⚙   الإعدادات"
-  ],
-  "⛶   Pencere modu": [
-   "⛶   Window mode",
-   "⛶   وضع النافذة"
-  ],
-  "⛶   Tam ekran": [
-   "⛶   Full screen",
-   "⛶   ملء الشاشة"
-  ],
-  "⏻   Çıkış": [
-   "⏻   Exit",
-   "⏻   خروج"
-  ],
-  "Yeni yer": [
-   "New location",
-   "مكان جديد"
-  ],
-  "Yeni kategori": [
-   "New category",
-   "فئة جديدة"
-  ],
-  "Üst yer:": [
-   "Parent location:",
-   "المكان الأعلى:"
-  ],
-  "Üst kategori:": [
-   "Parent category:",
-   "الفئة الأعلى:"
-  ],
-  "Ad:": [
-   "Name:",
-   "الاسم:"
-  ],
-  "Örn. Balkon dolabı": [
-   "e.g. Balcony cupboard",
-   "مثلاً: خزانة الشرفة"
-  ],
-  "Örn. Vidalar": [
-   "e.g. Screws",
-   "مثلاً: براغي"
-  ],
-  "Eşyayı düzenle": [
-   "Edit item",
-   "تعديل الغرض"
-  ],
-  "Yeni eşya": [
-   "New item",
-   "غرض جديد"
-  ],
-  "Adı:": [
-   "Name:",
-   "الاسم:"
-  ],
-  "Örn. 4x40 sunta vidası": [
-   "e.g. 4x40 wood screw",
-   "مثلاً: برغي خشب 4x40"
-  ],
-  "Adet:": [
-   "Quantity:",
-   "العدد:"
-  ],
-  " adet": [
-   " pcs",
-   " قطعة"
-  ],
-  "Kategori:": [
-   "Category:",
-   "الفئة:"
-  ],
-  "Bulunduğu yer:": [
-   "Location:",
-   "المكان:"
-  ],
-  "Belirtilmedi": [
-   "Not specified",
-   "غير محدد"
-  ],
-  "Alış fiyatı:": [
-   "Purchase price:",
-   "سعر الشراء:"
-  ],
-  "Ekleme tarihi:": [
-   "Date added:",
-   "تاريخ الإضافة:"
-  ],
-  "Ölçü, marka, nereden alındığı gibi notlar…": [
-   "Notes such as size, brand, where it was bought…",
-   "ملاحظات مثل المقاس والماركة ومكان الشراء…"
-  ],
-  "Notlar:": [
-   "Notes:",
-   "ملاحظات:"
-  ],
-  "Fotoğraflar": [
-   "Photos",
-   "الصور"
-  ],
-  "(sürükleyip bırakabilirsiniz)": [
-   "(you can drag and drop)",
-   "(يمكنك السحب والإفلات)"
-  ],
-  "＋ Fotoğraf ekle": [
-   "＋ Add photo",
-   "＋ إضافة صورة"
-  ],
-  "Seçileni kaldır": [
-   "Remove selected",
-   "إزالة المحدد"
-  ],
-  "＋ Yeni": [
-   "＋ New",
-   "＋ جديد"
-  ],
-  "Yeni yer ekle": [
-   "Add new location",
-   "إضافة مكان جديد"
-  ],
-  "Yeni kategori ekle": [
-   "Add new category",
-   "إضافة فئة جديدة"
-  ],
-  "Fotoğraf seç": [
-   "Choose photos",
-   "اختر الصور"
-  ],
-  "Lütfen bir ad yazın": [
-   "Please enter a name",
-   "يرجى كتابة اسم"
-  ],
-  "Fotoğraf": [
-   "Photo",
-   "صورة"
-  ],
-  "◀  Önceki": [
-   "◀  Previous",
-   "◀  السابق"
-  ],
-  "Sonraki  ▶": [
-   "Next  ▶",
-   "التالي  ▶"
-  ],
-  "Fotoğraf bulunamadı": [
-   "Photo not found",
-   "الصورة غير موجودة"
-  ],
-  "En yeni eklenen": [
-   "Newest first",
-   "الأحدث أولاً"
-  ],
-  "En eski eklenen": [
-   "Oldest first",
-   "الأقدم أولاً"
-  ],
-  "Ada göre (A → Z)": [
-   "Name (A → Z)",
-   "الاسم (أ ← ي)"
-  ],
-  "Ada göre (Z → A)": [
-   "Name (Z → A)",
-   "الاسم (ي ← أ)"
-  ],
-  "Kategoriye göre": [
-   "By category",
-   "حسب الفئة"
-  ],
-  "Yere göre": [
-   "By location",
-   "حسب المكان"
-  ],
-  "Adet (çok → az)": [
-   "Quantity (high → low)",
-   "العدد (الأكثر أولاً)"
-  ],
-  "Adet (az → çok)": [
-   "Quantity (low → high)",
-   "العدد (الأقل أولاً)"
-  ],
-  "Fiyat (yüksek → düşük)": [
-   "Price (high → low)",
-   "السعر (الأعلى أولاً)"
-  ],
-  "Tümü  ({n})": [
-   "All  ({n})",
-   "الكل  ({n})"
-  ],
-  "Belirtilmemiş  ({n})": [
-   "Unspecified  ({n})",
-   "غير محدد  ({n})"
-  ],
-  "Fotoğraf yok": [
-   "No photo",
-   "لا توجد صورة"
-  ],
-  "Adet": [
-   "Qty",
-   "العدد"
-  ],
-  "Kategori": [
-   "Category",
-   "الفئة"
-  ],
-  "Yer": [
-   "Location",
-   "المكان"
-  ],
-  "Fiyat": [
-   "Price",
-   "السعر"
-  ],
-  "Eklenme": [
-   "Added",
-   "أضيف في"
-  ],
-  "Adı": [
-   "Name",
-   "الاسم"
-  ],
-  "Adedi azalt": [
-   "Decrease quantity",
-   "إنقاص العدد"
-  ],
-  "Adedi artır": [
-   "Increase quantity",
-   "زيادة العدد"
-  ],
-  "Ayrıntıları görmek için\nlistedeki bir eşyayı seçin": [
-   "Select an item in the list\nto see its details",
-   "اختر غرضاً من القائمة\nلعرض تفاصيله"
-  ],
-  "Fotoğraf yok\n(Düzenle ile ekleyebilirsiniz)": [
-   "No photo\n(add one with Edit)",
-   "لا توجد صورة\n(يمكنك الإضافة عبر تعديل)"
-  ],
-  "Fotoğraf açılamadı": [
-   "Could not open photo",
-   "تعذر فتح الصورة"
-  ],
-  "Eşyalarım": [
-   "My Items",
-   "أغراضي"
-  ],
-  "🔍  Eşya adı, kategori, yer ya da not ile ara…": [
-   "🔍  Search by item name, category, location or note…",
-   "🔍  ابحث بالاسم أو الفئة أو المكان أو الملاحظة…"
-  ],
-  "＋  Yeni Eşya": [
-   "＋  New Item",
-   "＋  غرض جديد"
-  ],
-  "Sırala:": [
-   "Sort:",
-   "ترتيب:"
-  ],
-  "Sınıflandırma": [
-   "Classification",
-   "التصنيف"
-  ],
-  "Kategoriler": [
-   "Categories",
-   "الفئات"
-  ],
-  "Yerler": [
-   "Locations",
-   "الأماكن"
-  ],
-  "Filtreleri temizle": [
-   "Clear filters",
-   "مسح عوامل التصفية"
-  ],
-  "{n} fotoğraf": [
-   "{n} photos",
-   "{n} صور"
-  ],
-  "Kalmadı": [
-   "Out of stock",
-   "نفد"
-  ],
-  "Henüz eşya eklenmemiş.\n\n„＋ Yeni Eşya“ düğmesiyle ilk eşyanızı ekleyin.": [
-   "No items yet.\n\nAdd your first item with the “＋ New Item” button.",
-   "لا توجد أغراض بعد.\n\nأضف أول غرض بزر «＋ غرض جديد»."
-  ],
-  "Aramanıza uyan eşya bulunamadı.": [
-   "No items match your search.",
-   "لا توجد أغراض تطابق بحثك."
-  ],
-  "{n} eşya listeleniyor · toplam {q} adet": [
-   "{n} items shown · {q} pieces in total",
-   "{n} غرض معروض · المجموع {q} قطعة"
-  ],
-  " · Değer: ": [
-   " · Value: ",
-   " · القيمة: "
-  ],
-  "Etkin filtre — ": [
-   "Active filter — ",
-   "التصفية الحالية — "
-  ],
-  "„{name}“ silinsin mi? Fotoğrafları da silinecek.": [
-   "Delete “{name}”? Its photos will be deleted too.",
-   "هل تريد حذف «{name}»؟ ستحذف صوره أيضاً."
-  ],
-  "Seçili {n} eşya silinsin mi? Fotoğrafları da silinecek.": [
-   "Delete the {n} selected items? Their photos will be deleted too.",
-   "هل تريد حذف {n} من الأغراض المحددة؟ ستحذف صورها أيضاً."
-  ],
-  "Eşyayı sil": [
-   "Delete item",
-   "حذف الغرض"
-  ],
-  "Kategoriye taşı": [
-   "Move to category",
-   "نقل إلى فئة"
-  ],
-  "Yere taşı": [
-   "Move to location",
-   "نقل إلى مكان"
-  ],
-  "Telefonla arama": [
-   "Phone call",
-   "اتصال هاتفي"
-  ],
-  "Arama": [
-   "Call",
-   "اتصال"
-  ],
-  "{label} ile ulaş": [
-   "Contact via {label}",
-   "تواصل عبر {label}"
-  ],
-  "{label} yok": [
-   "No {label}",
-   "لا يوجد {label}"
-  ],
-  "Kişiyi düzenle": [
-   "Edit contact",
-   "تعديل جهة الاتصال"
-  ],
-  "Yeni usta / dükkan": [
-   "New craftsman / shop",
-   "حرفي / محل جديد"
-  ],
-  "🔧  Usta": [
-   "🔧  Craftsman",
-   "🔧  حرفي"
-  ],
-  "🏪  Dükkan": [
-   "🏪  Shop",
-   "🏪  محل"
-  ],
-  "Tür:": [
-   "Type:",
-   "النوع:"
-  ],
-  "Örn. Ahmet Usta / Yıldız Hırdavat": [
-   "e.g. Ahmet the electrician / Star Hardware",
-   "مثلاً: أبو أحمد / محل النجمة"
-  ],
-  "İsim:": [
-   "Name:",
-   "الاسم:"
-  ],
-  "Örn. Elektrikçi, Tesisatçı, Nalbur": [
-   "e.g. Electrician, Plumber, Hardware store",
-   "مثلاً: كهربائي، سبّاك، محل خردوات"
-  ],
-  "Meslek / alan:": [
-   "Trade / field:",
-   "المهنة / المجال:"
-  ],
-  "Semt, sokak ya da adres": [
-   "District, street or address",
-   "الحي أو الشارع أو العنوان"
-  ],
-  "Yer / adres:": [
-   "Place / address:",
-   "المكان / العنوان:"
-  ],
-  "Örn. 0532 123 45 67 ya da +963 …": [
-   "e.g. 0532 123 45 67 or +963 …",
-   "مثلاً: 0944 123 456 أو ‎+963 …"
-  ],
-  "Telefon:": [
-   "Phone:",
-   "الهاتف:"
-  ],
-  "Ulaşılabilir:": [
-   "Reachable via:",
-   "متاح عبر:"
-  ],
-  "Numaranın hangi uygulamalarda çalıştığını işaretleyin.": [
-   "Tick the apps this number works with.",
-   "حدد التطبيقات التي يعمل عليها هذا الرقم."
-  ],
-  "Çalışma saatleri, fiyat, tavsiye eden kişi…": [
-   "Working hours, prices, who recommended them…",
-   "ساعات العمل، الأسعار، من أوصى به…"
-  ],
-  "Ustalar ve Dükkanlar": [
-   "Craftsmen and Shops",
-   "الحرفيون والمحلات"
-  ],
-  "🔍  İsim, meslek, yer ya da telefon numarası ile ara…": [
-   "🔍  Search by name, trade, place or phone number…",
-   "🔍  ابحث بالاسم أو المهنة أو المكان أو رقم الهاتف…"
-  ],
-  "Hepsi": [
-   "All",
-   "الكل"
-  ],
-  "🔧  Ustalar": [
-   "🔧  Craftsmen",
-   "🔧  الحرفيون"
-  ],
-  "🏪  Dükkanlar": [
-   "🏪  Shops",
-   "🏪  المحلات"
-  ],
-  "＋  Yeni Usta / Dükkan": [
-   "＋  New Craftsman / Shop",
-   "＋  حرفي / محل جديد"
-  ],
-  "Tür": [
-   "Type",
-   "النوع"
-  ],
-  "İsim": [
-   "Name",
-   "الاسم"
-  ],
-  "Meslek / alan": [
-   "Trade / field",
-   "المهنة / المجال"
-  ],
-  "Yer / adres": [
-   "Place / address",
-   "المكان / العنوان"
-  ],
-  "Telefon": [
-   "Phone",
-   "الهاتف"
-  ],
-  "İletişim": [
-   "Contact",
-   "التواصل"
-  ],
-  "Notlar": [
-   "Notes",
-   "ملاحظات"
-  ],
-  "Renkli simge: bu yolla ulaşılabilir · Soluk simge: kullanılmıyor · Simgeye tıklayınca WhatsApp / Telegram / arama açılır": [
-   "Colored icon: reachable this way · Faded icon: not used · Click an icon to open WhatsApp / Telegram / call",
-   "أيقونة ملونة: متاح بهذه الطريقة · أيقونة باهتة: غير مستخدمة · انقر الأيقونة لفتح واتساب / تيليجرام / الاتصال"
-  ],
-  "Henüz usta ya da dükkan eklenmemiş.\n\n„＋ Yeni Usta / Dükkan“ ile ekleyin.": [
-   "No craftsmen or shops yet.\n\nAdd one with “＋ New Craftsman / Shop”.",
-   "لا يوجد حرفيون أو محلات بعد.\n\nأضف واحداً عبر «＋ حرفي / محل جديد»."
-  ],
-  "Aramanıza uyan kayıt bulunamadı.": [
-   "No records match your search.",
-   "لا توجد سجلات تطابق بحثك."
-  ],
-  "{a} usta · {b} dükkan": [
-   "{a} craftsmen · {b} shops",
-   "{a} حرفي · {b} محل"
-  ],
-  "Numarayı kopyala": [
-   "Copy number",
-   "نسخ الرقم"
-  ],
-  "„{name}“ silinsin mi?": [
-   "Delete “{name}”?",
-   "هل تريد حذف «{name}»؟"
-  ],
-  "Seçili {n} kayıt silinsin mi?": [
-   "Delete the {n} selected records?",
-   "هل تريد حذف {n} من السجلات المحددة؟"
-  ],
-  "Sürükleyip bırakarak sırasını ya da üst öğesini değiştirebilirsiniz. Çift tıklayarak yeniden adlandırabilirsiniz.": [
-   "Drag and drop to reorder or change the parent. Double-click to rename.",
-   "اسحب وأفلت لتغيير الترتيب أو العنصر الأعلى. انقر مرتين لإعادة التسمية."
-  ],
-  "＋ Ekle": [
-   "＋ Add",
-   "＋ إضافة"
-  ],
-  "＋ Alt öğe ekle": [
-   "＋ Add sub-item",
-   "＋ إضافة عنصر فرعي"
-  ],
-  "✎ Yeniden adlandır": [
-   "✎ Rename",
-   "✎ إعادة تسمية"
-  ],
-  "{name}   ·  {n} eşya": [
-   "{name}   ·  {n} item(s)",
-   "{name}   ·  {n} غرض"
-  ],
-  "Alt öğe ekle": [
-   "Add sub-item",
-   "إضافة عنصر فرعي"
-  ],
-  "Önce listeden bir yer seçin.": [
-   "First select a location in the list.",
-   "اختر مكاناً من القائمة أولاً."
-  ],
-  "Önce listeden bir kategori seçin.": [
-   "First select a category in the list.",
-   "اختر فئة من القائمة أولاً."
-  ],
-  "Yeniden adlandır": [
-   "Rename",
-   "إعادة تسمية"
-  ],
-  "Yeni ad:": [
-   "New name:",
-   "الاسم الجديد:"
-  ],
-  "„{name}“ silinsin mi?\n": [
-   "Delete “{name}”?\n",
-   "هل تريد حذف «{name}»؟\n"
-  ],
-  "„{name}“ ve altındaki her şey silinsin mi?\n": [
-   "Delete “{name}” and everything under it?\n",
-   "هل تريد حذف «{name}» وكل ما تحته؟\n"
-  ],
-  "\nBurada kayıtlı {n} eşya silinmeyecek; bir üst öğeye taşınacak.": [
-   "\nThe {n} items stored here will not be deleted; they will move one level up.",
-   "\nلن تحذف الأغراض المسجلة هنا ({n})؛ ستنقل إلى المستوى الأعلى."
-  ],
-  "Ayarlar": [
-   "Settings",
-   "الإعدادات"
-  ],
-  "🏠  Yerler": [
-   "🏠  Locations",
-   "🏠  الأماكن"
-  ],
-  "🗂  Kategoriler": [
-   "🗂  Categories",
-   "🗂  الفئات"
-  ],
-  "⚙  Genel": [
-   "⚙  General",
-   "⚙  عام"
-  ],
-  "Dil:": [
-   "Language:",
-   "اللغة:"
-  ],
-  "Varsayılan para birimi:": [
-   "Default currency:",
-   "العملة الافتراضية:"
-  ],
-  "0 ile başlayan numaralara eklenecek ülke kodu (Türkiye 90, Suriye 963)": [
-   "Country code added to numbers starting with 0 (Turkey 90, Syria 963)",
-   "رمز الدولة الذي يضاف للأرقام التي تبدأ بـ 0 (تركيا 90، سوريا 963)"
-  ],
-  "Ülke telefon kodu:": [
-   "Country phone code:",
-   "رمز الدولة للهاتف:"
-  ],
-  "WhatsApp / Telegram bağlantıları için kullanılır. Numara + ile yazılmışsa kendi kodu geçerlidir.": [
-   "Used for WhatsApp / Telegram links. Numbers written with + keep their own code.",
-   "يستخدم لروابط واتساب / تيليجرام. الأرقام المكتوبة بـ + تحتفظ برمزها."
-  ],
-  "Veriler ve yedek": [
-   "Data and backup",
-   "البيانات والنسخ الاحتياطي"
-  ],
-  "📂  Veri klasörünü aç": [
-   "📂  Open data folder",
-   "📂  فتح مجلد البيانات"
-  ],
-  "💾  Yedek al (.zip)": [
-   "💾  Back up (.zip)",
-   "💾  نسخ احتياطي (.zip)"
-  ],
-  "Organizer {v}\nF11: tam ekran aç / kapat · Ctrl+F: ara · Ctrl+N: yeni kayıt · Ctrl+P: döküm": [
-   "Organizer {v}\nF11: toggle full screen · Ctrl+F: search · Ctrl+N: new record · Ctrl+P: inventory list",
-   "Organizer {v}\nF11: ملء الشاشة · Ctrl+F: بحث · Ctrl+N: سجل جديد · Ctrl+P: الجرد"
-  ],
-  "Yedeği kaydet": [
-   "Save backup",
-   "حفظ النسخة الاحتياطية"
-  ],
-  "Zip dosyası": [
-   "Zip file",
-   "ملف مضغوط"
-  ],
-  "Yedek alındı": [
-   "Backup created",
-   "تم النسخ الاحتياطي"
-  ],
-  "Yedek kaydedildi:\n{path}": [
-   "Backup saved:\n{path}",
-   "تم حفظ النسخة الاحتياطية:\n{path}"
-  ],
-  "Firebase ayarları okunamadı. Konsoldaki firebaseConfig bölümünü olduğu gibi yapıştırın.": [
-   "Could not read the Firebase settings. Paste the firebaseConfig block from the console as it is.",
-   "تعذرت قراءة إعدادات Firebase. الصق قسم firebaseConfig من لوحة التحكم كما هو."
-  ],
-  "İnternete ya da Firebase'e bağlanılamadı.": [
-   "Could not connect to the internet or Firebase.",
-   "تعذر الاتصال بالإنترنت أو بـ Firebase."
-  ],
-  "Bu e-posta ile zaten bir hesap var. „Giriş yap“ı kullanın.": [
-   "An account with this e-mail already exists. Use “Sign in”.",
-   "يوجد حساب بهذا البريد بالفعل. استخدم «تسجيل الدخول»."
-  ],
-  "Şifre en az 6 karakter olmalı.": [
-   "The password must be at least 6 characters.",
-   "يجب أن تتكون كلمة المرور من 6 أحرف على الأقل."
-  ],
-  "E-posta ya da şifre hatalı.": [
-   "Wrong e-mail or password.",
-   "البريد الإلكتروني أو كلمة المرور غير صحيحة."
-  ],
-  "Firebase'de e-posta/şifre ile giriş açılmamış (Authentication › Sign-in method).": [
-   "E-mail/password sign-in is not enabled in Firebase (Authentication › Sign-in method).",
-   "تسجيل الدخول بالبريد/كلمة المرور غير مفعّل في Firebase (Authentication › Sign-in method)."
-  ],
-  "Firebase izin vermedi. Firestore kurallarını talimattaki gibi ayarlayın.": [
-   "Firebase refused access. Set the Firestore rules as described in the instructions.",
-   "رفض Firebase الوصول. اضبط قواعد Firestore كما في التعليمات."
-  ],
-  "Firestore veritabanı bulunamadı. Firebase'de Firestore Database oluşturun.": [
-   "Firestore database not found. Create a Firestore Database in Firebase.",
-   "لم يتم العثور على قاعدة بيانات Firestore. أنشئ Firestore Database في Firebase."
-  ],
-  "Eşitleme hatası: {m}": [
-   "Sync error: {m}",
-   "خطأ في المزامنة: {m}"
-  ],
-  "Bulut hesabı bağlı değil": [
-   "No cloud account connected",
-   "لا يوجد حساب سحابي مرتبط"
-  ],
-  "Eşitleniyor…": [
-   "Syncing…",
-   "جارٍ المزامنة…"
-  ],
-  "Son eşitleme: {d}": [
-   "Last sync: {d}",
-   "آخر مزامنة: {d}"
-  ],
-  "Henüz eşitlenmedi": [
-   "Not synced yet",
-   "لم تتم المزامنة بعد"
-  ],
-  "Bulut hesabı (Firebase)": [
-   "Cloud account (Firebase)",
-   "الحساب السحابي (Firebase)"
-  ],
-  "☁  Bulut hesabı (Firebase)": [
-   "☁  Cloud account (Firebase)",
-   "☁  الحساب السحابي (Firebase)"
-  ],
-  "Telefon ve bilgisayarda aynı Firebase ayarlarını ve aynı e-posta/şifreyi kullanın. Böylece iki cihaz aynı arşivi görür.": [
-   "Use the same Firebase settings and the same e-mail/password on the phone and the computer. Then both devices see the same archive.",
-   "استخدم نفس إعدادات Firebase ونفس البريد/كلمة المرور على الهاتف والحاسوب، فيرى الجهازان الأرشيف نفسه."
-  ],
-  "Firebase ayarları:": [
-   "Firebase settings:",
-   "إعدادات Firebase:"
-  ],
-  "E-posta:": [
-   "E-mail:",
-   "البريد الإلكتروني:"
-  ],
-  "Şifre:": [
-   "Password:",
-   "كلمة المرور:"
-  ],
-  "Yeni hesap oluştur": [
-   "Create new account",
-   "إنشاء حساب جديد"
-  ],
-  "Giriş yap": [
-   "Sign in",
-   "تسجيل الدخول"
-  ],
-  "E-posta ve şifreyi yazın.": [
-   "Enter the e-mail and password.",
-   "أدخل البريد الإلكتروني وكلمة المرور."
-  ],
-  "Bağlanıyor…": [
-   "Connecting…",
-   "جارٍ الاتصال…"
-  ],
-  "☁   Eşitle": [
-   "☁   Sync",
-   "☁   مزامنة"
-  ],
-  "⟳  Şimdi eşitle": [
-   "⟳  Sync now",
-   "⟳  زامن الآن"
-  ],
-  "Bağlı hesap: {e}": [
-   "Connected account: {e}",
-   "الحساب المرتبط: {e}"
-  ],
-  "🔌  Hesabı kaldır": [
-   "🔌  Disconnect account",
-   "🔌  فصل الحساب"
-  ],
-  "🔑  Hesaba bağlan": [
-   "🔑  Connect account",
-   "🔑  ربط الحساب"
-  ],
-  "Hesabı kaldır": [
-   "Disconnect account",
-   "فصل الحساب"
-  ],
-  "Bu bilgisayar bulut hesabından ayrılsın mı?\nBilgisayardaki kayıtlar silinmez.": [
-   "Disconnect this computer from the cloud account?\nRecords on this computer are not deleted.",
-   "هل تريد فصل هذا الحاسوب عن الحساب السحابي؟\nلن تُحذف السجلات الموجودة على الحاسوب."
-  ],
-  "Ara": [
-   "Call",
-   "اتصال"
-  ],
-  "Belirtilmemiş": [
-   "Not specified",
-   "غير محدد"
-  ],
-  "Bir öğeye dokunarak alt öğe ekleyebilir, adını değiştirebilir, sırasını ya da yerini değiştirebilir veya silebilirsiniz.": [
-   "Tap an entry to add a sub-entry, rename it, change its order or position, or delete it.",
-   "اضغط على عنصر لإضافة عنصر فرعي أو إعادة تسميته أو تغيير ترتيبه أو مكانه أو حذفه."
-  ],
-  "Bu telefon bulut hesabından ayrılsın mı?\nTelefondaki kayıtlar silinmez.": [
-   "Disconnect this phone from the cloud account?\nRecords on the phone are not deleted.",
-   "هل تريد فصل هذا الهاتف عن الحساب السحابي؟\nلن تُحذف السجلات الموجودة على الهاتف."
-  ],
-  "Bulut hesabı bağlandı": [
-   "Cloud account connected",
-   "تم ربط الحساب السحابي"
-  ],
-  "Usta": [
-   "Craftsman",
-   "حرفي"
-  ],
-  "Ustalar": [
-   "Craftsmen",
-   "الحرفيون"
-  ],
-  "Firebase konsolunda Proje ayarları › Uygulamalarınız › firebaseConfig bölümünü kopyalayıp buraya yapıştırın.": [
-   "In the Firebase console open Project settings › Your apps, copy the firebaseConfig block and paste it here.",
-   "في لوحة Firebase افتح Project settings › Your apps وانسخ قسم firebaseConfig والصقه هنا."
-  ],
-  "Kaydedildi": [
-   "Saved",
-   "تم الحفظ"
-  ],
-  "Kaydediliyor…": [
-   "Saving…",
-   "جارٍ الحفظ…"
-  ],
-  "Kayıtlar ve fotoğraflar bu telefonda saklanır. Bulut hesabı bağlıysa bilgisayarla da eşitlenir.": [
-   "Records and photos are stored on this phone. If a cloud account is connected they are synced with the computer too.",
-   "تُحفظ السجلات والصور على هذا الهاتف، وإذا كان الحساب السحابي مرتبطاً تتم مزامنتها مع الحاسوب أيضاً."
-  ],
-  "Numara kopyalandı": [
-   "Number copied",
-   "تم نسخ الرقم"
-  ],
-  "Tümü": [
-   "All",
-   "الكل"
-  ],
-  "Tümünü seç": [
-   "Select all",
-   "تحديد الكل"
-  ],
-  "Yedek hazırlanıyor…": [
-   "Preparing backup…",
-   "جارٍ تحضير النسخة الاحتياطية…"
-  ],
-  "Yeni Eşya": [
-   "New item",
-   "غرض جديد"
-  ],
-  "Yeni Usta / Dükkan": [
-   "New craftsman / shop",
-   "حرفي / محل جديد"
-  ],
-  "{n} eşya": [
-   "{n} items",
-   "{n} أغراض"
-  ],
-  "{n} eşya taşındı": [
-   "{n} items moved",
-   "تم نقل {n} أغراض"
-  ],
-  "{n} seçili": [
-   "{n} selected",
-   "{n} محدد"
-  ],
-  "İlk fotoğraf listede görünür. Başka bir fotoğrafa dokunarak öne alabilirsiniz.": [
-   "The first photo is shown in the list. Tap another photo to move it to the front.",
-   "تظهر الصورة الأولى في القائمة. اضغط على صورة أخرى لنقلها إلى البداية."
-  ],
-  "↪  Başka bir öğenin altına taşı": [
-   "↪  Move under another entry",
-   "↪  نقل تحت عنصر آخر"
-  ],
-  "▲  Yukarı taşı": [
-   "▲  Move up",
-   "▲  نقل للأعلى"
-  ],
-  "▼  Aşağı taşı": [
-   "▼  Move down",
-   "▼  نقل للأسفل"
-  ],
-  "＋ Yeni kategori": [
-   "＋ New category",
-   "＋ فئة جديدة"
-  ],
-  "＋ Yeni yer": [
-   "＋ New place",
-   "＋ مكان جديد"
-  ],
-  "🏠  Tüm yerler": [
-   "🏠  All places",
-   "🏠  كل الأماكن"
-  ],
-  "🗂  Tüm kategoriler": [
-   "🗂  All categories",
-   "🗂  كل الفئات"
-  ],
-  "💾  Yedek al (.json) ve paylaş": [
-   "💾  Back up (.json) and share",
-   "💾  نسخ احتياطي (.json) ومشاركة"
-  ],
-  "📷  Fotoğraf çek": [
-   "📷  Take photo",
-   "📷  التقاط صورة"
-  ],
-  "🖼  Galeriden seç": [
-   "🖼  Choose from gallery",
-   "🖼  اختيار من المعرض"
-  ],
-  "Bu bölümde kayıtlı eşya yok.": [
-   "There are no items in this section.",
-   "لا توجد أغراض في هذا القسم."
-  ],
-  "Bütün kategoriler": [
-   "All categories",
-   "كل الفئات"
-  ],
-  "Bütün yerler": [
-   "All places",
-   "كل الأماكن"
-  ],
-  "Değer:": [
-   "Value:",
-   "القيمة:"
-  ],
-  "Döküm": [
-   "Inventory list",
-   "قائمة الجرد"
-  ],
-  "Döküm: {scope}": [
-   "Inventory list: {scope}",
-   "قائمة الجرد: {scope}"
-  ],
-  "Döküm türü:": [
-   "List by:",
-   "نوع القائمة:"
-  ],
-  "Döküm, seçilen bölümdeki ve altındaki bütün eşyaları gösterir.": [
-   "The list shows every item in the selected section and its sub-sections.",
-   "تعرض القائمة كل الأغراض في القسم المحدد وأقسامه الفرعية."
-  ],
-  "Fotoğraflarla": [
-   "With photos",
-   "مع الصور"
-  ],
-  "PDF kaydedildi:\n{path}": [
-   "PDF saved:\n{path}",
-   "تم حفظ PDF:\n{path}"
-  ],
-  "PDF olarak kaydet": [
-   "Save as PDF",
-   "حفظ بصيغة PDF"
-  ],
-  "📄  PDF olarak kaydet…": [
-   "📄  Save as PDF…",
-   "📄  حفظ بصيغة PDF…"
-  ],
-  "🖨  Yazdır…": [
-   "🖨  Print…",
-   "🖨  طباعة…"
-  ],
-  "🖨  Döküm": [
-   "🖨  Inventory list",
-   "🖨  قائمة الجرد"
-  ],
-  "🖨  Bu bölümün dökümünü al": [
-   "🖨  Inventory list of this section",
-   "🖨  قائمة جرد هذا القسم"
-  ],
-  "🖨  Yazdır / PDF olarak kaydet": [
-   "🖨  Print / save as PDF",
-   "🖨  طباعة / حفظ PDF"
-  ],
-  "Seçili kategori ya da yerdeki bütün eşyaların listesi (yazdır / PDF)": [
-   "List of all items in the selected category or place (print / PDF)",
-   "قائمة كل الأغراض في الفئة أو المكان المحدد (طباعة / PDF)"
-  ],
-  "{n} eşya · toplam {q} adet": [
-   "{n} items · {q} pieces in total",
-   "{n} أغراض · المجموع {q} قطعة"
-  ],
-  "⭐ Favori": [
-   "⭐ Favourite",
-   "⭐ المفضلة"
-  ],
-  "⭐ Favori yap": [
-   "⭐ Make favourite",
-   "⭐ اجعلها المفضلة"
-  ],
-  "Seçili fotoğraf ilk sıraya alınır ve listede o görünür.": [
-   "The selected photo moves to the front and is shown in the list.",
-   "تنتقل الصورة المحددة إلى البداية وتظهر في القائمة."
-  ],
-  "⭐ işaretli ilk fotoğraf favoridir ve listede o görünür. Bir fotoğrafa dokunarak favori yapabilirsiniz.": [
-   "The first photo (⭐) is the favourite and is shown in the list. Tap a photo to make it the favourite.",
-   "الصورة الأولى (⭐) هي المفضلة وتظهر في القائمة. اضغط على صورة لجعلها المفضلة."
-  ],
-  "🔍  Büyüt": [
-   "🔍  Enlarge",
-   "🔍  تكبير"
-  ],
-  "büyütmek için çift tıklayın": [
-   "double-click to enlarge",
-   "انقر مرتين للتكبير"
-  ],
-  "Yeni bir meslek yazarsanız uygun simge internetten kendiliğinden bulunur.": [
-   "If you type a new profession, a matching icon is found on the internet automatically.",
-   "إذا كتبت مهنة جديدة، يتم العثور على رمز مناسب لها من الإنترنت تلقائياً."
-  ],
-  "Mesleğin simgesi. Yeni bir meslek yazarsanız uygun simge internetten kendiliğinden bulunur.": [
-   "Icon of the profession. If you type a new profession, a matching icon is found on the internet automatically.",
-   "رمز المهنة. إذا كتبت مهنة جديدة، يتم العثور على رمز مناسب لها من الإنترنت تلقائياً."
-  ],
-  "⬆  Güncelleme": [
-   "⬆  Updates",
-   "⬆  التحديثات"
-  ],
-  "🔄  Güncellemeleri denetle": [
-   "🔄  Check for updates",
-   "🔄  البحث عن تحديثات"
-  ],
-  "Sürüm {v}": [
-   "Version {v}",
-   "الإصدار {v}"
-  ],
-  "Sürüm {v} · Güncellemeler denetleniyor…": [
-   "Version {v} · Checking for updates…",
-   "الإصدار {v} · جارٍ البحث عن تحديثات…"
-  ],
-  "Sürüm {v} · Program güncel.": [
-   "Version {v} · Up to date.",
-   "الإصدار {v} · البرنامج محدَّث."
-  ],
-  "Sürüm {v} · Yeni sürüm hazır: {n}": [
-   "Version {v} · New version available: {n}",
-   "الإصدار {v} · إصدار جديد متاح: {n}"
-  ],
-  "Sürüm {v} · Güncellemeler bulut hesabı üzerinden gelir; önce hesaba bağlanın.": [
-   "Version {v} · Updates arrive through the cloud account; connect it first.",
-   "الإصدار {v} · تصل التحديثات عبر الحساب السحابي؛ اربطه أولاً."
-  ],
-  "Sürüm {v} · {n} sürümü uygulama içinden kurulamıyor; yeni tam paket gerekiyor.": [
-   "Version {v} · Version {n} cannot be installed from inside the app; a new full package is needed.",
-   "الإصدار {v} · لا يمكن تثبيت الإصدار {n} من داخل البرنامج؛ يلزم حزمة كاملة جديدة."
-  ],
-  "⬆  Şimdi güncelle ({n})": [
-   "⬆  Update now ({n})",
-   "⬆  حدِّث الآن ({n})"
-  ],
-  "⬆  Güncelle: {n}": [
-   "⬆  Update: {n}",
-   "⬆  تحديث: {n}"
-  ],
-  "{x} MB/sn": [
-   "{x} MB/s",
-   "{x} م.ب/ث"
-  ],
-  "{x} KB/sn": [
-   "{x} KB/s",
-   "{x} ك.ب/ث"
-  ],
-  "hesaplanıyor…": [
-   "calculating…",
-   "جارٍ الحساب…"
-  ],
-  "yaklaşık {s} sn": [
-   "about {s} s",
-   "حوالي {s} ث"
-  ],
-  "yaklaşık {m} dk {s} sn": [
-   "about {m} min {s} s",
-   "حوالي {m} د {s} ث"
-  ],
-  "İnen": [
-   "Downloaded",
-   "تم تنزيله"
-  ],
-  "Kalan": [
-   "Remaining",
-   "المتبقي"
-  ],
-  "Hız": [
-   "Speed",
-   "السرعة"
-  ],
-  "Kalan süre": [
-   "Time left",
-   "الوقت المتبقي"
-  ],
-  "{a} / {b} MB": [
-   "{a} / {b} MB",
-   "{a} / {b} م.ب"
-  ],
-  "{a} MB": [
-   "{a} MB",
-   "{a} م.ب"
-  ],
-  "Güncelleme indiriliyor: {n}": [
-   "Downloading update: {n}",
-   "جارٍ تنزيل التحديث: {n}"
-  ],
-  "⬇  İndiriliyor %{p}": [
-   "⬇  Downloading {p}%",
-   "⬇  جارٍ التنزيل {p}%"
-  ],
-  "Güncelleme indiriliyor… {p}": [
-   "Downloading update… {p}",
-   "جارٍ تنزيل التحديث… {p}"
-  ],
-  "Güncelleniyor… {p}": [
-   "Updating… {p}",
-   "جارٍ التحديث… {p}"
-  ],
-  "{n} kuruldu. Program yeniden başlatılıyor…": [
-   "{n} installed. Restarting…",
-   "تم تثبيت {n}. جارٍ إعادة التشغيل…"
-  ],
-  "{n} kuruldu. Uygulama yeniden başlatılıyor…": [
-   "{n} installed. Restarting…",
-   "تم تثبيت {n}. جارٍ إعادة التشغيل…"
-  ],
-  "↻  Yeniden başlat": [
-   "↻  Restart",
-   "↻  إعادة التشغيل"
-  ],
-  "↻  Yeniden başlatılıyor…": [
-   "↻  Restarting…",
-   "↻  جارٍ إعادة التشغيل…"
-  ],
-  "Bu cihazda kurulamaz.": [
-   "Cannot be installed on this device.",
-   "لا يمكن التثبيت على هذا الجهاز."
-  ],
-  "Bu güncelleme için gereken paket bulunamadı.": [
-   "The package needed for this update was not found.",
-   "لم يُعثر على الحزمة اللازمة لهذا التحديث."
-  ],
-  "Bu güncellemede Android bir kez \"Güncelle\" onayı isteyecek.": [
-   "Android will ask once to confirm \"Update\" for this update.",
-   "سيطلب أندرويد تأكيد \"تحديث\" مرة واحدة لهذا التحديث."
-  ],
-  "Güncelleme paketi bozuk indi. Yeniden deneyin.": [
-   "The update package was damaged while downloading. Try again.",
-   "وصلت حزمة التحديث تالفة. حاول مرة أخرى."
-  ],
-  "Güncelleme paketi eksik. Biraz sonra yeniden deneyin.": [
-   "The update package is incomplete. Try again a little later.",
-   "حزمة التحديث ناقصة. حاول بعد قليل."
-  ],
-  "Türk Lirası": [
-   "Turkish Lira",
-   "ليرة تركية"
-  ],
-  "ABD Doları": [
-   "US Dollar",
-   "دولار أمريكي"
-  ],
-  "Suriye Lirası": [
-   "Syrian Pound",
-   "ليرة سورية"
-  ],
-  "✉ Admin ile iletişime geç": [
-   "✉ Contact the admin",
-   "✉ التواصل مع المسؤول"
-  ],
-  "Programı geliştirmemiz için öneri, istek ve hata bildirimlerinizi yazın; mesajınız doğrudan yöneticiye ulaşır.": [
-   "Send suggestions, requests and bug reports to help us improve the program; your message goes straight to the administrator.",
-   "أرسل اقتراحاتك وطلباتك وبلاغات الأخطاء لمساعدتنا على تطوير البرنامج؛ تصل رسالتك مباشرة إلى المسؤول."
-  ],
-  "Adınız (isteğe bağlı)": [
-   "Your name (optional)",
-   "اسمك (اختياري)"
-  ],
-  "E-posta (yanıt için, isteğe bağlı)": [
-   "Email (for a reply, optional)",
-   "البريد الإلكتروني (للرد، اختياري)"
-  ],
-  "Mesajınız": [
-   "Your message",
-   "رسالتك"
-  ],
-  "✉  Gönder": [
-   "✉  Send",
-   "✉  إرسال"
-  ],
-  "Lütfen mesajınızı yazın.": [
-   "Please write your message.",
-   "يرجى كتابة رسالتك."
-  ],
-  "E-posta adresi geçerli değil.": [
-   "The email address is not valid.",
-   "عنوان البريد الإلكتروني غير صالح."
-  ],
-  "Mesajınız yöneticiye iletildi. Teşekkürler!": [
-   "Your message has been delivered to the administrator. Thank you!",
-   "تم إيصال رسالتك إلى المسؤول. شكرًا لك!"
-  ],
-  "Mesaj gönderilemedi. İnternet bağlantınızı kontrol edip tekrar deneyin.": [
-   "The message could not be sent. Check your internet connection and try again.",
-   "تعذّر إرسال الرسالة. تحقّق من اتصالك بالإنترنت وحاول مجددًا."
-  ],
-  "Hızlı ara / barkod okuyucu (Ctrl+F)": [
-   "Quick search / barcode reader (Ctrl+F)",
-   "بحث سريع / قارئ الباركود (Ctrl+F)"
-  ],
-  "Simge durumuna küçült": [
-   "Minimize",
-   "تصغير"
-  ],
-  "Yarım ekran": [
-   "Half screen",
-   "نصف الشاشة"
-  ],
-  "Tam ekran": [
-   "Full screen",
-   "ملء الشاشة"
-  ],
-  "Yeni sürüm hazır. Kurmak için tıklayın.": [
-   "A new version is ready. Click to install.",
-   "إصدار جديد جاهز. انقر للتثبيت."
-  ],
-  "%{p} · {a} / {b} MB · {s}": [
-   "{p}% · {a} / {b} MB · {s}",
-   "%{p} · {a} / {b} MB · {s}"
-  ],
-  "Kalan: {k} MB · {e}": [
-   "Remaining: {k} MB · {e}",
-   "المتبقي: {k} MB · {e}"
-  ],
-  "Yeni sürüm var mı diye bak (sürüm {v}).": [
-   "Check for a new version (version {v}).",
-   "التحقق من وجود إصدار جديد (الإصدار {v})."
-  ],
-  "Sıralamak için tıklayın, yeniden tıklayınca ters sıralanır · Genişlik: ayırıcıyı sürükleyin, çift tıklayınca otomatik · Yer değiştirmek için başlığı sürükleyin · Sağ tık: varsayılan düzen": [
-   "Click to sort, click again to reverse · Width: drag the divider, double-click to auto-fit · Drag a header to move the column · Right-click: default layout",
-   "انقر للترتيب، وانقر مرة أخرى لعكسه · العرض: اسحب الفاصل، وانقر نقرًا مزدوجًا للضبط التلقائي · اسحب العنوان لنقل العمود · نقرة يمنى: الترتيب الافتراضي"
-  ],
-  "Varsayılan sütun düzeni": [
-   "Default column layout",
-   "ترتيب الأعمدة الافتراضي"
-  ]
+ "⚡ Otomatik fiyat — henüz kontrol edilmedi": ["⚡ Automatic price — not checked yet", "⚡ سعر تلقائي — لم تتم مراجعته بعد"],
+ "İşareti kaldırırsanız ya da fiyatı değiştirirseniz bu fiyat sizin girdiğiniz fiyat sayılır (✎).": ["If you untick this or change the price, it counts as a price you entered (✎).", "إذا أزلت العلامة أو غيّرت السعر، يُعتبر هذا السعر سعرًا أدخلته أنت (✎)."],
+ "⚡ otomatik — kontrol edilmedi": ["⚡ automatic — not checked", "⚡ تلقائي — لم تتم مراجعته"],
+ "Yalnızca otomatik girilmiş, henüz kontrol etmediğiniz fiyatları göster\n⚡ = otomatik fiyat · ✎ = sizin girdiğiniz fiyat": ["Show only automatically entered prices you have not checked yet\n⚡ = automatic price · ✎ = price you entered", "عرض الأسعار المُدخلة تلقائيًا التي لم تراجعها بعد فقط\n⚡ = سعر تلقائي · ✎ = سعر أدخلته أنت"],
+ "⚡ Kontrol edilmemiş fiyatlar ({n})": ["⚡ Unchecked prices ({n})", "⚡ أسعار غير مُراجَعة ({n})"],
+ "⚡ Otomatik (tahmini) fiyat — henüz kontrol edilmedi.\nDüzenleyip fiyatı değiştirince ya da sağ tık → \"Fiyatı onayla\" deyince sizin fiyatınız olur.": ["⚡ Automatic (estimated) price — not checked yet.\nIt becomes your price when you edit it or right-click → \"Confirm price\".", "⚡ سعر تلقائي (تقديري) — لم تتم مراجعته بعد.\nيصبح سعرك عند تعديله أو بالنقر الأيمن ← \"تأكيد السعر\"."],
+ "✎ Sizin girdiğiniz fiyat": ["✎ Price you entered", "✎ سعر أدخلته أنت"],
+ "Kontrol edilmemiş otomatik fiyat kalmadı. ✓": ["No unchecked automatic prices left. ✓", "لم يبقَ أي سعر تلقائي غير مُراجَع. ✓"],
+ " · ⚡ {n} fiyat otomatik (kontrol edilmedi) · ✎ sizin girdiğiniz": [" · ⚡ {n} prices automatic (not checked) · ✎ entered by you", " · ⚡ {n} سعر تلقائي (غير مُراجَع) · ✎ أدخلته أنت"],
+ "✎  Fiyatı onayla (benim fiyatım)": ["✎  Confirm price (my price)", "✎  تأكيد السعر (سعري)"],
+ "⚡  Otomatik fiyat olarak işaretle": ["⚡  Mark as automatic price", "⚡  تعليم كسعر تلقائي"],
+ "⚡ Otomatik (tahmini) fiyat — henüz kontrol edilmedi": ["⚡ Automatic (estimated) price — not checked yet", "⚡ سعر تلقائي (تقديري) — لم تتم مراجعته بعد"],
+ "⚡ Otomatik fiyat olarak işaretlendi": ["⚡ Marked as automatic price", "⚡ تم التعليم كسعر تلقائي"],
+ "✎ Fiyat onaylandı": ["✎ Price confirmed", "✎ تم تأكيد السعر"],
+ "✎ Onayla": ["✎ Confirm", "✎ تأكيد"],
+ "İsme göre (A → Z)": ["By name (A → Z)", "حسب الاسم (أ ← ي)"],
+ "İsme göre (Z → A)": ["By name (Z → A)", "حسب الاسم (ي ← أ)"],
+ "Türe göre": ["By type", "حسب النوع"],
+ "Mesleğe göre (A → Z)": ["By trade (A → Z)", "حسب المهنة (أ ← ي)"],
+ "Mesleğe göre (Z → A)": ["By trade (Z → A)", "حسب المهنة (ي ← أ)"],
+ "Telefona göre": ["By phone", "حسب الهاتف"],
+ "Güncelleme sunucusuna ulaşılamadı. İnternet bağlantısını denetleyin.": ["Could not reach the update server. Check your internet connection.", "تعذّر الوصول إلى خادم التحديثات. تحقّق من اتصال الإنترنت."],
+ "🏪  Satın alındığı yer": ["🏪  Where it was bought", "🏪  مكان الشراء"],
+ "Satın alındığı yer": ["Bought at", "مكان الشراء"],
+ "Satın alındığı yer:": ["Bought at:", "مكان الشراء:"],
+ "Dükkan/Kişi Adı:": ["Shop/Person name:", "اسم المحل / الشخص:"],
+ "Dükkan/Kişi Yeri:": ["Shop/Person location:", "مكان المحل / الشخص:"],
+ "Adres": ["Address", "العنوان"],
+ "Dükkan/Kişi": ["Shop/Person", "المحل/الشخص"],
+ "Konum": ["Location", "الموقع"],
+ "Dükkan/Kişiye göre (A → Z)": ["By shop/person (A → Z)", "حسب المحل/الشخص (أ ← ي)"],
+ "Dükkan/Kişiye göre (Z → A)": ["By shop/person (Z → A)", "حسب المحل/الشخص (ي ← أ)"],
+ "Konuma göre (A → Z)": ["By location (A → Z)", "حسب الموقع (أ ← ي)"],
+ "Konuma göre (Z → A)": ["By location (Z → A)", "حسب الموقع (ي ← أ)"],
+ "🏷  Etiketler": ["🏷  Labels", "🏷  التسميات"],
+ "🏷  Etiketleri düzenle…": ["🏷  Edit labels…", "🏷  تعديل التسميات…"],
+ "Programdaki bütün yazıları (düğmeler, başlıklar, alan adları) kendinize göre değiştirebilirsiniz. Değişiklik yalnızca seçili dil için geçerlidir.": ["You can change every text in the program (buttons, headings, field names). Changes apply to the selected language only.", "يمكنك تغيير كل نصوص البرنامج (الأزرار والعناوين وأسماء الحقول). تنطبق التغييرات على اللغة المحددة فقط."],
+ "{n} etiket değiştirildi": ["{n} labels changed", "تم تغيير {n} تسمية"],
+ "Etiketleri düzenle": ["Edit labels", "تعديل التسميات"],
+ "Etiket ara…": ["Search labels…", "ابحث في التسميات…"],
+ "Yalnızca değiştirilenler": ["Changed only", "المعدلة فقط"],
+ "Hepsini sıfırla": ["Reset all", "إعادة الكل"],
+ "Bütün etiketler programın kendi yazısına dönsün mü?": ["Reset all labels to the program defaults?", "إعادة كل التسميات إلى نصوص البرنامج؟"],
+ "{x} gibi yer tutucuları silmeyin; oraya sayı ya da ad gelir.": ["Keep placeholders like {x}; a number or name goes there.", "لا تحذف العناصر مثل {x}؛ يوضع مكانها رقم أو اسم."],
+ "Yeni etiket (boş = programın yazısı):": ["New label (empty = program text):", "تسمية جديدة (فارغ = نص البرنامج):"],
+ "Programdaki yazı": ["Program text", "نص البرنامج"],
+ "Yeni etiket (boş = değişmesin)": ["New label (empty = unchanged)", "تسمية جديدة (فارغ = بلا تغيير)"],
+ "İletişim numarası:": ["Contact number:", "رقم التواصل:"],
+ "Örn. Yıldız Hırdavat": ["e.g. Star Hardware", "مثال: محل النجمة للعدد"],
+ "Semt, çarşı, sokak ya da adres": ["District, market, street or address", "الحي أو السوق أو الشارع أو العنوان"],
+ "Satın alınan yere göre (A → Z)": ["By shop (A → Z)", "حسب مكان الشراء (أ ← ي)"],
+ "Satın alınan yere göre (Z → A)": ["By shop (Z → A)", "حسب مكان الشراء (ي ← أ)"],
+ "Dükkan: {x}": ["Shop: {x}", "المحل: {x}"],
+ "Yeri: {x}": ["Location: {x}", "المكان: {x}"],
+ "Numara: {x}": ["Number: {x}", "الرقم: {x}"],
+ "Çalışan: {x}": ["Works on: {x}", "يعمل على: {x}"],
+ "WhatsApp / Telegram işaretlenmemiş": ["WhatsApp / Telegram not marked", "لم يتم تحديد واتساب / تيليجرام"],
+ "{app} açılıyor…": ["Opening {app}…", "جارٍ فتح {app}…"],
+ "{app} ile yaz: {p}": ["Message on {app}: {p}", "راسل عبر {app}: {p}"],
+ "{app} bu numarada çalışıyor. Kapatmak için tıklayın.": ["{app} works on this number. Click to turn off.", "{app} يعمل على هذا الرقم. انقر للإيقاف."],
+ "{app} bu numarada çalışıyorsa tıklayıp etkinleştirin.": ["If {app} works on this number, click to enable.", "إذا كان {app} يعمل على هذا الرقم فانقر للتفعيل."],
+ "Bu numara için WhatsApp / Telegram seçilmedi. Çalışanın düğmesine tıklayın.": ["No WhatsApp / Telegram selected for this number. Click the one that works.", "لم يتم اختيار واتساب / تيليجرام لهذا الرقم. انقر على الذي يعمل."],
+ "Bu numarada çalışan: {x}": ["Works on this number: {x}", "يعمل على هذا الرقم: {x}"],
+ "(numara yazılmadı)": ["(no number entered)", "(لم يُكتب رقم)"],
+ "Güncellemeler GitHub'dan denetleniyor…": ["Checking GitHub for updates…", "جارٍ البحث عن تحديثات في GitHub…"],
+ "Dükkan": ["Shop", "محل"],
+ "Fiyatları gizle / göster": ["Hide / show prices", "إخفاء / إظهار الأسعار"],
+ "Ad": ["Name", "الاسم"],
+ "Tarih": ["Date", "التاريخ"],
+ "Meslek": ["Trade", "المهنة"],
+ "Kategoriye göre (A → Z)": ["By category (A → Z)", "حسب الفئة (أ ← ي)"],
+ "Kategoriye göre (Z → A)": ["By category (Z → A)", "حسب الفئة (ي ← أ)"],
+ "Yere göre (A → Z)": ["By location (A → Z)", "حسب المكان (أ ← ي)"],
+ "Yere göre (Z → A)": ["By location (Z → A)", "حسب المكان (ي ← أ)"],
+ "Fiyat (düşük → yüksek)": ["Price (low → high)", "السعر (من الأقل إلى الأعلى)"],
+ "Hızlı ara": ["Quick search", "بحث سريع"],
+ "Eşitle": ["Sync", "مزامنة"],
+ "Güncelle": ["Update", "تحديث"],
+ "Güncelle: {n}": ["Update: {n}", "تحديث: {n}"],
+ "%{p} · {a}/{b} MB": ["{p}% · {a}/{b} MB", "%{p} · {a}/{b} MB"],
+ "Yeniden başlatılıyor…": ["Restarting…", "جارٍ إعادة التشغيل…"],
+ "Denetleniyor…": ["Checking…", "جارٍ التحقق…"],
+ "Program güncel (sürüm {v}).": ["Up to date (version {v}).", "البرنامج محدّث (الإصدار {v})."],
+ "Organizer": ["Organizer", "Organizer"],
+ "Evdeki her şey yerli yerinde": ["Everything at home in its place", "كل شيء في البيت في مكانه"],
+ "Evet": ["Yes", "نعم"],
+ "Vazgeç": ["Cancel", "إلغاء"],
+ "Tamam": ["OK", "حسناً"],
+ "Kaydet": ["Save", "حفظ"],
+ "Sil": ["Delete", "حذف"],
+ "Ekle": ["Add", "إضافة"],
+ "✎  Düzenle": ["✎  Edit", "✎  تعديل"],
+ "Kapat": ["Close", "إغلاق"],
+ "— Seçilmedi —": ["— Not selected —", "— غير محدد —"],
+ "— En üst seviye —": ["— Top level —", "— المستوى الأعلى —"],
+ "— Belirtilmemiş —": ["— Unspecified —", "— غير محدد —"],
+ "Resimler": ["Images", "الصور"],
+ "📦   Eşyalarım": ["📦   My Items", "📦   أغراضي"],
+ "🔧   Ustalar && Dükkanlar": ["🔧   Craftsmen && Shops", "🔧   الحرفيون والمحلات"],
+ "⚙   Ayarlar": ["⚙   Settings", "⚙   الإعدادات"],
+ "⛶   Pencere modu": ["⛶   Window mode", "⛶   وضع النافذة"],
+ "⛶   Tam ekran": ["⛶   Full screen", "⛶   ملء الشاشة"],
+ "⏻   Çıkış": ["⏻   Exit", "⏻   خروج"],
+ "Yeni yer": ["New location", "مكان جديد"],
+ "Yeni kategori": ["New category", "فئة جديدة"],
+ "Üst yer:": ["Parent location:", "المكان الأعلى:"],
+ "Üst kategori:": ["Parent category:", "الفئة الأعلى:"],
+ "Ad:": ["Name:", "الاسم:"],
+ "Örn. Balkon dolabı": ["e.g. Balcony cupboard", "مثلاً: خزانة الشرفة"],
+ "Örn. Vidalar": ["e.g. Screws", "مثلاً: براغي"],
+ "Eşyayı düzenle": ["Edit item", "تعديل الغرض"],
+ "Yeni eşya": ["New item", "غرض جديد"],
+ "Adı:": ["Name:", "الاسم:"],
+ "Örn. 4x40 sunta vidası": ["e.g. 4x40 wood screw", "مثلاً: برغي خشب 4x40"],
+ "Adet:": ["Quantity:", "العدد:"],
+ " adet": [" pcs", " قطعة"],
+ "Kategori:": ["Category:", "الفئة:"],
+ "Bulunduğu yer:": ["Location:", "المكان:"],
+ "Belirtilmedi": ["Not specified", "غير محدد"],
+ "Alış fiyatı:": ["Purchase price:", "سعر الشراء:"],
+ "Ekleme tarihi:": ["Date added:", "تاريخ الإضافة:"],
+ "Ölçü, marka, nereden alındığı gibi notlar…": ["Notes such as size, brand, where it was bought…", "ملاحظات مثل المقاس والماركة ومكان الشراء…"],
+ "Notlar:": ["Notes:", "ملاحظات:"],
+ "Fotoğraflar": ["Photos", "الصور"],
+ "(sürükleyip bırakabilirsiniz)": ["(you can drag and drop)", "(يمكنك السحب والإفلات)"],
+ "＋ Fotoğraf ekle": ["＋ Add photo", "＋ إضافة صورة"],
+ "Seçileni kaldır": ["Remove selected", "إزالة المحدد"],
+ "＋ Yeni": ["＋ New", "＋ جديد"],
+ "Yeni yer ekle": ["Add new location", "إضافة مكان جديد"],
+ "Yeni kategori ekle": ["Add new category", "إضافة فئة جديدة"],
+ "Fotoğraf seç": ["Choose photos", "اختر الصور"],
+ "Lütfen bir ad yazın": ["Please enter a name", "يرجى كتابة اسم"],
+ "Fotoğraf": ["Photo", "صورة"],
+ "◀  Önceki": ["◀  Previous", "◀  السابق"],
+ "Sonraki  ▶": ["Next  ▶", "التالي  ▶"],
+ "Fotoğraf bulunamadı": ["Photo not found", "الصورة غير موجودة"],
+ "En yeni eklenen": ["Newest first", "الأحدث أولاً"],
+ "En eski eklenen": ["Oldest first", "الأقدم أولاً"],
+ "Ada göre (A → Z)": ["Name (A → Z)", "الاسم (أ ← ي)"],
+ "Ada göre (Z → A)": ["Name (Z → A)", "الاسم (ي ← أ)"],
+ "Kategoriye göre": ["By category", "حسب الفئة"],
+ "Yere göre": ["By location", "حسب المكان"],
+ "Adet (çok → az)": ["Quantity (high → low)", "العدد (الأكثر أولاً)"],
+ "Adet (az → çok)": ["Quantity (low → high)", "العدد (الأقل أولاً)"],
+ "Fiyat (yüksek → düşük)": ["Price (high → low)", "السعر (الأعلى أولاً)"],
+ "Tümü  ({n})": ["All  ({n})", "الكل  ({n})"],
+ "Belirtilmemiş  ({n})": ["Unspecified  ({n})", "غير محدد  ({n})"],
+ "Fotoğraf yok": ["No photo", "لا توجد صورة"],
+ "Adet": ["Qty", "العدد"],
+ "Kategori": ["Category", "الفئة"],
+ "Yer": ["Location", "المكان"],
+ "Fiyat": ["Price", "السعر"],
+ "Eklenme": ["Added", "أضيف في"],
+ "Adı": ["Name", "الاسم"],
+ "Adedi azalt": ["Decrease quantity", "إنقاص العدد"],
+ "Adedi artır": ["Increase quantity", "زيادة العدد"],
+ "Ayrıntıları görmek için\nlistedeki bir eşyayı seçin": ["Select an item in the list\nto see its details", "اختر غرضاً من القائمة\nلعرض تفاصيله"],
+ "Fotoğraf yok\n(Düzenle ile ekleyebilirsiniz)": ["No photo\n(add one with Edit)", "لا توجد صورة\n(يمكنك الإضافة عبر تعديل)"],
+ "Fotoğraf açılamadı": ["Could not open photo", "تعذر فتح الصورة"],
+ "Eşyalarım": ["My Items", "أغراضي"],
+ "🔍  Eşya adı, kategori, yer ya da not ile ara…": ["🔍  Search by item name, category, location or note…", "🔍  ابحث بالاسم أو الفئة أو المكان أو الملاحظة…"],
+ "＋  Yeni Eşya": ["＋  New Item", "＋  غرض جديد"],
+ "Sırala:": ["Sort:", "ترتيب:"],
+ "Sınıflandırma": ["Classification", "التصنيف"],
+ "Kategoriler": ["Categories", "الفئات"],
+ "Yerler": ["Locations", "الأماكن"],
+ "Filtreleri temizle": ["Clear filters", "مسح عوامل التصفية"],
+ "{n} fotoğraf": ["{n} photos", "{n} صور"],
+ "Kalmadı": ["Out of stock", "نفد"],
+ "Henüz eşya eklenmemiş.\n\n„＋ Yeni Eşya“ düğmesiyle ilk eşyanızı ekleyin.": ["No items yet.\n\nAdd your first item with the “＋ New Item” button.", "لا توجد أغراض بعد.\n\nأضف أول غرض بزر «＋ غرض جديد»."],
+ "Aramanıza uyan eşya bulunamadı.": ["No items match your search.", "لا توجد أغراض تطابق بحثك."],
+ "{n} eşya listeleniyor · toplam {q} adet": ["{n} items shown · {q} pieces in total", "{n} غرض معروض · المجموع {q} قطعة"],
+ " · Değer: ": [" · Value: ", " · القيمة: "],
+ "Etkin filtre — ": ["Active filter — ", "التصفية الحالية — "],
+ "„{name}“ silinsin mi? Fotoğrafları da silinecek.": ["Delete “{name}”? Its photos will be deleted too.", "هل تريد حذف «{name}»؟ ستحذف صوره أيضاً."],
+ "Seçili {n} eşya silinsin mi? Fotoğrafları da silinecek.": ["Delete the {n} selected items? Their photos will be deleted too.", "هل تريد حذف {n} من الأغراض المحددة؟ ستحذف صورها أيضاً."],
+ "Eşyayı sil": ["Delete item", "حذف الغرض"],
+ "Kategoriye taşı": ["Move to category", "نقل إلى فئة"],
+ "Yere taşı": ["Move to location", "نقل إلى مكان"],
+ "Telefonla arama": ["Phone call", "اتصال هاتفي"],
+ "Arama": ["Call", "اتصال"],
+ "{label} ile ulaş": ["Contact via {label}", "تواصل عبر {label}"],
+ "{label} yok": ["No {label}", "لا يوجد {label}"],
+ "Kişiyi düzenle": ["Edit contact", "تعديل جهة الاتصال"],
+ "Yeni usta / dükkan": ["New craftsman / shop", "حرفي / محل جديد"],
+ "🔧  Usta": ["🔧  Craftsman", "🔧  حرفي"],
+ "🏪  Dükkan": ["🏪  Shop", "🏪  محل"],
+ "Tür:": ["Type:", "النوع:"],
+ "Örn. Ahmet Usta / Yıldız Hırdavat": ["e.g. Ahmet the electrician / Star Hardware", "مثلاً: أبو أحمد / محل النجمة"],
+ "İsim:": ["Name:", "الاسم:"],
+ "Örn. Elektrikçi, Tesisatçı, Nalbur": ["e.g. Electrician, Plumber, Hardware store", "مثلاً: كهربائي، سبّاك، محل خردوات"],
+ "Meslek / alan:": ["Trade / field:", "المهنة / المجال:"],
+ "Semt, sokak ya da adres": ["District, street or address", "الحي أو الشارع أو العنوان"],
+ "Yer / adres:": ["Place / address:", "المكان / العنوان:"],
+ "Örn. 0532 123 45 67 ya da +963 …": ["e.g. 0532 123 45 67 or +963 …", "مثلاً: 0944 123 456 أو ‎+963 …"],
+ "Telefon:": ["Phone:", "الهاتف:"],
+ "Ulaşılabilir:": ["Reachable via:", "متاح عبر:"],
+ "Numaranın hangi uygulamalarda çalıştığını işaretleyin.": ["Tick the apps this number works with.", "حدد التطبيقات التي يعمل عليها هذا الرقم."],
+ "Çalışma saatleri, fiyat, tavsiye eden kişi…": ["Working hours, prices, who recommended them…", "ساعات العمل، الأسعار، من أوصى به…"],
+ "Ustalar ve Dükkanlar": ["Craftsmen and Shops", "الحرفيون والمحلات"],
+ "🔍  İsim, meslek, yer ya da telefon numarası ile ara…": ["🔍  Search by name, trade, place or phone number…", "🔍  ابحث بالاسم أو المهنة أو المكان أو رقم الهاتف…"],
+ "Hepsi": ["All", "الكل"],
+ "🔧  Ustalar": ["🔧  Craftsmen", "🔧  الحرفيون"],
+ "🏪  Dükkanlar": ["🏪  Shops", "🏪  المحلات"],
+ "＋  Yeni Usta / Dükkan": ["＋  New Craftsman / Shop", "＋  حرفي / محل جديد"],
+ "Tür": ["Type", "النوع"],
+ "İsim": ["Name", "الاسم"],
+ "Meslek / alan": ["Trade / field", "المهنة / المجال"],
+ "Yer / adres": ["Place / address", "المكان / العنوان"],
+ "Telefon": ["Phone", "الهاتف"],
+ "İletişim": ["Contact", "التواصل"],
+ "Notlar": ["Notes", "ملاحظات"],
+ "Renkli simge: bu yolla ulaşılabilir · Soluk simge: kullanılmıyor · Simgeye tıklayınca WhatsApp / Telegram / arama açılır": ["Colored icon: reachable this way · Faded icon: not used · Click an icon to open WhatsApp / Telegram / call", "أيقونة ملونة: متاح بهذه الطريقة · أيقونة باهتة: غير مستخدمة · انقر الأيقونة لفتح واتساب / تيليجرام / الاتصال"],
+ "Henüz usta ya da dükkan eklenmemiş.\n\n„＋ Yeni Usta / Dükkan“ ile ekleyin.": ["No craftsmen or shops yet.\n\nAdd one with “＋ New Craftsman / Shop”.", "لا يوجد حرفيون أو محلات بعد.\n\nأضف واحداً عبر «＋ حرفي / محل جديد»."],
+ "Aramanıza uyan kayıt bulunamadı.": ["No records match your search.", "لا توجد سجلات تطابق بحثك."],
+ "{a} usta · {b} dükkan": ["{a} craftsmen · {b} shops", "{a} حرفي · {b} محل"],
+ "Numarayı kopyala": ["Copy number", "نسخ الرقم"],
+ "„{name}“ silinsin mi?": ["Delete “{name}”?", "هل تريد حذف «{name}»؟"],
+ "Seçili {n} kayıt silinsin mi?": ["Delete the {n} selected records?", "هل تريد حذف {n} من السجلات المحددة؟"],
+ "Sürükleyip bırakarak sırasını ya da üst öğesini değiştirebilirsiniz. Çift tıklayarak yeniden adlandırabilirsiniz.": ["Drag and drop to reorder or change the parent. Double-click to rename.", "اسحب وأفلت لتغيير الترتيب أو العنصر الأعلى. انقر مرتين لإعادة التسمية."],
+ "＋ Ekle": ["＋ Add", "＋ إضافة"],
+ "＋ Alt öğe ekle": ["＋ Add sub-item", "＋ إضافة عنصر فرعي"],
+ "✎ Yeniden adlandır": ["✎ Rename", "✎ إعادة تسمية"],
+ "{name}   ·  {n} eşya": ["{name}   ·  {n} item(s)", "{name}   ·  {n} غرض"],
+ "Alt öğe ekle": ["Add sub-item", "إضافة عنصر فرعي"],
+ "Önce listeden bir yer seçin.": ["First select a location in the list.", "اختر مكاناً من القائمة أولاً."],
+ "Önce listeden bir kategori seçin.": ["First select a category in the list.", "اختر فئة من القائمة أولاً."],
+ "Yeniden adlandır": ["Rename", "إعادة تسمية"],
+ "Yeni ad:": ["New name:", "الاسم الجديد:"],
+ "„{name}“ silinsin mi?\n": ["Delete “{name}”?\n", "هل تريد حذف «{name}»؟\n"],
+ "„{name}“ ve altındaki her şey silinsin mi?\n": ["Delete “{name}” and everything under it?\n", "هل تريد حذف «{name}» وكل ما تحته؟\n"],
+ "\nBurada kayıtlı {n} eşya silinmeyecek; bir üst öğeye taşınacak.": ["\nThe {n} items stored here will not be deleted; they will move one level up.", "\nلن تحذف الأغراض المسجلة هنا ({n})؛ ستنقل إلى المستوى الأعلى."],
+ "Ayarlar": ["Settings", "الإعدادات"],
+ "🏠  Yerler": ["🏠  Locations", "🏠  الأماكن"],
+ "🗂  Kategoriler": ["🗂  Categories", "🗂  الفئات"],
+ "⚙  Genel": ["⚙  General", "⚙  عام"],
+ "Dil:": ["Language:", "اللغة:"],
+ "Varsayılan para birimi:": ["Default currency:", "العملة الافتراضية:"],
+ "0 ile başlayan numaralara eklenecek ülke kodu (Türkiye 90, Suriye 963)": ["Country code added to numbers starting with 0 (Turkey 90, Syria 963)", "رمز الدولة الذي يضاف للأرقام التي تبدأ بـ 0 (تركيا 90، سوريا 963)"],
+ "Ülke telefon kodu:": ["Country phone code:", "رمز الدولة للهاتف:"],
+ "WhatsApp / Telegram bağlantıları için kullanılır. Numara + ile yazılmışsa kendi kodu geçerlidir.": ["Used for WhatsApp / Telegram links. Numbers written with + keep their own code.", "يستخدم لروابط واتساب / تيليجرام. الأرقام المكتوبة بـ + تحتفظ برمزها."],
+ "Veriler ve yedek": ["Data and backup", "البيانات والنسخ الاحتياطي"],
+ "📂  Veri klasörünü aç": ["📂  Open data folder", "📂  فتح مجلد البيانات"],
+ "💾  Yedek al (.zip)": ["💾  Back up (.zip)", "💾  نسخ احتياطي (.zip)"],
+ "Organizer {v}\nF11: tam ekran aç / kapat · Ctrl+F: ara · Ctrl+N: yeni kayıt · Ctrl+P: döküm": ["Organizer {v}\nF11: toggle full screen · Ctrl+F: search · Ctrl+N: new record · Ctrl+P: inventory list", "Organizer {v}\nF11: ملء الشاشة · Ctrl+F: بحث · Ctrl+N: سجل جديد · Ctrl+P: الجرد"],
+ "Yedeği kaydet": ["Save backup", "حفظ النسخة الاحتياطية"],
+ "Zip dosyası": ["Zip file", "ملف مضغوط"],
+ "Yedek alındı": ["Backup created", "تم النسخ الاحتياطي"],
+ "Yedek kaydedildi:\n{path}": ["Backup saved:\n{path}", "تم حفظ النسخة الاحتياطية:\n{path}"],
+ "Firebase ayarları okunamadı. Konsoldaki firebaseConfig bölümünü olduğu gibi yapıştırın.": ["Could not read the Firebase settings. Paste the firebaseConfig block from the console as it is.", "تعذرت قراءة إعدادات Firebase. الصق قسم firebaseConfig من لوحة التحكم كما هو."],
+ "İnternete ya da Firebase'e bağlanılamadı.": ["Could not connect to the internet or Firebase.", "تعذر الاتصال بالإنترنت أو بـ Firebase."],
+ "Bu e-posta ile zaten bir hesap var. „Giriş yap“ı kullanın.": ["An account with this e-mail already exists. Use “Sign in”.", "يوجد حساب بهذا البريد بالفعل. استخدم «تسجيل الدخول»."],
+ "Şifre en az 6 karakter olmalı.": ["The password must be at least 6 characters.", "يجب أن تتكون كلمة المرور من 6 أحرف على الأقل."],
+ "E-posta ya da şifre hatalı.": ["Wrong e-mail or password.", "البريد الإلكتروني أو كلمة المرور غير صحيحة."],
+ "Firebase'de e-posta/şifre ile giriş açılmamış (Authentication › Sign-in method).": ["E-mail/password sign-in is not enabled in Firebase (Authentication › Sign-in method).", "تسجيل الدخول بالبريد/كلمة المرور غير مفعّل في Firebase (Authentication › Sign-in method)."],
+ "Firebase izin vermedi. Firestore kurallarını talimattaki gibi ayarlayın.": ["Firebase refused access. Set the Firestore rules as described in the instructions.", "رفض Firebase الوصول. اضبط قواعد Firestore كما في التعليمات."],
+ "Firestore veritabanı bulunamadı. Firebase'de Firestore Database oluşturun.": ["Firestore database not found. Create a Firestore Database in Firebase.", "لم يتم العثور على قاعدة بيانات Firestore. أنشئ Firestore Database في Firebase."],
+ "Eşitleme hatası: {m}": ["Sync error: {m}", "خطأ في المزامنة: {m}"],
+ "Bulut hesabı bağlı değil": ["No cloud account connected", "لا يوجد حساب سحابي مرتبط"],
+ "Eşitleniyor…": ["Syncing…", "جارٍ المزامنة…"],
+ "Son eşitleme: {d}": ["Last sync: {d}", "آخر مزامنة: {d}"],
+ "Henüz eşitlenmedi": ["Not synced yet", "لم تتم المزامنة بعد"],
+ "Bulut hesabı (Firebase)": ["Cloud account (Firebase)", "الحساب السحابي (Firebase)"],
+ "☁  Bulut hesabı (Firebase)": ["☁  Cloud account (Firebase)", "☁  الحساب السحابي (Firebase)"],
+ "Telefon ve bilgisayarda aynı Firebase ayarlarını ve aynı e-posta/şifreyi kullanın. Böylece iki cihaz aynı arşivi görür.": ["Use the same Firebase settings and the same e-mail/password on the phone and the computer. Then both devices see the same archive.", "استخدم نفس إعدادات Firebase ونفس البريد/كلمة المرور على الهاتف والحاسوب، فيرى الجهازان الأرشيف نفسه."],
+ "Firebase ayarları:": ["Firebase settings:", "إعدادات Firebase:"],
+ "E-posta:": ["E-mail:", "البريد الإلكتروني:"],
+ "Şifre:": ["Password:", "كلمة المرور:"],
+ "Yeni hesap oluştur": ["Create new account", "إنشاء حساب جديد"],
+ "Giriş yap": ["Sign in", "تسجيل الدخول"],
+ "E-posta ve şifreyi yazın.": ["Enter the e-mail and password.", "أدخل البريد الإلكتروني وكلمة المرور."],
+ "Bağlanıyor…": ["Connecting…", "جارٍ الاتصال…"],
+ "☁   Eşitle": ["☁   Sync", "☁   مزامنة"],
+ "⟳  Şimdi eşitle": ["⟳  Sync now", "⟳  زامن الآن"],
+ "Bağlı hesap: {e}": ["Connected account: {e}", "الحساب المرتبط: {e}"],
+ "🔌  Hesabı kaldır": ["🔌  Disconnect account", "🔌  فصل الحساب"],
+ "🔑  Hesaba bağlan": ["🔑  Connect account", "🔑  ربط الحساب"],
+ "Hesabı kaldır": ["Disconnect account", "فصل الحساب"],
+ "Bu bilgisayar bulut hesabından ayrılsın mı?\nBilgisayardaki kayıtlar silinmez.": ["Disconnect this computer from the cloud account?\nRecords on this computer are not deleted.", "هل تريد فصل هذا الحاسوب عن الحساب السحابي؟\nلن تُحذف السجلات الموجودة على الحاسوب."],
+ "Ara": ["Call", "اتصال"],
+ "Belirtilmemiş": ["Not specified", "غير محدد"],
+ "Bir öğeye dokunarak alt öğe ekleyebilir, adını değiştirebilir, sırasını ya da yerini değiştirebilir veya silebilirsiniz.": ["Tap an entry to add a sub-entry, rename it, change its order or position, or delete it.", "اضغط على عنصر لإضافة عنصر فرعي أو إعادة تسميته أو تغيير ترتيبه أو مكانه أو حذفه."],
+ "Bu telefon bulut hesabından ayrılsın mı?\nTelefondaki kayıtlar silinmez.": ["Disconnect this phone from the cloud account?\nRecords on the phone are not deleted.", "هل تريد فصل هذا الهاتف عن الحساب السحابي؟\nلن تُحذف السجلات الموجودة على الهاتف."],
+ "Bulut hesabı bağlandı": ["Cloud account connected", "تم ربط الحساب السحابي"],
+ "Usta": ["Craftsman", "حرفي"],
+ "Ustalar": ["Craftsmen", "الحرفيون"],
+ "Firebase konsolunda Proje ayarları › Uygulamalarınız › firebaseConfig bölümünü kopyalayıp buraya yapıştırın.": ["In the Firebase console open Project settings › Your apps, copy the firebaseConfig block and paste it here.", "في لوحة Firebase افتح Project settings › Your apps وانسخ قسم firebaseConfig والصقه هنا."],
+ "Kaydedildi": ["Saved", "تم الحفظ"],
+ "Kaydediliyor…": ["Saving…", "جارٍ الحفظ…"],
+ "Kayıtlar ve fotoğraflar bu telefonda saklanır. Bulut hesabı bağlıysa bilgisayarla da eşitlenir.": ["Records and photos are stored on this phone. If a cloud account is connected they are synced with the computer too.", "تُحفظ السجلات والصور على هذا الهاتف، وإذا كان الحساب السحابي مرتبطاً تتم مزامنتها مع الحاسوب أيضاً."],
+ "Numara kopyalandı": ["Number copied", "تم نسخ الرقم"],
+ "Tümü": ["All", "الكل"],
+ "Tümünü seç": ["Select all", "تحديد الكل"],
+ "Yedek hazırlanıyor…": ["Preparing backup…", "جارٍ تحضير النسخة الاحتياطية…"],
+ "Yeni Eşya": ["New item", "غرض جديد"],
+ "Yeni Usta / Dükkan": ["New craftsman / shop", "حرفي / محل جديد"],
+ "{n} eşya": ["{n} items", "{n} أغراض"],
+ "{n} eşya taşındı": ["{n} items moved", "تم نقل {n} أغراض"],
+ "{n} seçili": ["{n} selected", "{n} محدد"],
+ "İlk fotoğraf listede görünür. Başka bir fotoğrafa dokunarak öne alabilirsiniz.": ["The first photo is shown in the list. Tap another photo to move it to the front.", "تظهر الصورة الأولى في القائمة. اضغط على صورة أخرى لنقلها إلى البداية."],
+ "↪  Başka bir öğenin altına taşı": ["↪  Move under another entry", "↪  نقل تحت عنصر آخر"],
+ "▲  Yukarı taşı": ["▲  Move up", "▲  نقل للأعلى"],
+ "▼  Aşağı taşı": ["▼  Move down", "▼  نقل للأسفل"],
+ "＋ Yeni kategori": ["＋ New category", "＋ فئة جديدة"],
+ "＋ Yeni yer": ["＋ New place", "＋ مكان جديد"],
+ "🏠  Tüm yerler": ["🏠  All places", "🏠  كل الأماكن"],
+ "🗂  Tüm kategoriler": ["🗂  All categories", "🗂  كل الفئات"],
+ "💾  Yedek al (.json) ve paylaş": ["💾  Back up (.json) and share", "💾  نسخ احتياطي (.json) ومشاركة"],
+ "📷  Fotoğraf çek": ["📷  Take photo", "📷  التقاط صورة"],
+ "🖼  Galeriden seç": ["🖼  Choose from gallery", "🖼  اختيار من المعرض"],
+ "Bu bölümde kayıtlı eşya yok.": ["There are no items in this section.", "لا توجد أغراض في هذا القسم."],
+ "Bütün kategoriler": ["All categories", "كل الفئات"],
+ "Bütün yerler": ["All places", "كل الأماكن"],
+ "Değer:": ["Value:", "القيمة:"],
+ "Döküm": ["Inventory list", "قائمة الجرد"],
+ "Döküm: {scope}": ["Inventory list: {scope}", "قائمة الجرد: {scope}"],
+ "Döküm türü:": ["List by:", "نوع القائمة:"],
+ "Döküm, seçilen bölümdeki ve altındaki bütün eşyaları gösterir.": ["The list shows every item in the selected section and its sub-sections.", "تعرض القائمة كل الأغراض في القسم المحدد وأقسامه الفرعية."],
+ "Fotoğraflarla": ["With photos", "مع الصور"],
+ "PDF kaydedildi:\n{path}": ["PDF saved:\n{path}", "تم حفظ PDF:\n{path}"],
+ "PDF olarak kaydet": ["Save as PDF", "حفظ بصيغة PDF"],
+ "📄  PDF olarak kaydet…": ["📄  Save as PDF…", "📄  حفظ بصيغة PDF…"],
+ "🖨  Yazdır…": ["🖨  Print…", "🖨  طباعة…"],
+ "🖨  Döküm": ["🖨  Inventory list", "🖨  قائمة الجرد"],
+ "🖨  Bu bölümün dökümünü al": ["🖨  Inventory list of this section", "🖨  قائمة جرد هذا القسم"],
+ "🖨  Yazdır / PDF olarak kaydet": ["🖨  Print / save as PDF", "🖨  طباعة / حفظ PDF"],
+ "Seçili kategori ya da yerdeki bütün eşyaların listesi (yazdır / PDF)": ["List of all items in the selected category or place (print / PDF)", "قائمة كل الأغراض في الفئة أو المكان المحدد (طباعة / PDF)"],
+ "{n} eşya · toplam {q} adet": ["{n} items · {q} pieces in total", "{n} أغراض · المجموع {q} قطعة"],
+ "⭐ Favori": ["⭐ Favourite", "⭐ المفضلة"],
+ "⭐ Favori yap": ["⭐ Make favourite", "⭐ اجعلها المفضلة"],
+ "Seçili fotoğraf ilk sıraya alınır ve listede o görünür.": ["The selected photo moves to the front and is shown in the list.", "تنتقل الصورة المحددة إلى البداية وتظهر في القائمة."],
+ "⭐ işaretli ilk fotoğraf favoridir ve listede o görünür. Bir fotoğrafa dokunarak favori yapabilirsiniz.": ["The first photo (⭐) is the favourite and is shown in the list. Tap a photo to make it the favourite.", "الصورة الأولى (⭐) هي المفضلة وتظهر في القائمة. اضغط على صورة لجعلها المفضلة."],
+ "🔍  Büyüt": ["🔍  Enlarge", "🔍  تكبير"],
+ "büyütmek için çift tıklayın": ["double-click to enlarge", "انقر مرتين للتكبير"],
+ "Yeni bir meslek yazarsanız uygun simge internetten kendiliğinden bulunur.": ["If you type a new profession, a matching icon is found on the internet automatically.", "إذا كتبت مهنة جديدة، يتم العثور على رمز مناسب لها من الإنترنت تلقائياً."],
+ "Mesleğin simgesi. Yeni bir meslek yazarsanız uygun simge internetten kendiliğinden bulunur.": ["Icon of the profession. If you type a new profession, a matching icon is found on the internet automatically.", "رمز المهنة. إذا كتبت مهنة جديدة، يتم العثور على رمز مناسب لها من الإنترنت تلقائياً."],
+ "⬆  Güncelleme": ["⬆  Updates", "⬆  التحديثات"],
+ "🔄  Güncellemeleri denetle": ["🔄  Check for updates", "🔄  البحث عن تحديثات"],
+ "Sürüm {v}": ["Version {v}", "الإصدار {v}"],
+ "Sürüm {v} · Güncellemeler denetleniyor…": ["Version {v} · Checking for updates…", "الإصدار {v} · جارٍ البحث عن تحديثات…"],
+ "Sürüm {v} · Program güncel.": ["Version {v} · Up to date.", "الإصدار {v} · البرنامج محدَّث."],
+ "Sürüm {v} · Yeni sürüm hazır: {n}": ["Version {v} · New version available: {n}", "الإصدار {v} · إصدار جديد متاح: {n}"],
+ "Sürüm {v} · Güncellemeler bulut hesabı üzerinden gelir; önce hesaba bağlanın.": ["Version {v} · Updates arrive through the cloud account; connect it first.", "الإصدار {v} · تصل التحديثات عبر الحساب السحابي؛ اربطه أولاً."],
+ "Sürüm {v} · {n} sürümü uygulama içinden kurulamıyor; yeni tam paket gerekiyor.": ["Version {v} · Version {n} cannot be installed from inside the app; a new full package is needed.", "الإصدار {v} · لا يمكن تثبيت الإصدار {n} من داخل البرنامج؛ يلزم حزمة كاملة جديدة."],
+ "⬆  Şimdi güncelle ({n})": ["⬆  Update now ({n})", "⬆  حدِّث الآن ({n})"],
+ "⬆  Güncelle: {n}": ["⬆  Update: {n}", "⬆  تحديث: {n}"],
+ "{x} MB/sn": ["{x} MB/s", "{x} م.ب/ث"],
+ "{x} KB/sn": ["{x} KB/s", "{x} ك.ب/ث"],
+ "hesaplanıyor…": ["calculating…", "جارٍ الحساب…"],
+ "yaklaşık {s} sn": ["about {s} s", "حوالي {s} ث"],
+ "yaklaşık {m} dk {s} sn": ["about {m} min {s} s", "حوالي {m} د {s} ث"],
+ "İnen": ["Downloaded", "تم تنزيله"],
+ "Kalan": ["Remaining", "المتبقي"],
+ "Hız": ["Speed", "السرعة"],
+ "Kalan süre": ["Time left", "الوقت المتبقي"],
+ "{a} / {b} MB": ["{a} / {b} MB", "{a} / {b} م.ب"],
+ "{a} MB": ["{a} MB", "{a} م.ب"],
+ "Güncelleme indiriliyor: {n}": ["Downloading update: {n}", "جارٍ تنزيل التحديث: {n}"],
+ "⬇  İndiriliyor %{p}": ["⬇  Downloading {p}%", "⬇  جارٍ التنزيل {p}%"],
+ "Güncelleme indiriliyor… {p}": ["Downloading update… {p}", "جارٍ تنزيل التحديث… {p}"],
+ "Güncelleniyor… {p}": ["Updating… {p}", "جارٍ التحديث… {p}"],
+ "{n} kuruldu. Program yeniden başlatılıyor…": ["{n} installed. Restarting…", "تم تثبيت {n}. جارٍ إعادة التشغيل…"],
+ "{n} kuruldu. Uygulama yeniden başlatılıyor…": ["{n} installed. Restarting…", "تم تثبيت {n}. جارٍ إعادة التشغيل…"],
+ "↻  Yeniden başlat": ["↻  Restart", "↻  إعادة التشغيل"],
+ "↻  Yeniden başlatılıyor…": ["↻  Restarting…", "↻  جارٍ إعادة التشغيل…"],
+ "Bu cihazda kurulamaz.": ["Cannot be installed on this device.", "لا يمكن التثبيت على هذا الجهاز."],
+ "Bu güncelleme için gereken paket bulunamadı.": ["The package needed for this update was not found.", "لم يُعثر على الحزمة اللازمة لهذا التحديث."],
+ "Bu güncellemede Android bir kez \"Güncelle\" onayı isteyecek.": ["Android will ask once to confirm \"Update\" for this update.", "سيطلب أندرويد تأكيد \"تحديث\" مرة واحدة لهذا التحديث."],
+ "Güncelleme paketi bozuk indi. Yeniden deneyin.": ["The update package was damaged while downloading. Try again.", "وصلت حزمة التحديث تالفة. حاول مرة أخرى."],
+ "Güncelleme paketi eksik. Biraz sonra yeniden deneyin.": ["The update package is incomplete. Try again a little later.", "حزمة التحديث ناقصة. حاول بعد قليل."],
+ "Türk Lirası": ["Turkish Lira", "ليرة تركية"],
+ "ABD Doları": ["US Dollar", "دولار أمريكي"],
+ "Suriye Lirası": ["Syrian Pound", "ليرة سورية"],
+ "Hızlı ara / barkod okuyucu (Ctrl+F)": ["Quick search / barcode reader (Ctrl+F)", "بحث سريع / قارئ الباركود (Ctrl+F)"],
+ "Simge durumuna küçült": ["Minimize", "تصغير"],
+ "Yarım ekran": ["Half screen", "نصف الشاشة"],
+ "Tam ekran": ["Full screen", "ملء الشاشة"],
+ "Yeni sürüm hazır. Kurmak için tıklayın.": ["A new version is ready. Click to install.", "إصدار جديد جاهز. انقر للتثبيت."],
+ "%{p} · {a} / {b} MB · {s}": ["{p}% · {a} / {b} MB · {s}", "%{p} · {a} / {b} MB · {s}"],
+ "Kalan: {k} MB · {e}": ["Remaining: {k} MB · {e}", "المتبقي: {k} MB · {e}"],
+ "Yeni sürüm var mı diye bak (sürüm {v}).": ["Check for a new version (version {v}).", "التحقق من وجود إصدار جديد (الإصدار {v})."],
+ "Sıralamak için tıklayın, yeniden tıklayınca ters sıralanır · Genişlik: ayırıcıyı sürükleyin, çift tıklayınca otomatik · Yer değiştirmek için başlığı sürükleyin · Sağ tık: varsayılan düzen": ["Click to sort, click again to reverse · Width: drag the divider, double-click to auto-fit · Drag a header to move the column · Right-click: default layout", "انقر للترتيب، وانقر مرة أخرى لعكسه · العرض: اسحب الفاصل، وانقر نقرًا مزدوجًا للضبط التلقائي · اسحب العنوان لنقل العمود · نقرة يمنى: الترتيب الافتراضي"],
+ "Varsayılan sütun düzeni": ["Default column layout", "ترتيب الأعمدة الافتراضي"],
+ " · ⚠ {n} gecikti": [" · ⚠ {n} overdue", " · ⚠ {n} متأخر"],
+ "(ağ bağlantısı yok)": ["(no network connection)", "(لا يوجد اتصال بالشبكة)"],
+ "(isteğe bağlı)": ["(optional)", "(اختياري)"],
+ "(isteğe bağlı) adınız, telefonunuz ya da e-postanız": ["(optional) your name, phone or e-mail", "(اختياري) اسمك أو هاتفك أو بريدك الإلكتروني"],
+ "({n} gün gecikti)": ["({n} days overdue)", "(متأخر {n} يوم)"],
+ "<br>… ve {n} eşya daha": ["<br>… and {n} more items", "<br>… و{n} غرض آخر"],
+ "Adedi azalan ve listeye eklenen eşyalar": ["Items running low and items added to the list", "الأغراض التي قلّت كميتها والمضافة إلى القائمة"],
+ "Adet bunun altına düşünce eşya alışveriş listesine eklenir (0 = uyarı yok)": ["When the quantity drops below this, the item is added to the shopping list (0 = no alert)", "عندما تنخفض الكمية عن هذا الحد يُضاف الغرض إلى قائمة التسوق (0 = بدون تنبيه)"],
+ "Adet değişti": ["Quantity changed", "تغيّرت الكمية"],
+ "Adresi elle yaz…": ["Type the address…", "اكتب العنوان يدويًا…"],
+ "Alıcı: {e}": ["To: {e}", "إلى: {e}"],
+ "Alınacak": ["To buy", "المطلوب شراؤه"],
+ "Alışveriş listesi boş. ✓": ["The shopping list is empty. ✓", "قائمة التسوق فارغة. ✓"],
+ "Alışveriş listesi değişti": ["Shopping list changed", "تغيّرت قائمة التسوق"],
+ "Alışveriş listesinden çıkar": ["Remove from shopping list", "إزالة من قائمة التسوق"],
+ "Alışveriş listesine ekle / çıkar": ["Add to / remove from shopping list", "إضافة إلى قائمة التسوق / إزالة منها"],
+ "Aynı ağda açık bir Organizer bilgisayarı bulunamadı.": ["No computer running Organizer was found on the same network.", "لم يُعثر على حاسوب يعمل عليه Organizer في الشبكة نفسها."],
+ "Aynı ağda açık bir Organizer bilgisayarı bulunamadı.\nÖbür bilgisayarın adresini biliyorsanız yazın (ör. 192.168.1.20):": ["No computer running Organizer was found on the same network.\nIf you know the other computer's address, type it (e.g. 192.168.1.20):", "لم يُعثر على حاسوب يعمل عليه Organizer في الشبكة نفسها.\nإذا كنت تعرف عنوان الحاسوب الآخر فاكتبه (مثال: 192.168.1.20):"],
+ "Az kaldı uyarısını kapat": ["Turn off the running-low alert", "إيقاف تنبيه انخفاض الكمية"],
+ "Ağdaki bilgisayarlar aranıyor…": ["Searching for computers on the network…", "جارٍ البحث عن الحواسيب في الشبكة…"],
+ "Bilgisayarda Organizer açık olmalı. İlk seferde bilgisayarın Ayarlar sayfasındaki 6 haneli eşleme kodu sorulur (iki cihaz aynı bulut hesabındaysa sorulmaz).": ["Organizer must be open on the computer. The first time, you are asked for the 6-digit pairing code shown on the computer's Settings page (not asked if both devices use the same cloud account).", "يجب أن يكون Organizer مفتوحًا على الحاسوب. في المرة الأولى يُطلب رمز الاقتران المكوّن من 6 أرقام الظاهر في صفحة الإعدادات على الحاسوب (لا يُطلب إذا كان الجهازان على حساب السحابة نفسه)."],
+ "Bilgisayarın adresini yazın (Organizer'ın Ayarlar sayfasında görünür, ör. 192.168.1.20):": ["Type the computer's address (shown on Organizer's Settings page, e.g. 192.168.1.20):", "اكتب عنوان الحاسوب (يظهر في صفحة إعدادات Organizer، مثال: 192.168.1.20):"],
+ "Bu bilgisayar aynı ağdaki cihazlarla eşitlensin": ["Sync this computer with devices on the same network", "مزامنة هذا الحاسوب مع الأجهزة في الشبكة نفسها"],
+ "Bu bilgisayar aynı ağdaki cihazları bekliyor: {a}": ["This computer is waiting for devices on the same network: {a}", "هذا الحاسوب بانتظار الأجهزة في الشبكة نفسها: {a}"],
+ "Bu iş kaydı silinsin mi?": ["Delete this job record?", "هل تريد حذف سجل العمل هذا؟"],
+ "Bu özellik için uygulamanın yeni sürümü gerekir. Üstteki güncelleme düğmesine dokunun.": ["This feature needs the new version of the app. Tap the update button at the top.", "تحتاج هذه الميزة إلى الإصدار الجديد من التطبيق. اضغط زر التحديث في الأعلى."],
+ "Dönüş günü geçince eşya listede kırmızı görünür. Geri gelince „↩ Geri geldi“ deyin; kayıt geçmişte kalır.": ["After the return date the item is shown in red. When it comes back, tap “↩ Returned”; the record stays in the history.", "بعد تجاوز موعد الإرجاع يظهر الغرض باللون الأحمر. عند عودته اضغط «↩ أُعيد»؛ ويبقى السجل في التاريخ."],
+ "Elle eklendi": ["Added manually", "أُضيف يدويًا"],
+ "En az": ["Min.", "الحد الأدنى"],
+ "En az adet:": ["Minimum quantity:", "الحد الأدنى للكمية:"],
+ "En az adet: {n}": ["Minimum quantity: {n}", "الحد الأدنى للكمية: {n}"],
+ "En az: {n}": ["Min.: {n}", "الحد الأدنى: {n}"],
+ "Eşitlenemedi: {m}": ["Could not sync: {m}", "تعذّرت المزامنة: {m}"],
+ "Eşleme kodu": ["Pairing code", "رمز الاقتران"],
+ "Eşleme kodu:": ["Pairing code:", "رمز الاقتران:"],
+ "Eşya ara…": ["Search items…", "ابحث عن غرض…"],
+ "Eşya:": ["Item:", "الغرض:"],
+ "Eşyanın „En az adet“ değeri girildiyse adedi bunun altına düşünce kendiliğinden buraya gelir. Başka eşyaları da elle ekleyebilirsiniz. Aldıktan sonra „✓ Alındı“ deyin; adet artar.": ["If an item has a “Minimum quantity”, it comes here automatically when its quantity drops below it. You can also add other items manually. After buying, tap “✓ Bought”; the quantity increases.", "إذا حُدد «الحد الأدنى للكمية» لغرض ما فإنه يُضاف هنا تلقائيًا عندما تنخفض كميته عنه. يمكنك أيضًا إضافة أغراض أخرى يدويًا. بعد الشراء اضغط «✓ تم الشراء» فتزداد الكمية."],
+ "Eşyayı aç": ["Open item", "فتح الغرض"],
+ "Fatura / fiş": ["Invoice / receipt", "الفاتورة / الإيصال"],
+ "Faturanın, fişin ya da garanti belgesinin fotoğrafını ekleyin (sürükleyip bırakabilirsiniz).": ["Add a photo of the invoice, receipt or warranty card (you can drag and drop).", "أضف صورة الفاتورة أو الإيصال أو بطاقة الضمان (يمكنك السحب والإفلات)."],
+ "Fiyat işareti değişti": ["Price mark changed", "تغيّرت علامة السعر"],
+ "Geri alınacak işlem yok": ["Nothing to undo", "لا يوجد ما يمكن التراجع عنه"],
+ "Geri getireceği gün:": ["Return date:", "موعد الإرجاع:"],
+ "Geri yüklendi: {x}": ["Restored: {x}", "تمت الاستعادة: {x}"],
+ "Geçmiş:": ["History:", "السجل:"],
+ "Gmail ile gönder (tarayıcı)": ["Send with Gmail (browser)", "إرسال عبر Gmail (المتصفح)"],
+ "Görünüm:": ["Appearance:", "المظهر:"],
+ "Hangi bilgisayarla eşitlensin?": ["Sync with which computer?", "المزامنة مع أي حاسوب؟"],
+ "Henüz iş kaydı yok": ["No job records yet", "لا توجد سجلات أعمال بعد"],
+ "Henüz yerel ağda eşitlenmedi": ["Not synced on the local network yet", "لم تتم المزامنة على الشبكة المحلية بعد"],
+ "Kalıcı olarak sil": ["Delete permanently", "حذف نهائي"],
+ "Kalıcı olarak sil ({n})": ["Delete permanently ({n})", "حذف نهائي ({n})"],
+ "Kime:": ["To whom:", "لمن:"],
+ "Kod yanlış ya da değişmiş.": ["The code is wrong or has changed.", "الرمز خاطئ أو تم تغييره."],
+ "Konu:": ["Subject:", "الموضوع:"],
+ "Konuşarak arayın ya da ekleyin: „Matkap nerede?“ · „3 ampul ekle“\nWindows'un sesle yazma özelliği açılır (Win+H).": ["Search or add by speaking: “Where is the drill?” · “add 3 bulbs”\nOpens Windows voice typing (Win+H).", "ابحث أو أضف بالكلام: «أين المثقاب؟» · «أضف 3 لمبات»\nتُفتح ميزة الكتابة الصوتية في ويندوز (Win+H)."],
+ "Liste kopyalandı.": ["List copied.", "تم نسخ القائمة."],
+ "Listeden çıkar": ["Remove from list", "إزالة من القائمة"],
+ "Listeyi metin olarak kopyalar (WhatsApp'a yapıştırabilirsiniz)": ["Copies the list as text (you can paste it into WhatsApp)", "ينسخ القائمة كنص (يمكنك لصقها في واتساب)"],
+ "Lütfen mesajınızı yazın.": ["Please write your message.", "يرجى كتابة رسالتك."],
+ "Masaüstü": ["Desktop", "سطح المكتب"],
+ "Mesaj kopyalandı. Dilediğiniz yoldan {e} adresine gönderebilirsiniz.": ["Message copied. You can send it to {e} any way you like.", "تم نسخ الرسالة. يمكنك إرسالها إلى {e} بالطريقة التي تفضلها."],
+ "Mesajınız…": ["Your message…", "رسالتك…"],
+ "Neden": ["Reason", "السبب"],
+ "Ses anlaşılamadı. Yeniden deneyin.": ["Could not understand. Please try again.", "لم يُفهم الصوت. حاول مرة أخرى."],
+ "Seçili {n} eşya kalıcı olarak silinsin mi? Bu işlem geri alınamaz.": ["Permanently delete the {n} selected items? This cannot be undone.", "هل تريد حذف {n} من الأغراض المحددة نهائيًا؟ لا يمكن التراجع عن ذلك."],
+ "Seçili {n} eşya çöp kutusuna taşınsın mı?": ["Move the {n} selected items to the trash?", "هل تريد نقل {n} من الأغراض المحددة إلى سلة المحذوفات؟"],
+ "Silindiği gün": ["Deleted on", "تاريخ الحذف"],
+ "Silindiği gün:": ["Deleted on:", "تاريخ الحذف:"],
+ "Silinen eşyalar fotoğraflarıyla birlikte {n} gün burada kalır, sonra kendiliğinden kalıcı olarak silinir.": ["Deleted items stay here with their photos for {n} days, then they are deleted permanently.", "تبقى الأغراض المحذوفة هنا مع صورها لمدة {n} يومًا، ثم تُحذف نهائيًا تلقائيًا."],
+ "Silinen eşyalar {n} gün burada kalır; geri yükleyebilirsiniz": ["Deleted items stay here for {n} days; you can restore them", "تبقى الأغراض المحذوفة هنا {n} يومًا؛ ويمكنك استعادتها"],
+ "Size ulaşma:": ["Contact you at:", "للتواصل معك:"],
+ "Son işlemi geri al (Ctrl+Z): {x}": ["Undo the last action (Ctrl+Z): {x}", "التراجع عن آخر إجراء (Ctrl+Z): {x}"],
+ "Son yerel ağ eşitlemesi: {d}": ["Last local network sync: {d}", "آخر مزامنة على الشبكة المحلية: {d}"],
+ "Sütun genişliği: ayırıcı çizgiyi sürükleyin · çift tıklayınca otomatik ayarlanır · Sütunun yerini değiştirmek için başlığı sürükleyin": ["Column width: drag the divider · double-click to auto-fit · Drag a header to move the column", "عرض العمود: اسحب الخط الفاصل · انقر مرتين للضبط التلقائي · اسحب العنوان لتغيير موضع العمود"],
+ "Tarih:": ["Date:", "التاريخ:"],
+ "Telefonda: Ayarlar → Yerel ağ eşitlemesi → „Bilgisayarı bul“. İlk seferde bu kod sorulur (iki cihaz aynı bulut hesabındaysa sorulmaz). Windows güvenlik duvarı sorarsa „Erişime izin ver“ deyin.": ["On the phone: Settings → Local network sync → “Find the computer”. This code is asked the first time (not asked if both devices use the same cloud account). If Windows Firewall asks, choose “Allow access”.", "على الهاتف: الإعدادات ← مزامنة الشبكة المحلية ← «ابحث عن الحاسوب». يُطلب هذا الرمز في المرة الأولى (لا يُطلب إذا كان الجهازان على حساب السحابة نفسه). إذا سأل جدار حماية ويندوز فاختر «السماح بالوصول»."],
+ "Telefonu:": ["Phone:", "هاتفه:"],
+ "Uyarı yok": ["No alert", "بدون تنبيه"],
+ "Uyarıyı kapat": ["Turn off alert", "إيقاف التنبيه"],
+ "Var": ["Have", "المتوفر"],
+ "Var: {n}": ["Have: {n}", "المتوفر: {n}"],
+ "Verildiği gün:": ["Lent on:", "تاريخ الإعارة:"],
+ "WhatsApp ile gönder": ["Send via WhatsApp", "إرسال عبر واتساب"],
+ "Yalnızca ödünç verilmiş eşyaları göster": ["Show only lent items", "عرض الأغراض المُعارة فقط"],
+ "Yapılan iş": ["Work done", "العمل المنجز"],
+ "Yapılan iş:": ["Work done:", "العمل المنجز:"],
+ "Yeni iş / ödeme": ["New job / payment", "عمل / دفعة جديدة"],
+ "Yeni kod": ["New code", "رمز جديد"],
+ "Yerel ağ eşitlemesi": ["Local network sync", "مزامنة الشبكة المحلية"],
+ "Yerel ağ eşitlemesi başlatılıyor…": ["Starting local network sync…", "جارٍ تشغيل مزامنة الشبكة المحلية…"],
+ "Yerel ağ eşitlemesi kapalı.": ["Local network sync is off.", "مزامنة الشبكة المحلية متوقفة."],
+ "Yerel ağ kapısı ({p}) açılamadı: {m}": ["Could not open local network port ({p}): {m}", "تعذّر فتح منفذ الشبكة المحلية ({p}): {m}"],
+ "yeri belirtilmemiş": ["no place set", "المكان غير محدد"],
+ "{name} bilgisayarına ulaşılamadı. Aynı Wi-Fi'de ve Organizer açık mı?": ["Could not reach {name}. Is it on the same Wi-Fi with Organizer open?", "تعذّر الوصول إلى {name}. هل هو على شبكة Wi-Fi نفسها وOrganizer مفتوح؟"],
+ "{name} bilgisayarının Ayarlar → Yerel ağ eşitlemesi bölümündeki 6 haneli kodu yazın:": ["Type the 6-digit code shown on {name} under Settings → Local network sync:", "اكتب الرمز المكوّن من 6 أرقام الظاهر على {name} في الإعدادات ← مزامنة الشبكة المحلية:"],
+ "{name} ile eşitlendi · {a} kayıt alındı · {b} fotoğraf gönderildi · {c} fotoğraf alındı": ["Synced with {name} · {a} records received · {b} photos sent · {c} photos received", "تمت المزامنة مع {name} · استُلم {a} سجل · أُرسلت {b} صورة · استُلمت {c} صورة"],
+ "{name} ile eşitlendi.\n{a} kayıt alındı · {b} fotoğraf gönderildi · {c} fotoğraf alındı.": ["Synced with {name}.\n{a} records received · {b} photos sent · {c} photos received.", "تمت المزامنة مع {name}.\nاستُلم {a} سجل · أُرسلت {b} صورة · استُلمت {c} صورة."],
+ "{n} eşya kalıcı olarak silinsin mi? Bu işlem geri alınamaz.": ["Permanently delete {n} items? This cannot be undone.", "هل تريد حذف {n} غرض نهائيًا؟ لا يمكن التراجع عن ذلك."],
+ "{n} eşya silindi": ["{n} items deleted", "حُذف {n} غرض"],
+ "{n} eşya çöp kutusuna taşındı": ["{n} items moved to the trash", "نُقل {n} غرض إلى سلة المحذوفات"],
+ "{n} gün": ["{n} days", "{n} يوم"],
+ "{n} gün içinde çöp kutusundan geri yükleyebilir ya da „↶ Geri al“ diyebilirsiniz.": ["You can restore it from the trash within {n} days or tap “↶ Undo”.", "يمكنك استعادته من سلة المحذوفات خلال {n} يومًا أو الضغط على «↶ تراجع»."],
+ "{n} gün kaldı": ["{n} days left", "بقي {n} يوم"],
+ "{n} iş": ["{n} jobs", "{n} عمل"],
+ "Çöp kutusu boş.": ["The trash is empty.", "سلة المحذوفات فارغة."],
+ "Çöp kutusundaki {n} eşya kalıcı olarak silinsin mi? Bu işlem geri alınamaz.": ["Permanently delete the {n} items in the trash? This cannot be undone.", "هل تريد حذف {n} غرض في سلة المحذوفات نهائيًا؟ لا يمكن التراجع عن ذلك."],
+ "Çöp kutusunu boşalt": ["Empty the trash", "إفراغ سلة المحذوفات"],
+ "Ödenen ücret:": ["Amount paid:", "المبلغ المدفوع:"],
+ "Ödünç verilmiş eşya yok.": ["No lent items.", "لا توجد أغراض مُعارة."],
+ "Ödünç": ["Lent", "مُعار"],
+ "Ödünç:": ["Lent:", "مُعار:"],
+ "Öneri, istek ya da hata bildirimlerinizi geliştiriciye gönderin; program sizin önerilerinizle gelişir.": ["Send your suggestions, requests or bug reports to the developer; the program improves with your ideas.", "أرسل اقتراحاتك أو طلباتك أو بلاغات الأخطاء إلى المطوّر؛ يتطور البرنامج باقتراحاتك."],
+ "Öneri, istek ya da hata bildirimlerinizi yazın. Programın geliştirilmesi için doğrudan geliştiriciye gider.": ["Write your suggestions, requests or bug reports. They go straight to the developer to improve the program.", "اكتب اقتراحاتك أو طلباتك أو بلاغات الأخطاء. تصل مباشرة إلى المطوّر لتحسين البرنامج."],
+ "Örn. Komşu Ahmet": ["e.g. Neighbour Ahmet", "مثال: الجار أحمد"],
+ "Örn. Mutfak musluğu değişti": ["e.g. Kitchen tap replaced", "مثال: تبديل حنفية المطبخ"],
+ "Ücret": ["Cost", "الأجرة"],
+ "İnternet olmadığında telefon ve bilgisayarlar aynı modem / Wi-Fi üzerinden eşitlenir. Kayıtlar bulut eşitlemesindeki gibi birleştirilir: her kaydın en son değiştirilen hali kalır, hiçbir şey silinmez ya da üst üste yazılmaz. İnternet gelince değişiklikler buluta da gider.": ["When there is no internet, phones and computers sync over the same modem / Wi-Fi. Records are merged as in cloud sync: the most recently changed version of each record is kept, nothing is deleted or overwritten. When the internet is back, changes also go to the cloud.", "عند انقطاع الإنترنت تتزامن الهواتف والحواسيب عبر المودم / شبكة Wi-Fi نفسها. تُدمج السجلات كما في مزامنة السحابة: تبقى أحدث نسخة معدّلة من كل سجل، ولا يُحذف شيء ولا يُكتب فوق شيء. وعند عودة الإنترنت تُرسل التغييرات إلى السحابة أيضًا."],
+ "İşi düzenle": ["Edit job", "تعديل العمل"],
+ "İşler / ödenen": ["Jobs / paid", "الأعمال / المدفوع"],
+ "„{name}“ alındı": ["“{name}” bought", "تم شراء «{name}»"],
+ "„{name}“ düzenlendi": ["“{name}” edited", "تم تعديل «{name}»"],
+ "„{name}“ geri geldi": ["“{name}” returned", "أُعيد «{name}»"],
+ "„{name}“ için az kaldı uyarısı kapatılsın mı? (En az adet: {n})": ["Turn off the running-low alert for “{name}”? (Minimum quantity: {n})", "هل تريد إيقاف تنبيه انخفاض الكمية لـ«{name}»؟ (الحد الأدنى: {n})"],
+ "„{name}“ kaç adet alındı?": ["How many “{name}” were bought?", "كم قطعة من «{name}» تم شراؤها؟"],
+ "„{name}“ kime ödünç verildi?": ["Who was “{name}” lent to?", "لمن أُعير «{name}»؟"],
+ "„{name}“ {who} kişisinden geri geldi mi?": ["Has “{name}” come back from {who}?", "هل أُعيد «{name}» من {who}؟"],
+ "„{name}“ çöp kutusuna taşınsın mı?": ["Move “{name}” to the trash?", "هل تريد نقل «{name}» إلى سلة المحذوفات؟"],
+ "„{name}“ ödünç verildi": ["“{name}” lent", "أُعير «{name}»"],
+ "„{x}“ bulunamadı.": ["“{x}” not found.", "لم يُعثر على «{x}»."],
+ "↩": ["↩", "↩"],
+ "↩  Geri geldi": ["↩  Returned", "↩  أُعيد"],
+ "↩  Geri yükle": ["↩  Restore", "↩  استعادة"],
+ "↩  Hepsini geri yükle": ["↩  Restore all", "↩  استعادة الكل"],
+ "↩  Seçilenleri geri yükle ({n})": ["↩  Restore selected ({n})", "↩  استعادة المحدد ({n})"],
+ "↶  Geri al": ["↶  Undo", "↶  تراجع"],
+ "↶ Geri alındı: {x}": ["↶ Undone: {x}", "↶ تم التراجع: {x}"],
+ "☀  Açık": ["☀  Light", "☀  فاتح"],
+ "🌙  Koyu": ["🌙  Dark", "🌙  داكن"],
+ "🖥  Sistemle aynı": ["🖥  Same as system", "🖥  مثل النظام"],
+ "⚠ Az kaldı": ["⚠ Running low", "⚠ الكمية قليلة"],
+ "⚠ Az kaldı (en az {n} olmalı) — alışveriş listesinde": ["⚠ Running low (should be at least {n}) — on the shopping list", "⚠ الكمية قليلة (يجب ألا تقل عن {n}) — في قائمة التسوق"],
+ "✉  Admin ile iletişime geç": ["✉  Contact the admin", "✉  التواصل مع المسؤول"],
+ "✉  E-posta uygulamasıyla gönder": ["✉  Send with e-mail app", "✉  إرسال عبر تطبيق البريد"],
+ "✉  Mesaj yaz…": ["✉  Write a message…", "✉  اكتب رسالة…"],
+ "✎ Düzenle": ["✎ Edit", "✎ تعديل"],
+ "✓  Alındı": ["✓  Bought", "✓  تم الشراء"],
+ "⟳  Eşitleniyor…": ["⟳  Syncing…", "⟳  جارٍ المزامنة…"],
+ "⟳  Şimdi eşitle: {x}": ["⟳  Sync now: {x}", "⟳  زامن الآن: {x}"],
+ "＋  Listeye eşya ekle": ["＋  Add item to list", "＋  إضافة غرض إلى القائمة"],
+ "＋ Fiş / fatura ekle": ["＋ Add receipt / invoice", "＋ إضافة إيصال / فاتورة"],
+ "＋ İş ekle": ["＋ Add job", "＋ إضافة عمل"],
+ "🎤  Sesle ara / ekle": ["🎤  Search / add by voice", "🎤  البحث / الإضافة بالصوت"],
+ "🎤 Arama kutusuna yazın ya da konuşun: „Matkap nerede?“ · „3 ampul ekle“. Sesle yazma Windows'ta Win+H ile açılır.": ["🎤 Type or speak into the search box: “Where is the drill?” · “add 3 bulbs”. Voice typing opens with Win+H on Windows.", "🎤 اكتب أو تكلّم في مربع البحث: «أين المثقاب؟» · «أضف 3 لمبات». تُفتح الكتابة الصوتية في ويندوز بـ Win+H."],
+ "🎤 Dinliyorum… „Matkap nerede?“ ya da „3 ampul ekle“": ["🎤 Listening… “Where is the drill?” or “add 3 bulbs”", "🎤 أستمع… «أين المثقاب؟» أو «أضف 3 لمبات»"],
+ "🎤 Yeni eşya: <b>{x}</b> — <a href='add'>＋ Ekle</a>": ["🎤 New item: <b>{x}</b> — <a href='add'>＋ Add</a>", "🎤 غرض جديد: <b>{x}</b> — <a href='add'>＋ إضافة</a>"],
+ "🎤 Yeni eşya: {x}": ["🎤 New item: {x}", "🎤 غرض جديد: {x}"],
+ "🎤 „{x}“ bulunamadı.": ["🎤 “{x}” not found.", "🎤 لم يُعثر على «{x}»."],
+ "💡 Öneri / istek": ["💡 Suggestion / request", "💡 اقتراح / طلب"],
+ "🐞 Hata bildirimi": ["🐞 Bug report", "🐞 بلاغ عن خطأ"],
+ "❓ Soru": ["❓ Question", "❓ سؤال"],
+ "💬 Diğer": ["💬 Other", "💬 أخرى"],
+ "📋  Kopyala": ["📋  Copy", "📋  نسخ"],
+ "📶  Yerel ağ eşitlemesi (internetsiz)": ["📶  Local network sync (no internet)", "📶  مزامنة الشبكة المحلية (بدون إنترنت)"],
+ "📷  Fotoğraflar": ["📷  Photos", "📷  الصور"],
+ "🔍  Ağdaki başka bir bilgisayarla eşitle": ["🔍  Sync with another computer on the network", "🔍  المزامنة مع حاسوب آخر في الشبكة"],
+ "🔍  Bilgisayarı bul ve eşitle": ["🔍  Find the computer and sync", "🔍  ابحث عن الحاسوب وزامن"],
+ "🗑  Sil (çöp kutusuna)": ["🗑  Delete (to trash)", "🗑  حذف (إلى سلة المحذوفات)"],
+ "🗑  Çöp kutusu": ["🗑  Trash", "🗑  سلة المحذوفات"],
+ "🗑 Çöp kutusu ({n})": ["🗑 Trash ({n})", "🗑 سلة المحذوفات ({n})"],
+ "🛒  Alışveriş listesi": ["🛒  Shopping list", "🛒  قائمة التسوق"],
+ "🛒  Alışveriş listesine ekle": ["🛒  Add to shopping list", "🛒  إضافة إلى قائمة التسوق"],
+ "🛒  Listede": ["🛒  On the list", "🛒  في القائمة"],
+ "🛒  Listeye ekle": ["🛒  Add to list", "🛒  أضف إلى القائمة"],
+ "🛒 Alışveriş listesi": ["🛒 Shopping list", "🛒 قائمة التسوق"],
+ "🛒 Alışveriş listesi ({n})": ["🛒 Shopping list ({n})", "🛒 قائمة التسوق ({n})"],
+ "🤝  Ödünç ver": ["🤝  Lend", "🤝  إعارة"],
+ "🤝 Ödünçtekiler ({n})": ["🤝 Lent out ({n})", "🤝 المُعارة ({n})"],
+ "🧾  Fatura / fiş": ["🧾  Invoice / receipt", "🧾  الفاتورة / الإيصال"],
+ "🧾  Fatura / fiş ({n})": ["🧾  Invoice / receipt ({n})", "🧾  الفاتورة / الإيصال ({n})"],
+ "🧾  Yapılan işler ve ödemeler": ["🧾  Jobs done and payments", "🧾  الأعمال المنجزة والمدفوعات"],
+ "🧾  İşler ve ödemeler": ["🧾  Jobs and payments", "🧾  الأعمال والمدفوعات"],
+ "🧾 {n} belge — görmek için tıklayın": ["🧾 {n} documents — click to view", "🧾 {n} مستند — انقر للعرض"],
+ "✉  Gönder": ["✉  Send", "✉  إرسال"],
+ "Mesajınız yöneticiye iletildi. Teşekkürler!": ["Your message has been delivered to the administrator. Thank you!", "تم إيصال رسالتك إلى المسؤول. شكرًا لك!"],
+ "Mesaj gönderilemedi. İnternet bağlantınızı kontrol edip tekrar deneyin.": ["The message could not be sent. Check your internet connection and try again.", "تعذّر إرسال الرسالة. تحقّق من اتصالك بالإنترنت وحاول مجددًا."],
+ "Mesaj kopyalandı.": ["Message copied.", "تم نسخ الرسالة."]
  },
  "defaults": {
   "Salon": [

@@ -2,12 +2,13 @@ from PySide6.QtCore import QSize, Qt, QTimer, QUrl
 from PySide6.QtGui import QDesktopServices, QGuiApplication, QIcon
 from PySide6.QtWidgets import (QAbstractItemView, QButtonGroup, QCheckBox, QComboBox, QDialog,
                                QDialogButtonBox, QFormLayout, QHBoxLayout, QHeaderView, QLabel,
-                               QLineEdit, QMenu, QPlainTextEdit, QPushButton, QRadioButton,
+                               QLineEdit, QMenu, QPlainTextEdit, QPushButton, QRadioButton, QTabWidget,
                                QTableWidget, QTableWidgetItem, QToolButton, QVBoxLayout, QWidget)
 
 from .common import Card, HeaderSort, ThumbCache, confirm, setup_columns
 from .db import phone_for_links
 from .item_dialog import PhotoEditor, PhotoViewer
+from .extras import JobsEditor, jobs_summary
 from .professions import ProfessionIcons
 from . import i18n
 from .i18n import PROFESSIONS, t
@@ -131,8 +132,12 @@ class ContactDialog(QDialog):
         self.notes.setPlaceholderText(t("Çalışma saatleri, fiyat, tavsiye eden kişi…"))
         form.addRow(t("Notlar:"), self.notes)
         lay.addLayout(form)
-        self.photos = PhotoEditor(thumbs)
-        lay.addWidget(self.photos, 1)
+        self.photos = PhotoEditor(thumbs, title=False)
+        self.jobs_ed = JobsEditor((contact or {}).get("jobs") or [], db.get_setting("default_currency", "USD"))
+        tabs = QTabWidget()
+        tabs.addTab(self.jobs_ed, t("🧾  İşler ve ödemeler") + (f" ({len(contact['jobs'])})" if contact and contact.get("jobs") else ""))
+        tabs.addTab(self.photos, t("📷  Fotoğraflar"))
+        lay.addWidget(tabs, 1)
 
         buttons = QDialogButtonBox()
         save = buttons.addButton(t("Kaydet"), QDialogButtonBox.AcceptRole)
@@ -165,6 +170,9 @@ class ContactDialog(QDialog):
 
     def photo_entries(self):
         return self.photos.entries()
+
+    def jobs(self):
+        return self.jobs_ed.value()
 
     def _save(self):
         if not self.name.text().strip():
@@ -227,8 +235,9 @@ class ContactsPage(QWidget):
         card = Card()
         cl = QVBoxLayout(card)
         cl.setContentsMargins(14, 10, 14, 12)
-        self.table = QTableWidget(0, 8)
-        labels = [""] + [t(x) for x in ("Tür", "İsim", "Meslek / alan", "Yer / adres", "Telefon", "İletişim", "Notlar")]
+        self.table = QTableWidget(0, 9)
+        labels = [""] + [t(x) for x in ("Tür", "İsim", "Meslek / alan", "Yer / adres", "Telefon", "İletişim", "Notlar",
+                                         "İşler / ödenen")]
         self.table.setHorizontalHeaderLabels(labels)
         self.table.setIconSize(QSize(46, 46))
         self.table.verticalHeader().hide()
@@ -240,7 +249,7 @@ class ContactsPage(QWidget):
         self.table.verticalHeader().setDefaultSectionSize(56)
         self.table.horizontalHeader().setHighlightSections(False)
         setup_columns(self.table, db, "cols_contacts",
-                      {0: 62, 1: 110, 2: 220, 3: 190, 4: 210, 5: 160, 6: 130, 7: 260})
+                      {0: 62, 1: 110, 2: 220, 3: 190, 4: 210, 5: 160, 6: 130, 7: 260, 8: 190})
         self.csort = db.get_setting("sort_contacts") or "name_asc"
         self.header_sort = HeaderSort(
             self.table, labels,
@@ -295,6 +304,12 @@ class ContactsPage(QWidget):
                      QTableWidgetItem("\u2066" + c["phone"] + "\u2069"), QTableWidgetItem(""),
                      QTableWidgetItem(c["notes"].replace("\n", " "))]
             cells[7].setToolTip(c["notes"])
+            jobs = c.get("jobs") or []
+            ji = QTableWidgetItem(jobs_summary(jobs) or "—")
+            if jobs:
+                ji.setToolTip("\n".join(f"{j.get('date', '')}  {j.get('work', '')}" for j in
+                                         sorted(jobs, key=lambda j: j.get("date") or "", reverse=True)[:12]))
+            cells.append(ji)
             for col, it in enumerate(cells):
                 self.table.setItem(row, col, it)
             self.table.setCellWidget(row, 6, ChannelCell(c, cc))
@@ -328,7 +343,8 @@ class ContactsPage(QWidget):
     def new_contact(self):
         dlg = ContactDialog(self.db, self.thumbs, self.icons, parent=self)
         if dlg.exec():
-            self.db.save_contact(dlg.data(), photos=dlg.photo_entries())
+            cid = self.db.save_contact(dlg.data(), photos=dlg.photo_entries())
+            self.db.save_jobs(cid, dlg.jobs())
             self.refresh()
 
     def edit_contact(self, cid):
@@ -338,6 +354,7 @@ class ContactsPage(QWidget):
         dlg = ContactDialog(self.db, self.thumbs, self.icons, c, self)
         if dlg.exec():
             self.db.save_contact(dlg.data(), cid, photos=dlg.photo_entries())
+            self.db.save_jobs(cid, dlg.jobs())
             self.refresh()
 
     def _context_menu(self, pos):

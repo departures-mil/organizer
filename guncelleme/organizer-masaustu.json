@@ -1,10 +1,10 @@
 {
- "surum": "2.1.0.7",
- "notlar": "v.1.0.7: Otomatik (tahmini) fiyatlar ⚡ ile, sizin girdiğiniz fiyatlar ✎ ile işaretlenir. 'Kontrol edilmemiş fiyatlar' filtresi; fiyatı değiştirince ya da 'Fiyatı onayla' deyince işaret kalkar.",
- "boyut": 164615,
- "sha256": "43580cded2a24c53fd020103a917519fb17af14b3459781466f2ff380e385d44",
- "imza": "bOqWuKbxzjU5Rrz+4Zqv9VqlR7A2lEKYzDmN/WuBxSVCbrgcw+xThpAikOMvNp5jdyqjgH7BMDfOg/NXwY9sAw5Mu/GlhKie9rBYQ3CgPpLBCWD/C0Ax+oF6BW1LsM2XnplLBH4voqCXG3c0i7EM3ZDAjZ3IV9wfMNffUhihjAFu4TwbJ02funFcv7A31orDAGB48HeCLM74QXjWDP7D2ilSiCHR/pVb6FEp4XFhtHUSxFbhlGvNe6PgTDHdknouKc9X+hOENN/A//MJdsNgajcallovqA6oNl8QvNUcXC8jTyVCtY83IOAjbek9P5U4UQzSuFHWR8Wp9NJ5AHWcuvVUyGvxGz1C+mQDwUwNHYK7Hj+GxuuAKiimXTi8cENjj9JbB00aYhTvCyph+z3+eUkJqTZCJKFdxNaxdJIXVn/Y8rJ0Jfq9yaU+rE0Xkwq0fFvtK47gUP1myKUIdiqFH5pUC5A0fYRSoNkvfD1ga4jolbrmKwfxOmEQUddmfnH2",
- "yayin": "2026-11-21 08:15 UTC",
+ "surum": "2.1.0.8",
+ "notlar": "v.1.0.8: 🗑 Çöp kutusu (silinenler 30 gün saklanır) ve ↶ Geri al · 📷 Fatura/fiş fotoğrafları · 🎤 Sesle arama ve ekleme ('Matkap nerede?', '3 ampul ekle') · 🤝 Ödünç takibi · 🛒 Az kalanlar için alışveriş listesi · 🧾 Ustalarla yapılan işler ve ödemeler · 🌙 Koyu görünüm · 📶 İnternetsiz yerel ağ eşitlemesi · ✉ Admin ile iletişim",
+ "boyut": 197009,
+ "sha256": "0376906257857520277cd324b6cee5a94bc04a1cf8ace31b44bee6b6555a50b0",
+ "imza": "H0jVJGbuYFn50EgnEX26aVQNo0LM1aa7OAHRimAC+Y24a0LL9XxqRa/DdmhaTEu3dWNhjpdOqsH24poraKnH6Q3++S9y+5slpl2GZlhmQBKBA7I35xXsmC7ypipOjIyykFrr5i+9RC9001ucvafKIisNsHtuh+utenwzlVgv1SfZjTi+RkL6AgPlnqj1cVFW9dhHvl90dNMxUa968VAw1fE+9LZxIqO48/MJevsPX7I7++Qz303XknOQj9i4dZYooMJIOJe2BWr3epKTfnsZVpYlR1TUFR5Gf+dN5fbt4bgUrYsry5QjkdFIYUDIZLpapyL9LZW+WwSsO+9NrWNztxw8+xjNof6yk4jnQqSXczlUg3UgDouO/QVG1PubEKn6CZ0VcmlVkw1UCoW7wIjq3z/Wd+rsFEec18d23zC96InhN+iTCHhBH/vAOkEsoslijxIBtNG7kgqoD0AB1vQqV5yOjRXd409IuCOqrRrd0bBdH26a2uEHxXXpt3H74vHz",
+ "yayin": "2026-11-21 21:06 UTC",
  "sistem": 1,
- "dosya": "organizer-masaustu-2.1.0.7.zip"
+ "dosya": "organizer-masaustu-2.1.0.8.zip"
 }

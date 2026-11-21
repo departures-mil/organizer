@@ -26,6 +26,24 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
+import android.content.res.Configuration;
+import android.speech.RecognizerIntent;
+import android.speech.tts.TextToSpeech;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import java.io.ByteArrayOutputStream;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.HttpURLConnection;
+import java.net.InetAddress;
+import java.net.InterfaceAddress;
+import java.net.NetworkInterface;
+import java.net.SocketTimeoutException;
+import java.net.URL;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.Set;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -43,16 +61,22 @@ import java.util.Map;
  * https://app.organizer.local/ adresinden sunar; JavaScript'e "Native" köprüsünü verir.
  * Kabuk sürümü (KABUK) Java kodu değiştikçe artar; manifest "kabuk" alanı bundan büyükse telefon APK ister.
  * KABUK 2 (v.1.0.5): yeniden başlatma kurulan sürümü gerçekten açar (güncelleme döngüsü düzeltmesi).
+ * KABUK 3 (v.1.0.8): sesli arama (listen), sesli cevap (speak), yerel ağ eşitlemesi (lanDiscover, lanPost),
+ *                    koyu görünümde sistem çubukları (setDark, isNight).
  */
 public class MainActivity extends Activity {
     static final String HOST = "app.organizer.local";
     static final String BASE = "https://" + HOST + "/index.html";
-    static final int KABUK = 2;
+    static final int KABUK = 3;
 
     private WebView web;
     private ValueCallback<Uri[]> fileCallback;
     private Uri cameraUri;
     private static final int REQ_FILE = 11;
+    private static final int REQ_VOICE = 12;
+    private int voiceCb = 0;
+    private TextToSpeech tts;
+    private boolean ttsReady = false;
     private Ota ota;
 
     @Override
@@ -145,6 +169,16 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQ_VOICE) {
+            String text = "";
+            if (resultCode == RESULT_OK && data != null) {
+                ArrayList<String> r = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                if (r != null && !r.isEmpty()) text = r.get(0);
+            }
+            callback(voiceCb, !text.isEmpty(), text.isEmpty() ? "cancel" : text);
+            voiceCb = 0;
+            return;
+        }
         if (requestCode != REQ_FILE) { super.onActivityResult(requestCode, resultCode, data); return; }
         if (fileCallback == null) return;
         Uri[] out = null;
@@ -301,6 +335,191 @@ public class MainActivity extends Activity {
         /** Şu an çalışan web paketinin sürümü. */
         @JavascriptInterface
         public String version() { return ota.activeVersion(); }
+
+        // ---------------------------------------------------- KABUK 3 (v.1.0.8)
+        /** Sesli arama: Android'in ses tanıma ekranı; sonuç __nativeCb ile döner. */
+        @JavascriptInterface
+        public void listen(final int id, final String lang) {
+            runOnUiThread(new Runnable() {
+                public void run() {
+                    try {
+                        Intent i = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+                        i.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+                        i.putExtra(RecognizerIntent.EXTRA_LANGUAGE, lang);
+                        i.putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, lang);
+                        i.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1);
+                        voiceCb = id;
+                        startActivityForResult(i, REQ_VOICE);
+                    } catch (Exception e) {
+                        callback(id, false, "Bu telefonda ses tanıma yok");
+                    }
+                }
+            });
+        }
+
+        /** Sesli cevap ("Matkap: Balkon dolabı") */
+        @JavascriptInterface
+        public void speak(final String text, final String lang) {
+            runOnUiThread(new Runnable() {
+                public void run() {
+                    final Runnable say = new Runnable() {
+                        public void run() {
+                            try {
+                                tts.setLanguage(Locale.forLanguageTag(lang));
+                                tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, "organizer");
+                            } catch (Exception ignored) { }
+                        }
+                    };
+                    if (tts != null && ttsReady) { say.run(); return; }
+                    tts = new TextToSpeech(MainActivity.this, new TextToSpeech.OnInitListener() {
+                        public void onInit(int status) {
+                            ttsReady = status == TextToSpeech.SUCCESS;
+                            if (ttsReady) say.run();
+                        }
+                    });
+                }
+            });
+        }
+
+        @JavascriptInterface
+        public void lanDiscover(final int id) {
+            new Thread(new Runnable() { public void run() { callback(id, true, discover()); } }).start();
+        }
+
+        /** body: base64 (UTF-8 JSON) */
+        @JavascriptInterface
+        public void lanPost(final int id, final String url, final String b64) {
+            new Thread(new Runnable() {
+                public void run() {
+                    String body = new String(Base64.decode(b64, Base64.DEFAULT), StandardCharsets.UTF_8);
+                    callback(id, true, post(url, body));
+                }
+            }).start();
+        }
+
+        @JavascriptInterface
+        public void setDark(boolean dark) { applyBars(dark); }
+
+        @JavascriptInterface
+        public boolean isNight() {
+            return (getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES;
+        }
+    }
+
+    /** JavaScript'e eşzamansız sonuç: window.__nativeCb(id, ok, base64(metin)) */
+    void callback(final int id, final boolean ok, final String text) {
+        if (id == 0) return;
+        final String b64 = Base64.encodeToString((text == null ? "" : text).getBytes(StandardCharsets.UTF_8), Base64.NO_WRAP);
+        runOnUiThread(new Runnable() {
+            public void run() {
+                web.evaluateJavascript("window.__nativeCb&&window.__nativeCb(" + id + "," + ok + ",'" + b64 + "')", null);
+            }
+        });
+    }
+
+    void applyBars(final boolean dark) {
+        runOnUiThread(new Runnable() {
+            public void run() {
+                Window w = getWindow();
+                if (Build.VERSION.SDK_INT >= 21) {
+                    w.setStatusBarColor(Color.parseColor(dark ? "#0b2229" : "#2e7d6b"));
+                    w.setNavigationBarColor(Color.parseColor(dark ? "#172126" : "#ffffff"));
+                }
+                if (Build.VERSION.SDK_INT >= 26) {
+                    w.getDecorView().setSystemUiVisibility(dark ? 0 : View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);
+                }
+                web.setBackgroundColor(Color.parseColor(dark ? "#111a1e" : "#ffffff"));
+            }
+        });
+    }
+
+    /** Aynı ağdaki Organizer bilgisayarlarını UDP yayınıyla bulur. */
+    String discover() {
+        JSONArray out = new JSONArray();
+        Set<String> seen = new HashSet<>();
+        Set<String> mine = new HashSet<>();
+        DatagramSocket sock = null;
+        try {
+            List<InetAddress> targets = new ArrayList<>();
+            targets.add(InetAddress.getByName("255.255.255.255"));
+            for (NetworkInterface ni : Collections.list(NetworkInterface.getNetworkInterfaces())) {
+                if (!ni.isUp() || ni.isLoopback()) continue;
+                for (InterfaceAddress ia : ni.getInterfaceAddresses()) {
+                    if (ia.getAddress() != null) mine.add(ia.getAddress().getHostAddress());
+                    if (ia.getBroadcast() != null) targets.add(ia.getBroadcast());
+                }
+            }
+            sock = new DatagramSocket();
+            sock.setBroadcast(true);
+            sock.setSoTimeout(300);
+            byte[] probe = "ORGANIZER-LAN?".getBytes(StandardCharsets.UTF_8);
+            long end = System.currentTimeMillis() + 1800;
+            int sent = 0;
+            byte[] buf = new byte[2048];
+            while (System.currentTimeMillis() < end) {
+                if (sent < 3) {
+                    for (InetAddress a : targets) {
+                        try { sock.send(new DatagramPacket(probe, probe.length, a, 47322)); } catch (Exception ignored) { }
+                    }
+                    sent++;
+                }
+                DatagramPacket p = new DatagramPacket(buf, buf.length);
+                try { sock.receive(p); } catch (SocketTimeoutException e) { continue; }
+                String host = p.getAddress().getHostAddress();
+                if (seen.contains(host) || mine.contains(host)) continue;
+                try {
+                    JSONObject info = new JSONObject(new String(p.getData(), 0, p.getLength(), StandardCharsets.UTF_8));
+                    if (!"organizer-lan".equals(info.optString("app"))) continue;
+                    JSONObject o = new JSONObject();
+                    o.put("host", host);
+                    o.put("port", info.optInt("port", 47321));
+                    o.put("name", info.optString("name", host));
+                    o.put("version", info.optString("version", ""));
+                    out.put(o);
+                    seen.add(host);
+                } catch (Exception ignored) { }
+            }
+        } catch (Exception ignored) {
+        } finally {
+            if (sock != null) sock.close();
+        }
+        return out.toString();
+    }
+
+    /** Yerel ağdaki bilgisayara JSON gönderir; "durum\ngövde" döndürür (0 = ulaşılamadı). */
+    String post(String url, String body) {
+        HttpURLConnection c = null;
+        try {
+            c = (HttpURLConnection) new URL(url).openConnection();
+            c.setConnectTimeout(6000);
+            c.setReadTimeout(90000);
+            c.setRequestMethod("POST");
+            c.setDoOutput(true);
+            c.setRequestProperty("Content-Type", "application/json; charset=utf-8");
+            byte[] data = body.getBytes(StandardCharsets.UTF_8);
+            c.setFixedLengthStreamingMode(data.length);
+            try (OutputStream o = c.getOutputStream()) { o.write(data); }
+            int code = c.getResponseCode();
+            InputStream in = code >= 400 ? c.getErrorStream() : c.getInputStream();
+            ByteArrayOutputStream bo = new ByteArrayOutputStream();
+            if (in != null) {
+                byte[] b = new byte[16384];
+                int n;
+                while ((n = in.read(b)) > 0) bo.write(b, 0, n);
+                in.close();
+            }
+            return code + "\n" + new String(bo.toByteArray(), StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            return "0\n" + e.getClass().getSimpleName() + ": " + e.getMessage();
+        } finally {
+            if (c != null) c.disconnect();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (tts != null) tts.shutdown();
+        super.onDestroy();
     }
 
     void toast(final String s) {

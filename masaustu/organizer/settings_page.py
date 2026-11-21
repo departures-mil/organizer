@@ -4,7 +4,7 @@ from pathlib import Path
 from PySide6.QtCore import Qt, QUrl, Signal
 from PySide6.QtGui import QDesktopServices
 from PySide6.QtWidgets import (QAbstractItemView, QComboBox, QFileDialog, QFormLayout, QGridLayout,
-                               QHBoxLayout, QInputDialog, QLabel, QLineEdit, QPlainTextEdit, QProgressBar, QPushButton, QScrollArea,
+                               QHBoxLayout, QInputDialog, QLabel, QLineEdit, QProgressBar, QPushButton, QScrollArea,
                                QTreeWidget, QTreeWidgetItem, QVBoxLayout, QWidget)
 
 from .common import Card, NewNodeDialog, confirm, info
@@ -151,12 +151,15 @@ class SettingsPage(QWidget):
     changed = Signal()
     language_changed = Signal(str)
     labels_changed = Signal()
+    theme_changed = Signal(str)
 
-    def __init__(self, db, sync=None, updater=None, parent=None):
+    def __init__(self, db, sync=None, updater=None, lan=None, parent=None):
         super().__init__(parent)
         self.db = db
         self.sync = sync
         self.updater = updater
+        self.lan = lan
+        self._lan_worker = None
         root = QVBoxLayout(self)
         root.setContentsMargins(0, 0, 0, 0)
         root.setSpacing(14)
@@ -186,6 +189,12 @@ class SettingsPage(QWidget):
         self.language.setCurrentIndex(max(0, self.language.findData(i18n.LANG)))
         self.language.currentIndexChanged.connect(lambda _: self.language_changed.emit(self.language.currentData()))
         form.addRow(t("Dil:"), self.language)
+        self.theme = QComboBox()
+        for code, name in (("light", "☀  Açık"), ("dark", "🌙  Koyu"), ("auto", "🖥  Sistemle aynı")):
+            self.theme.addItem(t(name), code)
+        self.theme.setCurrentIndex(max(0, self.theme.findData(db.get_setting("theme", "light"))))
+        self.theme.currentIndexChanged.connect(lambda _: self.theme_changed.emit(self.theme.currentData()))
+        form.addRow(t("Görünüm:"), self.theme)
         self.currency = QComboBox()
         for code, sym, name in CURRENCIES:
             self.currency.addItem(f"{sym}  {t(name)}", code)
@@ -243,6 +252,50 @@ class SettingsPage(QWidget):
             gl.addLayout(crow)
             sync.state_changed.connect(self._cloud_state)
             self._cloud_state()
+
+        if lan is not None:
+            # ---- v.1.0.8: internet yokken aynı modem / router üzerinden eşitleme
+            gl.addSpacing(14)
+            lt2 = QLabel(t("📶  Yerel ağ eşitlemesi (internetsiz)"))
+            lt2.setObjectName("SectionTitle")
+            gl.addWidget(lt2)
+            lh2 = QLabel(t("İnternet olmadığında telefon ve bilgisayarlar aynı modem / Wi-Fi üzerinden eşitlenir. "
+                           "Kayıtlar bulut eşitlemesindeki gibi birleştirilir: her kaydın en son değiştirilen hali kalır, "
+                           "hiçbir şey silinmez ya da üst üste yazılmaz. İnternet gelince değişiklikler buluta da gider."))
+            lh2.setObjectName("Muted")
+            lh2.setWordWrap(True)
+            gl.addWidget(lh2)
+            from PySide6.QtWidgets import QCheckBox
+            self.lan_on = QCheckBox(t("Bu bilgisayar aynı ağdaki cihazlarla eşitlensin"))
+            self.lan_on.setChecked(lan.enabled())
+            self.lan_on.toggled.connect(lan.set_enabled)
+            gl.addWidget(self.lan_on)
+            self.lan_status = QLabel()
+            self.lan_status.setObjectName("Muted")
+            self.lan_status.setWordWrap(True)
+            self.lan_status.setTextInteractionFlags(Qt.TextSelectableByMouse)
+            gl.addWidget(self.lan_status)
+            krow = QHBoxLayout()
+            self.lan_code = QLabel()
+            self.lan_code.setStyleSheet("font-size: 15pt; font-weight: 700; letter-spacing: 3px;")
+            self.lan_code.setTextInteractionFlags(Qt.TextSelectableByMouse)
+            newk = QPushButton(t("Yeni kod"))
+            newk.clicked.connect(lan.new_code)
+            krow.addWidget(QLabel(t("Eşleme kodu:")))
+            krow.addWidget(self.lan_code)
+            krow.addStretch()
+            krow.addWidget(newk)
+            gl.addLayout(krow)
+            kh = QLabel(t("Telefonda: Ayarlar → Yerel ağ eşitlemesi → „Bilgisayarı bul“. İlk seferde bu kod sorulur "
+                          "(iki cihaz aynı bulut hesabındaysa sorulmaz). Windows güvenlik duvarı sorarsa „Erişime izin ver“ deyin."))
+            kh.setObjectName("Muted")
+            kh.setWordWrap(True)
+            gl.addWidget(kh)
+            self.lan_btn = QPushButton(t("🔍  Ağdaki başka bir bilgisayarla eşitle"))
+            self.lan_btn.clicked.connect(self._lan_sync)
+            gl.addWidget(self.lan_btn)
+            lan.state_changed.connect(self._lan_state)
+            self._lan_state()
 
         if updater is not None:
             gl.addSpacing(14)
@@ -309,29 +362,19 @@ class SettingsPage(QWidget):
         gl.addWidget(open_btn)
         gl.addWidget(backup_btn)
 
-        # --- admin ile iletişim (ayarların sonu)
+        # ---- v.1.0.8: admin ile iletişim (öneri / hata bildirimi)
         gl.addSpacing(14)
-        ct = QLabel(t("✉ Admin ile iletişime geç"))
-        ct.setObjectName("SectionTitle")
-        gl.addWidget(ct)
-        cd = QLabel(t("Programı geliştirmemiz için öneri, istek ve hata bildirimlerinizi yazın; mesajınız doğrudan yöneticiye ulaşır."))
-        cd.setObjectName("Muted")
-        cd.setWordWrap(True)
-        gl.addWidget(cd)
-        self.c_name = QLineEdit()
-        self.c_name.setPlaceholderText(t("Adınız (isteğe bağlı)"))
-        self.c_name.setMaxLength(80)
-        self.c_mail = QLineEdit()
-        self.c_mail.setPlaceholderText(t("E-posta (yanıt için, isteğe bağlı)"))
-        self.c_mail.setMaxLength(120)
-        self.c_mail.setLayoutDirection(Qt.LeftToRight)
-        self.c_msg = QPlainTextEdit()
-        self.c_msg.setPlaceholderText(t("Mesajınız"))
-        self.c_msg.setMinimumHeight(110)
-        self.c_send = QPushButton(t("✉  Gönder"))
-        self.c_send.clicked.connect(self._send_contact)
-        for w in (self.c_name, self.c_mail, self.c_msg, self.c_send):
-            gl.addWidget(w)
+        at = QLabel(t("✉  Admin ile iletişime geç"))
+        at.setObjectName("SectionTitle")
+        gl.addWidget(at)
+        ah = QLabel(t("Öneri, istek ya da hata bildirimlerinizi geliştiriciye gönderin; program sizin önerilerinizle gelişir."))
+        ah.setObjectName("Muted")
+        ah.setWordWrap(True)
+        gl.addWidget(ah)
+        fb = QPushButton(t("✉  Mesaj yaz…"))
+        fb.setObjectName("Primary")
+        fb.clicked.connect(self._feedback)
+        gl.addWidget(fb)
         gl.addStretch()
         about = QLabel(t("Organizer {v}\nF11: tam ekran aç / kapat · Ctrl+F: ara · Ctrl+N: yeni kayıt · Ctrl+P: döküm", v=goster()))
         about.setObjectName("Muted")
@@ -343,6 +386,88 @@ class SettingsPage(QWidget):
         scroll.setWidget(general)
         row.addWidget(scroll, 1)
         root.addLayout(row, 1)
+
+    def _feedback(self):
+        from .extras import FeedbackDialog
+        FeedbackDialog(self).exec()
+
+    def _lan_state(self, *_):
+        self.lan_status.setText(self.lan.status_text())
+        self.lan_code.setText(self.lan.code())
+        busy = self._lan_worker is not None and self._lan_worker.isRunning()
+        self.lan_btn.setEnabled(not busy)
+        self.lan_btn.setText(t("⟳  Eşitleniyor…") if busy else t("🔍  Ağdaki başka bir bilgisayarla eşitle"))
+
+    def _lan_sync(self, host=None, port=None, name=None):
+        from PySide6.QtWidgets import QApplication
+        from . import lan as L
+        if host is None:
+            QApplication.setOverrideCursor(Qt.WaitCursor)
+            try:
+                found = L.discover()
+            finally:
+                QApplication.restoreOverrideCursor()
+            last = self.db.get_setting("lan_peer", "")
+            if not found:
+                text, ok = QInputDialog.getText(self, t("Yerel ağ eşitlemesi"),
+                                                t("Aynı ağda açık bir Organizer bilgisayarı bulunamadı.\n"
+                                                  "Öbür bilgisayarın adresini biliyorsanız yazın (ör. 192.168.1.20):"),
+                                                QLineEdit.Normal, last.split(":")[0] if last else "")
+                if not ok or not text.strip():
+                    return
+                host, port, name = text.strip().split(":")[0], L.HTTP_PORT, text.strip()
+            elif len(found) == 1:
+                host, port, name = found[0]["host"], found[0]["port"], found[0]["name"]
+            else:
+                labels = [f"{f['name']}  ({f['host']})" for f in found]
+                choice, ok = QInputDialog.getItem(self, t("Yerel ağ eşitlemesi"), t("Hangi bilgisayarla eşitlensin?"),
+                                                  labels, 0, False)
+                if not ok:
+                    return
+                f = found[labels.index(choice)]
+                host, port, name = f["host"], f["port"], f["name"]
+        key = self.db.get_setting(f"lan_key_{host}") or L.uid_key(self.db.get_setting("fb_uid"))
+        if not key:
+            key = self._ask_code(name)
+            if not key:
+                return
+        self._start_lan(host, port, name, key)
+
+    def _ask_code(self, name):
+        code, ok = QInputDialog.getText(self, t("Eşleme kodu"),
+                                        t("{name} bilgisayarının Ayarlar → Yerel ağ eşitlemesi bölümündeki 6 haneli kodu yazın:",
+                                          name=name))
+        return "".join(ch for ch in code if ch.isdigit()) if ok else ""
+
+    def _start_lan(self, host, port, name, key):
+        from .lan import LanClientWorker
+        w = LanClientWorker(self.db.data_dir, host, port, key)
+        self._lan_worker = w
+
+        def done(res):
+            self.db.set_setting(f"lan_key_{host}", key)
+            self.db.set_setting("lan_peer", f"{host}:{port}")
+            self._lan_state()
+            self.changed.emit()
+            self.window()._remote_data()
+            info(self, t("Yerel ağ eşitlemesi"), t("{name} ile eşitlendi.\n{a} kayıt alındı · {b} fotoğraf gönderildi · {c} fotoğraf alındı.",
+                                                    name=name, a=res["received"], b=res["sent"], c=res["photos"]))
+
+        def failed(code, detail):
+            self._lan_state()
+            if code == "key":
+                self.db.set_setting(f"lan_key_{host}", None)
+                key2 = self._ask_code(name)
+                if key2:
+                    self._start_lan(host, port, name, key2)
+                return
+            info(self, t("Yerel ağ eşitlemesi"), t("Eşitlenemedi: {m}", m=detail or code))
+
+        w.done.connect(done)
+        w.failed.connect(failed)
+        w.finished.connect(self._lan_state)
+        w.start()
+        self._lan_state()
 
     def _cloud_state(self, *_):
         connected = self.sync.is_connected()
@@ -430,46 +555,6 @@ class SettingsPage(QWidget):
         digits = "".join(ch for ch in self.cc.text() if ch.isdigit()) or "90"
         self.cc.setText(digits)
         self.db.set_setting("country_code", digits)
-
-    def _send_contact(self):
-        """Mesaj FormSubmit üzerinden yöneticinin e-postasına gider; adres programda görünmez."""
-        import base64, json, re, urllib.request
-        from PySide6.QtWidgets import QApplication
-        msg = self.c_msg.toPlainText().strip()[:5000]
-        mail = self.c_mail.text().strip()
-        if not msg:
-            info(self, t("✉ Admin ile iletişime geç"), t("Lütfen mesajınızı yazın."))
-            return
-        if mail and not re.match(r"^[^@\s]+@[^@\s]+\.[^@\s]+$", mail):
-            info(self, t("✉ Admin ile iletişime geç"), t("E-posta adresi geçerli değil."))
-            return
-        to = base64.b64decode("").decode()[::-1]
-        body = {"_subject": "Organizer: yeni mesaj", "_template": "table", "_captcha": "false",
-                "Ad": self.c_name.text().strip() or "-", "Mesaj": msg, "Surum": goster(), "Cihaz": "Windows",
-                "Dil": i18n.LANG}
-        if mail:
-            body["email"] = mail
-            body["_replyto"] = mail
-        self.c_send.setEnabled(False)
-        QApplication.setOverrideCursor(Qt.WaitCursor)
-        ok = False
-        try:
-            req = urllib.request.Request("https://formsubmit.co/ajax/" + to, data=json.dumps(body).encode("utf-8"),
-                                         headers={"Content-Type": "application/json", "Accept": "application/json",
-                                                  "User-Agent": "Mozilla/5.0 Organizer/" + __version__}, method="POST")
-            with urllib.request.urlopen(req, timeout=20) as r:
-                j = json.loads(r.read().decode("utf-8") or "{}")
-            ok = str(j.get("success")).lower() != "false" or "activat" in str(j.get("message", "")).lower()
-        except Exception:
-            ok = False
-        finally:
-            QApplication.restoreOverrideCursor()
-            self.c_send.setEnabled(True)
-        if ok:
-            self.c_msg.clear()
-            info(self, t("✉ Admin ile iletişime geç"), t("Mesajınız yöneticiye iletildi. Teşekkürler!"))
-        else:
-            info(self, t("✉ Admin ile iletişime geç"), t("Mesaj gönderilemedi. İnternet bağlantınızı kontrol edip tekrar deneyin."))
 
     def _backup(self):
         default = Path.home() / f"Organizer-yedek-{datetime.now():%Y-%m-%d}.zip"

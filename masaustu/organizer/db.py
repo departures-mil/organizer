@@ -76,6 +76,14 @@ CREATE TABLE IF NOT EXISTS items(
     shop_whatsapp INTEGER NOT NULL DEFAULT 0,
     shop_telegram INTEGER NOT NULL DEFAULT 0,
     price_auto INTEGER NOT NULL DEFAULT 0,
+    trashed_at TEXT NOT NULL DEFAULT '',
+    min_qty INTEGER NOT NULL DEFAULT 0,
+    to_buy INTEGER NOT NULL DEFAULT 0,
+    loan_to TEXT NOT NULL DEFAULT '',
+    loan_phone TEXT NOT NULL DEFAULT '',
+    loan_date TEXT NOT NULL DEFAULT '',
+    loan_due TEXT NOT NULL DEFAULT '',
+    loan_history TEXT NOT NULL DEFAULT '[]',
     {SYNC_COLS}
 );
 CREATE TABLE IF NOT EXISTS item_photos(
@@ -96,6 +104,7 @@ CREATE TABLE IF NOT EXISTS contacts(
     has_call INTEGER NOT NULL DEFAULT 1,
     notes TEXT NOT NULL DEFAULT '',
     created_at TEXT NOT NULL,
+    jobs TEXT NOT NULL DEFAULT '[]',
     {SYNC_COLS}
 );
 CREATE TABLE IF NOT EXISTS contact_photos(
@@ -122,6 +131,63 @@ SHOP_FIELDS = SHOP_TEXT + SHOP_FLAGS
 AUTO_PRICE_BACKUP = "organizer-yedek-fiyatlardan-once-2026-11-18.db"
 AUTO_PRICE_BATCH = ("2026-11-17T23:30", "2026-11-18T00:30")   # toplu işlemin mtime aralığı (UTC)
 
+# v.1.0.8: çöp kutusu, stok uyarısı / alışveriş listesi, ödünç takibi, usta iş geçmişi.
+# Eski sürümden gelen kayıtta bu alanlar yoksa yereldeki değer korunur (apply_remote).
+#   alan: (sqlite tanımı, varsayılan, tür)  tür: s=metin, i=tamsayı, b=evet/hayır, j=JSON liste
+ITEM_EXTRA = {
+    "trashed_at": ("TEXT NOT NULL DEFAULT ''", "", "s"),
+    "min_qty": ("INTEGER NOT NULL DEFAULT 0", 0, "i"),
+    "to_buy": ("INTEGER NOT NULL DEFAULT 0", False, "b"),
+    "loan_to": ("TEXT NOT NULL DEFAULT ''", "", "s"),
+    "loan_phone": ("TEXT NOT NULL DEFAULT ''", "", "s"),
+    "loan_date": ("TEXT NOT NULL DEFAULT ''", "", "s"),
+    "loan_due": ("TEXT NOT NULL DEFAULT ''", "", "s"),
+    "loan_history": ("TEXT NOT NULL DEFAULT '[]'", [], "j"),
+}
+CONTACT_EXTRA = {
+    "jobs": ("TEXT NOT NULL DEFAULT '[]'", [], "j"),
+}
+TRASH_DAYS = 30
+RECEIPT_PREFIX = "fis-"   # fatura / fiş fotoğrafları: dosya adı bu ekle başlar (eşitlemede sıradan fotoğraf gibi gider)
+
+
+def is_receipt(fname) -> bool:
+    return str(fname or "").startswith(RECEIPT_PREFIX)
+
+
+def _extra_to_db(kind, v):
+    """Ortak biçimdeki değeri SQLite sütununa çevirir."""
+    import json
+    if kind == "j":
+        return json.dumps(v if isinstance(v, list) else [], ensure_ascii=False)
+    if kind == "i":
+        try:
+            return max(0, int(v or 0))
+        except (TypeError, ValueError):
+            return 0
+    if kind == "b":
+        return int(bool(v))
+    return str(v or "")
+
+
+def _extra_from_db(kind, v):
+    import json
+    if kind == "j":
+        try:
+            d = json.loads(v or "[]")
+            return d if isinstance(d, list) else []
+        except ValueError:
+            return []
+    if kind == "i":
+        return int(v or 0)
+    if kind == "b":
+        return bool(v)
+    return v or ""
+
+
+def today_str() -> str:
+    return datetime.now().strftime("%Y-%m-%d")
+
 _UPPER_TR = str.maketrans({"İ": "i", "I": "ı"})
 _FOLD_TR = str.maketrans("ıçğöşüâîûأإآٱةى", "icgosuaiuااااهي")
 _AR_MARKS = dict.fromkeys(range(0x064B, 0x0653))  # Arapça hareke işaretleri
@@ -130,6 +196,45 @@ _AR_MARKS = dict.fromkeys(range(0x064B, 0x0653))  # Arapça hareke işaretleri
 def norm(text) -> str:
     """Harf farklarına duyarsız arama için metni sadeleştirir (Çivi -> civi, أ -> ا)."""
     return (text or "").translate(_UPPER_TR).lower().translate(_FOLD_TR).translate(_AR_MARKS).replace("ـ", "")
+
+
+# Sesli / yazılı soru sözcükleri: "Matkap nerede?" aramasında yalnızca "matkap" aranır.
+QUESTION_WORDS = {norm(w) for w in (
+    "nerede", "nerde", "neredeydi", "nerededir", "nereye", "koydum", "koymuştum", "benim", "acaba", "hani", "var", "mı", "mi",
+    "where", "is", "are", "the", "my", "did", "i", "put", "a", "an",
+    "أين", "اين", "وين", "فين", "هو", "هي", "ال")}
+QUESTION_MARKS = {norm(w) for w in ("nerede", "nerde", "neredeydi", "nerededir", "where", "أين", "اين", "وين", "فين")}
+ADD_WORDS = {norm(w) for w in ("ekle", "ekleyin", "kaydet", "yeni", "add", "new", "save", "أضف", "اضف", "زد", "جديد", "سجل")}
+
+
+def term_in(term, hay):
+    """Arama sözcüğü metinde var mı? Arapçadaki "ال" takısı olmadan da denenir (المثقاب → مثقاب)."""
+    return term in hay or (len(term) > 3 and term.startswith("ال") and term[2:] in hay)
+
+
+def parse_voice(text):
+    """Sesli komut: {"intent": "where"|"add"|"search", "query": metin, "qty": adet ya da None}.
+    "matkap nerede" → where/matkap · "3 ampul ekle" → add/ampul, 3 · "matkap" → search."""
+    raw = re.sub(r"[?؟!.,،]+", " ", text or "").strip()
+    words = raw.split()
+    nw = [norm(w) for w in words]
+    intent = "search"
+    if any(w in QUESTION_MARKS for w in nw):
+        intent = "where"
+    elif any(w in ADD_WORDS for w in nw):
+        intent = "add"
+    qty = None
+    keep = []
+    for w, n in zip(words, nw):
+        if intent == "add" and n in ADD_WORDS:
+            continue
+        if intent == "where" and n in QUESTION_WORDS:
+            continue
+        if intent == "add" and qty is None and re.fullmatch(r"\d+", w):
+            qty = int(w)
+            continue
+        keep.append(w)
+    return {"intent": intent, "query": " ".join(keep).strip(), "qty": qty}
 
 
 def now_str() -> str:
@@ -231,6 +336,10 @@ class Database:
                 for col in SHOP_FLAGS + ("price_auto",):
                     if col not in cols:
                         self.conn.execute(f"ALTER TABLE items ADD COLUMN {col} INTEGER NOT NULL DEFAULT 0")
+            extra = ITEM_EXTRA if table == "items" else CONTACT_EXTRA if table == "contacts" else {}
+            for col, (ddl, _d, _k) in extra.items():
+                if col not in cols:
+                    self.conn.execute(f"ALTER TABLE {table} ADD COLUMN {col} {ddl}")
         self.conn.commit()
 
     def _fill_uids(self):
@@ -423,7 +532,8 @@ class Database:
         ids = self.descendants(table, node_id)
         marks = ",".join("?" * len(ids))
         return self.conn.execute(
-            f"SELECT COUNT(*) FROM items WHERE deleted=0 AND {col} IN ({marks})", tuple(ids)).fetchone()[0]
+            f"SELECT COUNT(*) FROM items WHERE deleted=0 AND trashed_at='' AND {col} IN ({marks})",
+            tuple(ids)).fetchone()[0]
 
     def delete_node(self, table, node_id):
         """Düğümü alt düğümleriyle siler; içindeki eşyalar bir üst düğüme taşınır."""
@@ -445,7 +555,7 @@ class Database:
     def item_counts(self, table):
         col = "location_id" if table == "locations" else "category_id"
         return {r[0]: r[1] for r in self.conn.execute(
-            f"SELECT {col}, COUNT(*) FROM items WHERE deleted=0 GROUP BY {col}")}
+            f"SELECT {col}, COUNT(*) FROM items WHERE deleted=0 AND trashed_at='' GROUP BY {col}")}
 
     def translate_defaults(self, old_lang, new_lang):
         """Hazır gelen ve kullanıcının değiştirmediği yer/kategori adlarını yeni dile çevirir.
@@ -462,18 +572,27 @@ class Database:
 
     # ------------------------------------------------------------------ eşyalar
     def count_items(self):
-        return self.conn.execute("SELECT COUNT(*) FROM items WHERE deleted=0").fetchone()[0]
+        return self.conn.execute("SELECT COUNT(*) FROM items WHERE deleted=0 AND trashed_at=''").fetchone()[0]
 
-    def list_items(self, search="", category_ids=None, location_ids=None, sort="newest"):
-        rows = self.conn.execute("""
+    @staticmethod
+    def _decode_item(d):
+        for f, (_ddl, _dv, kind) in ITEM_EXTRA.items():
+            d[f] = _extra_from_db(kind, d.get(f))
+        return d
+
+    def list_items(self, search="", category_ids=None, location_ids=None, sort="newest", trashed=False):
+        rows = self.conn.execute(f"""
             SELECT i.*,
-                   (SELECT filename FROM item_photos p WHERE p.item_id=i.id
+                   (SELECT filename FROM item_photos p WHERE p.item_id=i.id AND p.filename NOT LIKE '{RECEIPT_PREFIX}%'
                      ORDER BY p.sort, p.id LIMIT 1) AS photo,
-                   (SELECT COUNT(*) FROM item_photos p WHERE p.item_id=i.id) AS photo_count
-            FROM items i WHERE i.deleted=0""").fetchall()
+                   (SELECT COUNT(*) FROM item_photos p WHERE p.item_id=i.id
+                     AND p.filename NOT LIKE '{RECEIPT_PREFIX}%') AS photo_count,
+                   (SELECT COUNT(*) FROM item_photos p WHERE p.item_id=i.id
+                     AND p.filename LIKE '{RECEIPT_PREFIX}%') AS receipt_count
+            FROM items i WHERE i.deleted=0 AND {"i.trashed_at<>''" if trashed else "i.trashed_at=''"}""").fetchall()
         cat_paths = self.tree_paths("categories")
         loc_paths = self.tree_paths("locations")
-        terms = norm(search).split()
+        terms = [w for w in norm(search).split() if w not in QUESTION_WORDS] if search else []
         result = []
         for r in rows:
             cat = r["category_id"] if r["category_id"] in cat_paths else None
@@ -482,15 +601,15 @@ class Database:
                 continue
             if location_ids is not None and loc not in location_ids:
                 continue
-            d = dict(r)
+            d = self._decode_item(dict(r))
             d["category_id"], d["location_id"] = cat, loc
             d["category_path"] = cat_paths.get(cat, "")
             d["location_path"] = loc_paths.get(loc, "")
             if terms:
                 hay = norm(" ".join((d["name"], d["notes"], d["category_path"], d["location_path"],
-                                     d["shop_name"], d["shop_place"], d["shop_phone"],
+                                     d["shop_name"], d["shop_place"], d["shop_phone"], d["loan_to"],
                                      re.sub(r"\D", "", d["shop_phone"]))))
-                if not all(t in hay for t in terms):
+                if not all(term_in(t, hay) for t in terms):
                     continue
             result.append(d)
 
@@ -500,6 +619,7 @@ class Database:
             "category": lambda d: norm(d["category_path"]), "location": lambda d: norm(d["location_path"]),
             "shop": lambda d: norm(d["shop_name"] or d["shop_place"] or d["shop_phone"]),
             "place": lambda d: norm(d["shop_place"]),
+            "trashed": lambda d: d["trashed_at"],
         }, empty={"price": lambda d: d["price"] is None, "category": lambda d: not d["category_path"],
                   "location": lambda d: not d["location_path"],
                   "shop": lambda d: not (d["shop_name"] or d["shop_place"] or d["shop_phone"]),
@@ -510,8 +630,10 @@ class Database:
         row = self.conn.execute("SELECT * FROM items WHERE id=? AND deleted=0", (item_id,)).fetchone()
         if not row:
             return None
-        d = dict(row)
-        d["photos"] = self.item_photos(item_id)
+        d = self._decode_item(dict(row))
+        allp = self.item_photos(item_id)
+        d["photos"] = [f for f in allp if not is_receipt(f)]
+        d["receipts"] = [f for f in allp if is_receipt(f)]
         d["category_path"] = self.tree_paths("categories").get(d["category_id"], "")
         d["location_path"] = self.tree_paths("locations").get(d["location_id"], "")
         return d
@@ -537,6 +659,9 @@ class Database:
                   "notes", "created_at") + SHOP_FIELDS + ("price_auto",)
         values = [data.get(f) for f in fields]
         values[-1] = int(bool(data.get("price_auto")) and data.get("price") is not None)
+        if "min_qty" in data:
+            fields += ("min_qty",)
+            values.append(_extra_to_db("i", data.get("min_qty")))
         for i, f in enumerate(fields):
             if f in SHOP_TEXT:
                 values[i] = (values[i] or "").strip()
@@ -565,7 +690,7 @@ class Database:
                 keep.append(value)
             else:
                 ext = Path(value).suffix.lower() or ".jpg"
-                fname = f"{uuid.uuid4().hex}{ext}"
+                fname = f"{RECEIPT_PREFIX if kind == 'new_fis' else ''}{uuid.uuid4().hex}{ext}"
                 shutil.copy2(value, self.photos_dir / fname)
                 keep.append(fname)
         self._write_photo_rows(item_id, keep, owner)
@@ -590,7 +715,7 @@ class Database:
             self.conn.execute("INSERT OR REPLACE INTO photo_sync VALUES (?, 'delete')", (fname,))
 
     def update_items_field(self, item_ids, field, value):
-        if field not in ("category_id", "location_id", "price_auto"):
+        if field not in ("category_id", "location_id", "price_auto", "to_buy", "min_qty"):
             raise ValueError(field)
         with self.conn:
             self.conn.executemany(
@@ -603,7 +728,37 @@ class Database:
                 "UPDATE items SET quantity=MAX(0, quantity+?), updated_at=?, mtime=?, dirty=1 WHERE id=?",
                 (delta, now_str(), now_utc(), item_id))
 
-    def delete_items(self, item_ids):
+    # ------------------------------------------------------------------ çöp kutusu (v.1.0.8)
+    def trash_items(self, item_ids):
+        """Silinen eşyalar 30 gün çöp kutusunda kalır (fotoğraflarıyla birlikte), sonra kendiliğinden silinir."""
+        ts = now_utc()
+        with self.conn:
+            self.conn.executemany("UPDATE items SET trashed_at=?, mtime=?, dirty=1 WHERE id=? AND deleted=0",
+                                  [(ts, ts, i) for i in item_ids])
+
+    delete_items = trash_items   # eski adla çağıranlar da çöp kutusuna atar
+
+    def restore_items(self, item_ids):
+        ts = now_utc()
+        with self.conn:
+            self.conn.executemany("UPDATE items SET trashed_at='', mtime=?, dirty=1 WHERE id=?",
+                                  [(ts, i) for i in item_ids])
+
+    def count_trash(self):
+        return self.conn.execute("SELECT COUNT(*) FROM items WHERE deleted=0 AND trashed_at<>''").fetchone()[0]
+
+    def purge_old_trash(self, days=TRASH_DAYS):
+        """Çöp kutusunda süresi dolanları kalıcı olarak siler. Silinen sayıyı döndürür."""
+        from datetime import timedelta
+        limit = (datetime.now(timezone.utc) - timedelta(days=days)).strftime("%Y-%m-%dT%H:%M:%S")
+        ids = [r[0] for r in self.conn.execute(
+            "SELECT id FROM items WHERE deleted=0 AND trashed_at<>'' AND trashed_at<?", (limit,))]
+        if ids:
+            self.purge_items(ids)
+        return len(ids)
+
+    def purge_items(self, item_ids):
+        """Kalıcı silme (geri alınamaz): kayıt "silindi" işaretiyle yayılır, fotoğraflar silinir."""
         for item_id in item_ids:
             photos = self.item_photos(item_id)
             with self.conn:
@@ -612,6 +767,101 @@ class Database:
                 self.conn.execute("DELETE FROM item_photos WHERE item_id=?", (item_id,))
             for f in photos:
                 self._remove_photo_file(f)
+
+    # ------------------------------------------------------------------ ödünç (v.1.0.8)
+    def lend_item(self, item_id, to, phone="", date="", due=""):
+        with self.conn:
+            self.conn.execute("UPDATE items SET loan_to=?, loan_phone=?, loan_date=?, loan_due=?, updated_at=?, "
+                              "mtime=?, dirty=1 WHERE id=?",
+                              ((to or "").strip(), (phone or "").strip(), date or today_str(), due or "",
+                               now_str(), now_utc(), item_id))
+
+    def return_item(self, item_id):
+        """Ödünç verilen eşya geri geldi: kayıt geçmişe eklenir."""
+        import json
+        row = self.conn.execute("SELECT loan_to, loan_phone, loan_date, loan_due, loan_history FROM items WHERE id=?",
+                                (item_id,)).fetchone()
+        if not row or not row["loan_to"]:
+            return
+        hist = _extra_from_db("j", row["loan_history"])
+        hist.append({"to": row["loan_to"], "phone": row["loan_phone"], "date": row["loan_date"],
+                     "due": row["loan_due"], "returned": today_str()})
+        with self.conn:
+            self.conn.execute("UPDATE items SET loan_to='', loan_phone='', loan_date='', loan_due='', loan_history=?, "
+                              "updated_at=?, mtime=?, dirty=1 WHERE id=?",
+                              (json.dumps(hist[-50:], ensure_ascii=False), now_str(), now_utc(), item_id))
+
+    def loan_counts(self):
+        """(ödünçteki eşya sayısı, gecikenlerin sayısı)"""
+        today = today_str()
+        rows = self.conn.execute("SELECT loan_due FROM items WHERE deleted=0 AND trashed_at='' AND loan_to<>''").fetchall()
+        return len(rows), sum(1 for r in rows if r[0] and r[0] < today)
+
+    # ------------------------------------------------------------------ stok / alışveriş listesi (v.1.0.8)
+    @staticmethod
+    def is_low(d):
+        return int(d.get("min_qty") or 0) > 0 and int(d.get("quantity") or 0) < int(d["min_qty"])
+
+    def shopping_list(self):
+        """Alışveriş listesi: adedi "en az" sınırının altına düşenler + elle listeye eklenenler."""
+        items = self.list_items(sort="name_asc")
+        return [d for d in items if d["to_buy"] or self.is_low(d)]
+
+    def bought(self, item_id, qty):
+        """Alındı: adet artar, elle eklenmişse listeden çıkar."""
+        with self.conn:
+            self.conn.execute("UPDATE items SET quantity=quantity+?, to_buy=0, updated_at=?, mtime=?, dirty=1 WHERE id=?",
+                              (max(0, int(qty)), now_str(), now_utc(), item_id))
+
+    # ------------------------------------------------------------------ usta iş geçmişi (v.1.0.8)
+    def contact_jobs(self, cid):
+        row = self.conn.execute("SELECT jobs FROM contacts WHERE id=?", (cid,)).fetchone()
+        return _extra_from_db("j", row["jobs"]) if row else []
+
+    def save_jobs(self, cid, jobs):
+        import json
+        with self.conn:
+            self.conn.execute("UPDATE contacts SET jobs=?, mtime=?, dirty=1 WHERE id=?",
+                              (json.dumps(list(jobs), ensure_ascii=False), now_utc(), cid))
+
+    @staticmethod
+    def jobs_total(jobs):
+        out = {}
+        for j in jobs or []:
+            if j.get("cost") not in (None, ""):
+                try:
+                    out[j.get("currency") or "USD"] = out.get(j.get("currency") or "USD", 0) + float(j["cost"])
+                except (TypeError, ValueError):
+                    pass
+        return out
+
+    # ------------------------------------------------------------------ geri al (v.1.0.8)
+    def snapshot(self, item_ids):
+        """Değişiklikten önceki hali: geri al için. [{sütunlar..., "_photos": [...]}]"""
+        out = []
+        for i in item_ids:
+            row = self.conn.execute("SELECT * FROM items WHERE id=?", (i,)).fetchone()
+            if row:
+                d = dict(row)
+                d["_photos"] = self.item_photos(i)
+                out.append(d)
+        return out
+
+    def restore_snapshot(self, snap):
+        """Kaydedilen hali geri yükler; değişiklik yeni bir düzenleme olarak eşitlenir."""
+        ts = now_utc()
+        skip = {"id", "uid", "mtime", "dirty", "_photos"}
+        with self.conn:
+            for d in snap:
+                cols = [c for c in d if c not in skip]
+                self.conn.execute(f"UPDATE items SET {', '.join(c + '=?' for c in cols)}, mtime=?, dirty=1 WHERE id=?",
+                                  (*[d[c] for c in cols], ts, d["id"]))
+        for d in snap:
+            photos = [f for f in d["_photos"] if (self.photos_dir / f).exists()]
+            for f in photos:
+                self.conn.execute("DELETE FROM photo_sync WHERE filename=? AND state='delete'", (f,))
+            self._write_photo_rows(d["id"], photos)
+        self.conn.commit()
 
     def totals_by_currency(self, items):
         totals = {}
@@ -628,6 +878,8 @@ class Database:
                      ORDER BY p.sort, p.id LIMIT 1) AS photo,
                    (SELECT COUNT(*) FROM contact_photos p WHERE p.contact_id=c.id) AS photo_count
             FROM contacts c WHERE c.deleted=0""")]
+        for d in rows:
+            d["jobs"] = _extra_from_db("j", d.get("jobs"))
         terms = norm(search).split()
         out = []
         for d in rows:
@@ -635,7 +887,8 @@ class Database:
                 continue
             if terms:
                 digits = re.sub(r"\D", "", d["phone"])
-                hay = norm(" ".join((d["name"], d["profession"], d["place"], d["phone"], digits, d["notes"])))
+                jobs = " ".join(str(j.get("work") or "") for j in d["jobs"])
+                hay = norm(" ".join((d["name"], d["profession"], d["place"], d["phone"], digits, d["notes"], jobs)))
                 if not all(t in hay for t in terms):
                     continue
             out.append(d)
@@ -653,6 +906,7 @@ class Database:
             return None
         d = dict(row)
         d["photos"] = self.contact_photos(cid)
+        d["jobs"] = _extra_from_db("j", d.get("jobs"))
         return d
 
     def save_contact(self, data, cid=None, photos=None):
@@ -714,15 +968,22 @@ class Database:
 
     def dirty_records(self):
         """Buluta gönderilecek kayıtlar: {tablo: [ortak biçimde kayıt]}."""
+        return self._records("dirty=1")
+
+    def all_records(self):
+        """Bütün kayıtlar (silinmişler dahil) — yerel ağ eşitlemesi için."""
+        return self._records("1=1")
+
+    def _records(self, where):
         out = {}
         loc_uid, cat_uid = self._uid_map("locations"), self._uid_map("categories")
         for table in TREE_TABLES:
             uids = loc_uid if table == "locations" else cat_uid
             out[table] = [{"uid": r["uid"], "name": r["name"], "parent": uids.get(r["parent_id"], ""),
                            "sort": r["sort"], "mtime": r["mtime"], "deleted": bool(r["deleted"])}
-                          for r in self.conn.execute(f"SELECT * FROM {table} WHERE dirty=1")]
+                          for r in self.conn.execute(f"SELECT * FROM {table} WHERE {where}")]
         out["items"] = []
-        for r in self.conn.execute("SELECT * FROM items WHERE dirty=1").fetchall():
+        for r in self.conn.execute(f"SELECT * FROM items WHERE {where}").fetchall():
             out["items"].append({
                 "uid": r["uid"], "name": r["name"], "quantity": r["quantity"],
                 "location": loc_uid.get(r["location_id"], ""), "category": cat_uid.get(r["category_id"], ""),
@@ -731,22 +992,39 @@ class Database:
                 "shop_name": r["shop_name"], "shop_place": r["shop_place"], "shop_phone": r["shop_phone"],
                 "shop_whatsapp": bool(r["shop_whatsapp"]), "shop_telegram": bool(r["shop_telegram"]),
                 "price_auto": bool(r["price_auto"]),
+                **{f: _extra_from_db(k, r[f]) for f, (_d, _v, k) in ITEM_EXTRA.items()},
                 "mtime": r["mtime"], "deleted": bool(r["deleted"])})
         out["contacts"] = [{
             "uid": r["uid"], "kind": r["kind"], "name": r["name"], "profession": r["profession"],
             "place": r["place"], "phone": r["phone"], "has_whatsapp": bool(r["has_whatsapp"]),
             "has_telegram": bool(r["has_telegram"]), "has_call": bool(r["has_call"]), "notes": r["notes"],
             "created_at": r["created_at"], "photos": [] if r["deleted"] else self.contact_photos(r["id"]),
+            **{f: _extra_from_db(k, r[f]) for f, (_d, _v, k) in CONTACT_EXTRA.items()},
             "mtime": r["mtime"], "deleted": bool(r["deleted"])}
-            for r in self.conn.execute("SELECT * FROM contacts WHERE dirty=1").fetchall()]
+            for r in self.conn.execute(f"SELECT * FROM contacts WHERE {where}").fetchall()]
         return out
 
     def mark_clean(self, table, uid, mtime):
         with self.conn:
             self.conn.execute(f"UPDATE {table} SET dirty=0 WHERE uid=? AND mtime=?", (uid, mtime))
 
-    def apply_remote(self, table, records):
-        """Buluttan gelen kayıtları birleştirir (son değişiklik kazanır). Değişen kayıt sayısını döndürür."""
+    def _merge_extras(self, table, rec, exists):
+        """Yeni alanlar (v.1.0.8): kayıtta yoksa (eski sürümden geldi) yereldeki değer korunur."""
+        extra = ITEM_EXTRA if table == "items" else CONTACT_EXTRA
+        missing = [f for f in extra if f not in rec]
+        if missing and exists:
+            old = self.conn.execute(f"SELECT {', '.join(missing)} FROM {table} WHERE uid=?", (rec["uid"],)).fetchone()
+            rec = {**rec, **{f: _extra_from_db(extra[f][2], old[f]) for f in missing}}
+        return [(f, _extra_to_db(k, rec.get(f, dv))) for f, (_ddl, dv, k) in extra.items()]
+
+    def _set_extras(self, table, uid, pairs):
+        if pairs:
+            self.conn.execute(f"UPDATE {table} SET {', '.join(f + '=?' for f, _ in pairs)} WHERE uid=?",
+                              (*[v for _, v in pairs], uid))
+
+    def apply_remote(self, table, records, keep_dirty=False):
+        """Buluttan (ya da yerel ağdan) gelen kayıtları birleştirir (son değişiklik kazanır).
+        keep_dirty: kabul edilen kayıt buluta da gönderilsin (yerel ağdan gelenler). Değişen kayıt sayısını döndürür."""
         changed = 0
         local = {r["uid"]: r for r in self.conn.execute(f"SELECT uid, mtime, id FROM {table}")}
         accepted = []
@@ -802,6 +1080,7 @@ class Database:
                             *[str(rec.get(f) or "") for f in SHOP_TEXT],
                             *[int(bool(rec.get(f))) for f in SHOP_FLAGS],
                             int(bool(rec.get("price_auto")) and price is not None))
+                    extras = self._merge_extras("items", rec, rec["uid"] in local)
                     if rec["uid"] in local:
                         item_id = local[rec["uid"]]["id"]
                         self.conn.execute(
@@ -815,6 +1094,7 @@ class Database:
                             "shop_telegram, price_auto, dirty, uid, updated_at) "
                             "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?)",
                             (*vals, rec["uid"], now_str())).lastrowid
+                    self._set_extras("items", rec["uid"], extras)
                     old = set(self.item_photos(item_id))
                     new = [] if rec.get("deleted") else list(rec.get("photos") or [])
                     self.conn.execute("DELETE FROM item_photos WHERE item_id=?", (item_id,))
@@ -829,6 +1109,7 @@ class Database:
                             int(bool(rec.get("has_telegram"))), int(bool(rec.get("has_call"))),
                             rec.get("notes", ""), rec.get("created_at") or now_str(),
                             rec["mtime"], int(bool(rec.get("deleted"))))
+                    extras = self._merge_extras("contacts", rec, rec["uid"] in local)
                     if rec["uid"] in local:
                         cid = local[rec["uid"]]["id"]
                         self.conn.execute(
@@ -840,6 +1121,7 @@ class Database:
                             "INSERT INTO contacts(kind, name, profession, place, phone, has_whatsapp, has_telegram, "
                             "has_call, notes, created_at, mtime, deleted, dirty, uid) "
                             "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?)", (*vals, rec["uid"])).lastrowid
+                    self._set_extras("contacts", rec["uid"], extras)
                     # 4.0 sürümünden gelen kayıtlarda "photos" alanı yoktur; o zaman fotoğraflara dokunma
                     if "photos" in rec or rec.get("deleted"):
                         old = set(self.contact_photos(cid))
@@ -849,7 +1131,13 @@ class Database:
                                               [(cid, f, i) for i, f in enumerate(new)])
                         self._unlink_photos(old - set(new))
                     changed += 1
+            if keep_dirty:
+                self.conn.executemany(f"UPDATE {table} SET dirty=1 WHERE uid=?", [(r["uid"],) for r in accepted])
         return changed
+
+    def photo_names(self):
+        """Bu cihazda dosyası bulunan fotoğraflar."""
+        return {p.name for p in self.photos_dir.iterdir() if p.is_file()}
 
     _ALL_PHOTOS = ("SELECT p.filename, i.uid FROM item_photos p JOIN items i ON i.id=p.item_id WHERE i.deleted=0 "
                    "UNION ALL SELECT p.filename, c.uid FROM contact_photos p JOIN contacts c ON c.id=p.contact_id "
