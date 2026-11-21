@@ -7,12 +7,17 @@ from PySide6.QtWidgets import (QAbstractItemView, QComboBox, QGridLayout, QHBoxL
                                QTreeWidgetItem, QVBoxLayout, QWidget)
 
 from .common import Card, ThumbCache, confirm, fmt_date, fmt_price, load_image, setup_columns, HeaderSort
+from .db import Database, parse_voice
+from . import extras
+from .extras import loan_text, overdue_days
 from .i18n import t
 from .item_dialog import ItemDialog, PhotoViewer
 from .report import ReportDialog
 from .shop import ShopLinks, has_shop, shop_title, shop_tooltip
 
 AUTO_COLOR = "#8a969c"   # otomatik (tahmini) fiyatların rengi
+LOW_COLOR = "#d97706"    # az kaldı (alışveriş listesinde)
+LATE_COLOR = "#c0392b"   # ödünç dönüş günü geçti
 
 
 def price_text(d):
@@ -123,6 +128,9 @@ class ItemDetail(Card):
     edit_requested = Signal(int)
     delete_requested = Signal(int)
     quantity_changed = Signal(int, int)
+    lend_requested = Signal(int)
+    return_requested = Signal(int)
+    buy_toggled = Signal(int, bool)
 
     def __init__(self, db, thumbs, parent=None):
         super().__init__(parent)
@@ -161,7 +169,8 @@ class ItemDetail(Card):
         self.fields = {}
         for row, (key, label) in enumerate([("quantity", "Adet"), ("category", "Kategori"),
                                             ("location", "Yer"), ("price", "Fiyat"),
-                                            ("created", "Eklenme"), ("shop", "Satın alındığı yer")]):
+                                            ("created", "Eklenme"), ("shop", "Satın alındığı yer"),
+                                            ("loan", "Ödünç"), ("receipts", "Fatura / fiş")]):
             l = QLabel(t(label))
             l.setObjectName("FieldName")
             v = QLabel()
@@ -205,6 +214,18 @@ class ItemDetail(Card):
         outer.addWidget(self.notes)
         outer.addStretch()
 
+        extra = QHBoxLayout()
+        self.lend_btn = QPushButton(t("🤝  Ödünç ver"))
+        self.lend_btn.clicked.connect(self._lend_clicked)
+        self.buy_btn = QPushButton(t("🛒  Listeye ekle"))
+        self.buy_btn.setCheckable(True)
+        self.buy_btn.setObjectName("Tool")
+        self.buy_btn.setToolTip(t("Alışveriş listesine ekle / çıkar"))
+        self.buy_btn.clicked.connect(lambda on: self.item and self.buy_toggled.emit(self.item["id"], on))
+        extra.addWidget(self.lend_btn, 1)
+        extra.addWidget(self.buy_btn, 1)
+        outer.addLayout(extra)
+
         btns = QHBoxLayout()
         self.edit_btn = QPushButton(t("✎  Düzenle"))
         self.edit_btn.setObjectName("Primary")
@@ -221,10 +242,15 @@ class ItemDetail(Card):
         if self.item:
             self.quantity_changed.emit(self.item["id"], d)
 
+    def _lend_clicked(self):
+        if not self.item:
+            return
+        (self.return_requested if self.item.get("loan_to") else self.lend_requested).emit(self.item["id"])
+
     def show_item(self, item_id):
         self.item = self.db.get_item(item_id) if item_id else None
         has = self.item is not None
-        for w in (self.edit_btn, self.del_btn, self.strip):
+        for w in (self.edit_btn, self.del_btn, self.strip, self.lend_btn, self.buy_btn):
             w.setEnabled(has)
         self.strip.clear()
         if not has:
@@ -240,6 +266,26 @@ class ItemDetail(Card):
         it = self.item
         self.name.setText(it["name"])
         self.fields["quantity"].setText(str(it["quantity"]))
+        low = Database.is_low(it)
+        self.fields["quantity"].setStyleSheet(f"font-size: 13pt; font-weight: 700; color: {LOW_COLOR};" if low
+                                              else "font-size: 13pt; font-weight: 700;")
+        self.fields["quantity"].setToolTip(t("⚠ Az kaldı (en az {n} olmalı) — alışveriş listesinde", n=it["min_qty"]) if low
+                                           else t("En az adet: {n}", n=it["min_qty"]) if it["min_qty"] else "")
+        self.fields["loan"].setText(loan_text(it) or "—")
+        late = it.get("loan_to") and overdue_days(it) > 0
+        self.fields["loan"].setStyleSheet(f"color: {LATE_COLOR}; font-weight: 700;" if late else "")
+        self.fields["loan"].setToolTip(extras.history_text(it) and t("Geçmiş:") + "\n" + extras.history_text(it))
+        self.lend_btn.setText(t("↩  Geri geldi") if it.get("loan_to") else t("🤝  Ödünç ver"))
+        self.lend_btn.setObjectName("Primary" if it.get("loan_to") else "")
+        self.lend_btn.style().unpolish(self.lend_btn)
+        self.lend_btn.style().polish(self.lend_btn)
+        self.buy_btn.setChecked(bool(it["to_buy"]) or low)
+        self.buy_btn.setEnabled(not low)
+        self.buy_btn.setText(t("🛒  Listede") if (it["to_buy"] or low) else t("🛒  Listeye ekle"))
+        rc = len(it.get("receipts") or [])
+        self.fields["receipts"].setText(t("🧾 {n} belge — görmek için tıklayın", n=rc) if rc else "—")
+        self.fields["receipts"].setCursor(Qt.PointingHandCursor if rc else Qt.ArrowCursor)
+        self.fields["receipts"].mousePressEvent = lambda e: rc and self._open_viewer(receipts=True)
         self.fields["category"].setText(it["category_path"] or "—")
         self.fields["location"].setText(it["location_path"] or "—")
         if it["price"] is not None and it.get("price_auto"):
@@ -290,9 +336,11 @@ class ItemDetail(Card):
         w = max(self.photo.width() - 8, 200)
         self.photo.setPixmap(pix.scaled(w, 232, Qt.KeepAspectRatio, Qt.SmoothTransformation))
 
-    def _open_viewer(self):
-        if self.item and self.item["photos"]:
-            v = PhotoViewer(self.db, self.item["photos"], self.current_photo, self.item["name"], self)
+    def _open_viewer(self, receipts=False):
+        files = (self.item or {}).get("receipts" if receipts else "photos") or []
+        if self.item and files:
+            v = PhotoViewer(self.db, files, 0 if receipts else self.current_photo,
+                            self.item["name"] + (" — " + t("Fatura / fiş") if receipts else ""), self)
             v.resize(self.window().width() * 3 // 4, self.window().height() * 3 // 4)
             v.exec()
 
@@ -308,6 +356,7 @@ class ItemsPage(QWidget):
         self.db = db
         self.thumbs = ThumbCache(db)
         self.items = []
+        self.undo_stack = []   # [(açıklama, anlık görüntü)] — v.1.0.8 "Geri al"
 
         root = QVBoxLayout(self)
         root.setContentsMargins(0, 0, 0, 0)
@@ -346,14 +395,52 @@ class ItemsPage(QWidget):
         report_btn.setToolTip(t("Seçili kategori ya da yerdeki bütün eşyaların listesi (yazdır / PDF)"))
         report_btn.clicked.connect(lambda: self.open_report())
         header.addWidget(report_btn)
+        header.addWidget(new_btn)
+        root.addLayout(header)
+
+        # ---- v.1.0.8 araç satırı: sesle ara, geri al, alışveriş listesi, ödünçtekiler, otomatik fiyatlar, çöp kutusu
+        tools = QHBoxLayout()
+        tools.setSpacing(8)
+        self.mic_btn = QPushButton(t("🎤  Sesle ara / ekle"))
+        self.mic_btn.setObjectName("Tool")
+        self.mic_btn.setToolTip(t("Konuşarak arayın ya da ekleyin: „Matkap nerede?“ · „3 ampul ekle“\n"
+                                  "Windows'un sesle yazma özelliği açılır (Win+H)."))
+        self.mic_btn.clicked.connect(self._voice)
+        self.undo_btn = QPushButton(t("↶  Geri al"))
+        self.undo_btn.setObjectName("Tool")
+        self.undo_btn.clicked.connect(self.undo)
+        self.shop_btn = QPushButton()
+        self.shop_btn.setObjectName("Tool")
+        self.shop_btn.setToolTip(t("Adedi azalan ve listeye eklenen eşyalar"))
+        self.shop_btn.clicked.connect(self.open_shopping)
+        self.loan_btn = QPushButton()
+        self.loan_btn.setObjectName("Tool")
+        self.loan_btn.setCheckable(True)
+        self.loan_btn.setToolTip(t("Yalnızca ödünç verilmiş eşyaları göster"))
         self.auto_btn = QPushButton()
+        self.auto_btn.setObjectName("Tool")
         self.auto_btn.setCheckable(True)
         self.auto_btn.setToolTip(t("Yalnızca otomatik girilmiş, henüz kontrol etmediğiniz fiyatları göster\n"
                                    "⚡ = otomatik fiyat · ✎ = sizin girdiğiniz fiyat"))
-        self.auto_btn.toggled.connect(lambda _: self.reload_items())
-        header.addWidget(self.auto_btn)
-        header.addWidget(new_btn)
-        root.addLayout(header)
+        self.loan_btn.toggled.connect(lambda on: (on and self.auto_btn.setChecked(False), self.reload_items()))
+        self.auto_btn.toggled.connect(lambda on: (on and self.loan_btn.setChecked(False), self.reload_items()))
+        self.trash_btn = QPushButton()
+        self.trash_btn.setObjectName("Tool")
+        self.trash_btn.setToolTip(t("Silinen eşyalar {n} gün burada kalır; geri yükleyebilirsiniz", n=extras.TRASH_DAYS))
+        self.trash_btn.clicked.connect(self.open_trash)
+        for b in (self.mic_btn, self.undo_btn):
+            tools.addWidget(b)
+        tools.addStretch()
+        for b in (self.shop_btn, self.loan_btn, self.auto_btn, self.trash_btn):
+            tools.addWidget(b)
+        root.addLayout(tools)
+        self.banner = QLabel()
+        self.banner.setObjectName("Banner")
+        self.banner.setWordWrap(True)
+        self.banner.setTextFormat(Qt.RichText)
+        self.banner.linkActivated.connect(self._banner_link)
+        self.banner.hide()
+        root.addWidget(self.banner)
 
         splitter = QSplitter(Qt.Horizontal)
         splitter.setHandleWidth(14)
@@ -422,6 +509,9 @@ class ItemsPage(QWidget):
         self.detail.edit_requested.connect(self.edit_item)
         self.detail.delete_requested.connect(lambda i: self.delete_items([i]))
         self.detail.quantity_changed.connect(self._change_qty)
+        self.detail.lend_requested.connect(self.lend)
+        self.detail.return_requested.connect(self.give_back)
+        self.detail.buy_toggled.connect(lambda i, on: self._set_buy([i], on))
         splitter.addWidget(self.detail)
 
         splitter.setStretchFactor(0, 0)
@@ -450,6 +540,14 @@ class ItemsPage(QWidget):
         self.auto_btn.setText(t("⚡ Kontrol edilmemiş fiyatlar ({n})", n=n_auto))
         if self.auto_btn.isChecked():
             self.items = [d for d in self.items if d["price_auto"] and d["price"] is not None]
+        n_loan, n_late = self.db.loan_counts()
+        self.loan_btn.setText(t("🤝 Ödünçtekiler ({n})", n=n_loan) + (t(" · ⚠ {n} gecikti", n=n_late) if n_late else ""))
+        if self.loan_btn.isChecked():
+            self.items = [d for d in self.items if d["loan_to"]]
+        self.shop_btn.setText(t("🛒 Alışveriş listesi ({n})", n=len(self.db.shopping_list())))
+        self.trash_btn.setText(t("🗑 Çöp kutusu ({n})", n=self.db.count_trash()))
+        self._draw_undo()
+        self._draw_banner()
 
         cc = self.db.get_setting("country_code", "90")
         self.table.blockSignals(True)
@@ -468,11 +566,22 @@ class ItemsPage(QWidget):
             name.setFont(f)
             if d["notes"]:
                 name.setToolTip(d["notes"])
+            if d["loan_to"]:
+                name.setText("🤝 " + d["name"])
+                name.setToolTip(loan_text(d) + ("\n" + d["notes"] if d["notes"] else ""))
+                if d["loan_due"] and overdue_days(d) > 0:
+                    name.setForeground(QColor(LATE_COLOR))
             qty = QTableWidgetItem(str(d["quantity"]))
             qty.setTextAlignment(Qt.AlignCenter)
             if d["quantity"] == 0:
                 qty.setForeground(Qt.red)
                 qty.setToolTip(t("Kalmadı"))
+            elif Database.is_low(d):
+                qty.setForeground(QColor(LOW_COLOR))
+                qf = qty.font()
+                qf.setBold(True)
+                qty.setFont(qf)
+                qty.setToolTip(t("⚠ Az kaldı (en az {n} olmalı) — alışveriş listesinde", n=d["min_qty"]))
             price = QTableWidgetItem(price_text(d))
             price.setTextAlignment(Qt.AlignRight | Qt.AlignVCenter)
             if d["price"] is not None and d["price_auto"]:
@@ -511,7 +620,9 @@ class ItemsPage(QWidget):
         self.table.setVisible(has)
         self.empty.setVisible(not has)
         if not has:
-            if self.auto_btn.isChecked():
+            if self.loan_btn.isChecked():
+                self.empty.setText(t("Ödünç verilmiş eşya yok."))
+            elif self.auto_btn.isChecked():
                 self.empty.setText(t("Kontrol edilmemiş otomatik fiyat kalmadı. ✓"))
             elif self.db.count_items() == 0:
                 self.empty.setText(t("Henüz eşya eklenmemiş.\n\n„＋ Yeni Eşya“ düğmesiyle ilk eşyanızı ekleyin."))
@@ -586,6 +697,7 @@ class ItemsPage(QWidget):
             return
         dlg = ItemDialog(self.db, self.thumbs, item=item, parent=self)
         if dlg.exec():
+            self._remember(t("„{name}“ düzenlendi", name=item["name"]), [item_id])
             self.db.save_item(dlg.data(), dlg.photo_entries(), item_id)
             self.cat_tree.reload()
             self.loc_tree.reload()
@@ -596,16 +708,124 @@ class ItemsPage(QWidget):
         if not ids:
             return
         if len(ids) == 1:
-            text = t("„{name}“ silinsin mi? Fotoğrafları da silinecek.", name=self.db.get_item(ids[0])["name"])
+            text = t("„{name}“ çöp kutusuna taşınsın mı?", name=self.db.get_item(ids[0])["name"])
         else:
-            text = t("Seçili {n} eşya silinsin mi? Fotoğrafları da silinecek.", n=len(ids))
+            text = t("Seçili {n} eşya çöp kutusuna taşınsın mı?", n=len(ids))
+        text += "\n\n" + t("{n} gün içinde çöp kutusundan geri yükleyebilir ya da „↶ Geri al“ diyebilirsiniz.", n=extras.TRASH_DAYS)
         if confirm(self, t("Eşyayı sil"), text, yes=t("Sil"), danger=True):
-            self.db.delete_items(ids)
+            self._remember(t("{n} eşya silindi", n=len(ids)), ids)
+            self.db.trash_items(ids)
             self.refresh()
 
     def _change_qty(self, item_id, delta):
+        self._remember(t("Adet değişti"), [item_id], merge_key=("qty", item_id))
         self.db.change_quantity(item_id, delta)
         self.reload_items(keep_id=item_id)
+
+    # ------------------------------------------------------------------ v.1.0.8
+    def _remember(self, label, ids, merge_key=None):
+        """Değişiklikten önceki hali saklar (Geri al). Aynı eşyada art arda adet değişimi tek adım sayılır."""
+        if merge_key and self.undo_stack and self.undo_stack[-1][2] == merge_key:
+            return
+        self.undo_stack.append((label, self.db.snapshot(ids), merge_key))
+        del self.undo_stack[:-30]
+
+    def _draw_undo(self):
+        self.undo_btn.setEnabled(bool(self.undo_stack))
+        self.undo_btn.setToolTip(t("Son işlemi geri al (Ctrl+Z): {x}", x=self.undo_stack[-1][0]) if self.undo_stack
+                                 else t("Geri alınacak işlem yok"))
+
+    def undo(self):
+        if not self.undo_stack:
+            return
+        label, snap, _ = self.undo_stack.pop()
+        self.db.restore_snapshot(snap)
+        self.refresh()
+        self.reload_items(keep_id=[d["id"] for d in snap])
+        self.summary.setText(t("↶ Geri alındı: {x}", x=label) + "   ·   " + self.summary.text())
+
+    def lend(self, item_id):
+        it = self.db.get_item(item_id)
+        if not it:
+            return
+        dlg = extras.LoanDialog(it, self)
+        if dlg.exec():
+            self._remember(t("„{name}“ ödünç verildi", name=it["name"]), [item_id])
+            self.db.lend_item(item_id, *dlg.values())
+            self.reload_items(keep_id=item_id)
+
+    def give_back(self, item_id):
+        it = self.db.get_item(item_id)
+        if it and confirm(self, t("↩  Geri geldi"), t("„{name}“ {who} kişisinden geri geldi mi?", name=it["name"], who=it["loan_to"]),
+                          yes=t("↩  Geri geldi")):
+            self._remember(t("„{name}“ geri geldi", name=it["name"]), [item_id])
+            self.db.return_item(item_id)
+            self.reload_items(keep_id=item_id)
+
+    def _set_buy(self, ids, on):
+        self._remember(t("Alışveriş listesi değişti"), ids)
+        self.db.update_items_field(ids, "to_buy", int(bool(on)))
+        self.reload_items(keep_id=ids)
+
+    def open_shopping(self):
+        dlg = extras.ShoppingDialog(self.db, self.thumbs, self)
+        dlg.exec()
+        if dlg.changed:
+            self.reload_items()
+
+    def open_trash(self):
+        dlg = extras.TrashDialog(self.db, self.thumbs, self)
+        dlg.exec()
+        if dlg.changed:
+            self.refresh()
+
+    # ---- sesli / yazılı soru: "Matkap nerede?" · "3 ampul ekle"
+    def _voice(self):
+        if not extras.start_dictation(self.search):
+            self.banner.setText(t("🎤 Arama kutusuna yazın ya da konuşun: „Matkap nerede?“ · „3 ampul ekle“. "
+                                  "Sesle yazma Windows'ta Win+H ile açılır."))
+            self.banner.show()
+
+    def _draw_banner(self):
+        text = self.search.text().strip()
+        cmd = parse_voice(text) if text else None
+        if not cmd or cmd["intent"] == "search" or not cmd["query"]:
+            self.banner.hide()
+            return
+        q = cmd["query"]
+        if cmd["intent"] == "add":
+            n = f"{cmd['qty']} × " if cmd["qty"] else ""
+            self.banner.setText(t("🎤 Yeni eşya: <b>{x}</b> — <a href='add'>＋ Ekle</a>", x=n + q))
+        else:
+            found = self.items[:3]
+            if not found:
+                self.banner.setText(t("🎤 „{x}“ bulunamadı.", x=q))
+            else:
+                parts = []
+                for d in found:
+                    where = d["location_path"] or t("yeri belirtilmemiş")
+                    extra = " · " + loan_text(d) if d["loan_to"] else ""
+                    parts.append(f"<b>{d['name']}</b> → 📍 {where}{extra}")
+                more = len(self.items) - len(found)
+                self.banner.setText("🎤 " + "<br>".join(parts) + (t("<br>… ve {n} eşya daha", n=more) if more > 0 else ""))
+        self.banner.show()
+
+    def _banner_link(self, link):
+        cmd = parse_voice(self.search.text())
+        if link == "add" and cmd["query"]:
+            q = cmd["query"]
+            defaults = {"name": q[:1].upper() + q[1:], "quantity": cmd["qty"] or 1}
+            low = q.lower()
+            for nid, name, depth, path in self.db.tree_ordered("locations"):
+                if name.lower() in low and len(name) > 2:
+                    defaults["location_id"] = nid
+                    defaults["name"] = q.replace(name, "").strip() or q
+            self.search.clear()
+            dlg = ItemDialog(self.db, self.thumbs, defaults=defaults, parent=self)
+            if dlg.exec():
+                new_id = self.db.save_item(dlg.data(), dlg.photo_entries())
+                self.refresh()
+                self.reload_items(keep_id=new_id)
 
     def _context_menu(self, pos):
         ids = self._selected_ids()
@@ -621,20 +841,31 @@ class ItemsPage(QWidget):
             sub.addAction(t("— Belirtilmemiş —"), lambda f=field: self._move(ids, f, None))
             for nid, name, depth, path in self.db.tree_ordered(table):
                 sub.addAction(("    " * depth) + name, lambda f=field, n=nid: self._move(ids, f, n))
+        menu.addSeparator()
+        if len(ids) == 1:
+            one = next((d for d in self.items if d["id"] == ids[0]), None)
+            if one and one["loan_to"]:
+                menu.addAction(t("↩  Geri geldi"), lambda: self.give_back(ids[0]))
+            else:
+                menu.addAction(t("🤝  Ödünç ver"), lambda: self.lend(ids[0]))
+        menu.addAction(t("🛒  Alışveriş listesine ekle"), lambda: self._set_buy(ids, True))
+        menu.addAction(t("Alışveriş listesinden çıkar"), lambda: self._set_buy(ids, False))
         priced = [d["id"] for d in self.items if d["id"] in ids and d["price"] is not None]
         if priced:
             menu.addSeparator()
             menu.addAction(t("✎  Fiyatı onayla (benim fiyatım)"), lambda: self._set_auto(priced, 0))
             menu.addAction(t("⚡  Otomatik fiyat olarak işaretle"), lambda: self._set_auto(priced, 1))
         menu.addSeparator()
-        menu.addAction(t("Sil"), lambda: self.delete_items(ids))
+        menu.addAction(t("🗑  Sil (çöp kutusuna)"), lambda: self.delete_items(ids))
         menu.exec(self.table.viewport().mapToGlobal(pos))
 
     def _set_auto(self, ids, value):
+        self._remember(t("Fiyat işareti değişti"), ids)
         self.db.update_items_field(ids, "price_auto", value)
         self.reload_items(keep_id=ids)
 
     def _move(self, ids, field, node_id):
+        self._remember(t("{n} eşya taşındı", n=len(ids)), ids)
         self.db.update_items_field(ids, field, node_id)
         self.cat_tree.reload()
         self.loc_tree.reload()

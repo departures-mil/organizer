@@ -27,7 +27,9 @@ _P = {
 }
 
 
-def icon(name, color=INK, size=40):
+def icon(name, color=None, size=40):
+    from . import theme
+    color = color or ("#cfe6e8" if theme.DARK else INK)
     svg = (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="{color}" '
            f'stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">{_P[name]}</svg>')
     pm = QPixmap(size, size)
@@ -38,7 +40,7 @@ def icon(name, color=INK, size=40):
     return QIcon(pm)
 
 
-STYLE = f"""
+_STYLE = """
 QFrame#TopBar {{ background: transparent; }}
 QPushButton#TbIcon, QPushButton#TbPill, QPushButton#TbWin {{
     background: rgba(255,255,255,0.92); border: 1px solid #cfe0e2; border-radius: 11px; }}
@@ -59,6 +61,16 @@ QLabel#TbInfo {{ color: #6b8590; font-size: 9.5pt; background: transparent; }}
 """
 
 
+def style():
+    from . import theme
+    s = _STYLE.format(INK=INK, TEAL=TEAL)
+    if theme.DARK:
+        s = (s.replace("rgba(255,255,255,0.92)", "#1d2a30").replace("#cfe0e2", "#36494f")
+              .replace("#f2faf9", "#22343a").replace("#e3f3f1", "#294047").replace("#d6efec", "#22484a")
+              .replace(f"color: {INK}", "color: #cfe6e8").replace("#fdecea", "#4a2421"))
+    return s
+
+
 class TopBar(QFrame):
     hide_toggled = Signal(bool)
     scan_clicked = Signal()
@@ -72,7 +84,7 @@ class TopBar(QFrame):
     def __init__(self, hidden=False, parent=None):
         super().__init__(parent)
         self.setObjectName("TopBar")
-        self.setStyleSheet(STYLE)
+        self.setStyleSheet(style())
         self.setLayoutDirection(Qt.LeftToRight)   # her dilde düğmeler sağ üst köşede dursun
         lay = QHBoxLayout(self)
         lay.setContentsMargins(0, 0, 0, 0)

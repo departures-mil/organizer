@@ -2,7 +2,7 @@ import os
 import sys
 
 from PySide6.QtCore import QLibraryInfo, QLocale, Qt, QTimer, QTranslator
-from PySide6.QtGui import QFont, QIcon
+from PySide6.QtGui import QColor, QFont, QIcon, QPalette
 from PySide6.QtWidgets import QApplication
 
 from . import i18n
@@ -11,6 +11,7 @@ from .db import Database
 from .i18n import t
 from .main_window import MainWindow
 from .paths import adopt_old_data, asset, data_dir
+from . import theme
 from .theme import build_style
 from .updater import Updater
 
@@ -33,6 +34,10 @@ class Controller:
         self.updater = Updater(self.sync)
         self._checked_update = False
         self.sync.state_changed.connect(self._after_sync)
+        from .lan import LanServer
+        self.lan = LanServer(db)
+        # yerel ağ eşitlemesi: internet yoksa (bulut hatası ağ kaynaklıysa) telefon bu bilgisayara bağlanır
+        self.lan.data_changed.connect(lambda: self.win and self.win._remote_data())
 
     def _after_sync(self, _text=""):
         """İlk başarılı eşitlemeden sonra bir kez yeni sürüm var mı diye bak."""
@@ -56,12 +61,35 @@ class Controller:
             self.app.installTranslator(self.translator)
         self.app.setLayoutDirection(Qt.RightToLeft if i18n.is_rtl() else Qt.LeftToRight)
         self.app.setApplicationDisplayName(t("Organizer"))
-        self.app.setStyleSheet(build_style(i18n.is_rtl()))
+        self.apply_theme()
+
+    def apply_theme(self):
+        """Açık / koyu görünüm (Ayarlar → Görünüm; "auto" = Windows'un ayarı)."""
+        theme.DARK = theme.resolve_dark(self.db.get_setting("theme", "light"))
+        pal = QPalette()
+        if theme.DARK:
+            for role, c in ((QPalette.Window, "#111a1e"), (QPalette.WindowText, "#e2ebee"), (QPalette.Base, "#18242a"),
+                            (QPalette.AlternateBase, "#1d2a30"), (QPalette.Text, "#e2ebee"), (QPalette.Button, "#1d2a30"),
+                            (QPalette.ButtonText, "#e2ebee"), (QPalette.ToolTipBase, "#1d5f74"),
+                            (QPalette.ToolTipText, "#ffffff"), (QPalette.Highlight, "#2a9d8f"),
+                            (QPalette.HighlightedText, "#ffffff"), (QPalette.PlaceholderText, "#7d939b"),
+                            (QPalette.Link, "#7fd1c5")):
+                pal.setColor(role, QColor(c))
+        else:
+            pal = self.app.style().standardPalette()
+        self.app.setPalette(pal)
+        self.app.setStyleSheet(build_style(i18n.is_rtl(), theme.DARK))
+
+    def change_theme(self, mode):
+        self.db.set_setting("theme", mode)
+        self.apply_theme()
+        self.rebuild()
 
     def build_window(self, page=0, fullscreen=True, maximized=False):
         old = self.win
-        self.win = MainWindow(self.db, self.sync, self.updater)
+        self.win = MainWindow(self.db, self.sync, self.updater, self.lan)
         self.win.language_changed.connect(self.change_language)
+        self.win.theme_changed.connect(self.change_theme)
         self.win.labels_changed.connect(self.rebuild)
         self.win.show_page(page)
         if fullscreen:
@@ -115,6 +143,10 @@ def run():
     folder = data_dir()
     adopt_old_data(folder)
     db = Database(folder)
+    try:
+        db.purge_old_trash()   # çöp kutusunda 30 günü dolanlar kalıcı silinir
+    except Exception:
+        pass
     ctl = Controller(app, db)
     from . import common
     common.PRICES_HIDDEN = db.get_setting("prices_hidden", "0") == "1"
@@ -124,5 +156,6 @@ def run():
     ctl.build_window()
     os.environ["ORGANIZER_BASLADI"] = "1"   # main.py: pencere açıldı, güncelleme sağlam
     QTimer.singleShot(1500, ctl.sync.sync_now)  # açılışta buluttan son hali al
+    QTimer.singleShot(2500, ctl.lan.start)      # yerel ağ eşitlemesi (internetsiz) için bekle
     QTimer.singleShot(4000, ctl.check_update_once)  # güncellemeler GitHub'dan: bulut hesabı beklenmez
     return app.exec()

@@ -1,10 +1,10 @@
 {
- "surum": "2.1.0.7",
- "notlar": "v.1.0.7: Otomatik (tahmini) fiyatlar ⚡ ile, sizin girdiğiniz fiyatlar ✎ ile işaretlenir. 'Kontrol edilmemiş fiyatlar' filtresi; fiyatı değiştirince ya da 'Fiyatı onayla' deyince işaret kalkar.",
- "boyut": 123064,
- "sha256": "e806afa89b9aaefed082f1482b8cd103f221a627bab2352bbf291b53cbb57147",
- "imza": "kKy0bt1rl1L82WyfWoNyUXF8MqJKO3VrLlv5f47H6KH/MVKHJU1Gx33SdGWSkB5Em/3gw7FWXmuVqQTS4qB8a6CMiOGnPtEGIzZvj5AIKGufktGMwJtqu5KA1BvIBvI5iTa2nkW6fnV1GUQdqORvaKChVXGJfXBxi+R1nSvqxLxWRoRcg2cIaAgZYSKlm98aCMFtrjXEUBudQ6wFiYavoVutQVKNqsLbElnW0Mr7YmtlSwjTXKb/38XugwqE3GTbJ+qDJQ3KOZRbVc3beHtof11iLVbBsf7MvIfo+N11Q4A/dwxukHzzTepl4zdm7l1+x/i30lywtBZrTJ9fkFKimsnDC09bnWeQEm74OwoJTazsxhQWWffy3lCHgBidfy1MwjWi7zynXsFGAUSUcdtOcj3beBDK/HNRK0VIAzoQv8KbHzZ2LIJo0HUZbJ0MWXubKDUTWhdQtT1HNogUcmrEoQXHuDNBkfXB8S2PUvafUkedUZZmmCA6O3SW2KtL+6JA",
- "yayin": "2026-11-21 08:15 UTC",
- "kabuk": 2,
- "dosya": "organizer-telefon-2.1.0.7.zip"
+ "surum": "2.1.0.8",
+ "notlar": "v.1.0.8: 🗑 Çöp kutusu (silinenler 30 gün saklanır) ve ↶ Geri al · 📷 Fatura/fiş fotoğrafları · 🎤 Sesle arama ve ekleme ('Matkap nerede?', '3 ampul ekle') · 🤝 Ödünç takibi · 🛒 Az kalanlar için alışveriş listesi · 🧾 Ustalarla yapılan işler ve ödemeler · 🌙 Koyu görünüm · 📶 İnternetsiz yerel ağ eşitlemesi · ✉ Admin ile iletişim",
+ "boyut": 146890,
+ "sha256": "a680b14e80d4567739467bbe2c86015f51830865ec8c3b5ca6e70176195a5862",
+ "imza": "NdkUVZLWnxAvOPERKVBz7pVJGLnOsFLBMqk/xm8FustedxoxX0CjPgnEGeG/TDGVxUKfhy6z3klO3E2LcBfZTIvTht/rKjr0dSYIdPJdWIL8VRhYYyr2iydBH0jbT5v/GJQnxb5r2bEQOmYY/rjNFiZl1RmT512WFZIZX+Y1frsr+jKAmLkn4tWj8FgV2SQlq15KbccFe9ZPiYdyyVyBTwqADcHg321p2gk3jWTjdDLVIY2beMGPkF7znNOotTewBSlIyMPoubA//IRmb0YouCjpCDT/+LQKTOniK6h2MS4KRue+jkw246LZkykRKZTMwBeH9ShKoq7XJ6g2uEv4o2aK7EL5P6fNbw9ZMFqtjyuSrIeqlWAkyuUB+2Ejw5f+6a2KlHVM6vIdN9OpAJylZq37yw4coMkKU0JA1KI48SHxoixY2Tcok+9OwV5iS3hT9xkicfUYVqmo2Kvi0WNHNP3OWA5oKspNqFr0YWgx6EBA/G6g/sO1piDRZ50nu4IC",
+ "yayin": "2026-11-21 21:06 UTC",
+ "kabuk": 3,
+ "dosya": "organizer-telefon-2.1.0.8.zip"
 }

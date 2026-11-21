@@ -3,7 +3,7 @@ from pathlib import Path
 
 from PySide6.QtCore import QDateTime, QSize, Qt
 from PySide6.QtGui import QIcon, QKeySequence, QPixmap, QShortcut
-from PySide6.QtWidgets import (QCheckBox, QComboBox, QCompleter, QFrame, QDateTimeEdit, QDialog, QDialogButtonBox,
+from PySide6.QtWidgets import (QCheckBox, QComboBox, QCompleter, QFrame, QDateTimeEdit, QDialog, QDialogButtonBox, QTabWidget,
                                QDoubleSpinBox, QFileDialog, QFormLayout, QHBoxLayout, QLabel,
                                QLineEdit, QListView, QListWidget, QListWidgetItem, QPlainTextEdit,
                                QPushButton, QSpinBox, QVBoxLayout, QWidget)
@@ -28,7 +28,7 @@ class PhotoList(QListWidget):
         self.setSelectionMode(QListWidget.ExtendedSelection)
         self.setAcceptDrops(True)
         self.setMinimumHeight(140)
-        self.setStyleSheet("QListWidget { background: #f6f2ea; border-radius: 12px; }")
+        self.setObjectName("PhotoList")
 
     def dragEnterEvent(self, e):
         if e.mimeData().hasUrls():
@@ -51,21 +51,25 @@ class PhotoList(QListWidget):
 class PhotoEditor(QWidget):
     """Fotoğraf ekleme / kaldırma / favori seçme. İlk fotoğraf favoridir; listelerde o görünür."""
 
-    def __init__(self, thumbs, parent=None):
+    def __init__(self, thumbs, parent=None, receipts=False, title=True):
         super().__init__(parent)
         self.thumbs = thumbs
+        self.receipts = receipts   # v.1.0.8: fatura / fiş fotoğrafları (dosya adı "fis-" ile başlar)
         lay = QVBoxLayout(self)
         lay.setContentsMargins(0, 0, 0, 0)
         head = QHBoxLayout()
-        lbl = QLabel(t("Fotoğraflar"))
+        lbl = QLabel(t("🧾  Fatura / fiş") if receipts else t("Fotoğraflar"))
         lbl.setObjectName("SectionTitle")
-        hint = QLabel(t("(sürükleyip bırakabilirsiniz)"))
+        lbl.setVisible(title)
+        hint = QLabel(t("(sürükleyip bırakabilirsiniz)") if not receipts else
+                      t("Faturanın, fişin ya da garanti belgesinin fotoğrafını ekleyin (sürükleyip bırakabilirsiniz)."))
         hint.setObjectName("Muted")
-        add_photo = QPushButton(t("＋ Fotoğraf ekle"))
+        add_photo = QPushButton(t("＋ Fiş / fatura ekle") if receipts else t("＋ Fotoğraf ekle"))
         add_photo.clicked.connect(self._pick_photos)
         fav = QPushButton(t("⭐ Favori yap"))
         fav.setToolTip(t("Seçili fotoğraf ilk sıraya alınır ve listede o görünür."))
         fav.clicked.connect(self._make_favorite)
+        fav.setVisible(not receipts)
         del_photo = QPushButton(t("Seçileni kaldır"))
         del_photo.setObjectName("Danger")
         del_photo.clicked.connect(self._remove_photos)
@@ -96,6 +100,8 @@ class PhotoEditor(QWidget):
         self.list.addItem(it)
 
     def _mark(self):
+        if self.receipts:
+            return
         for i in range(self.list.count()):
             self.list.item(i).setText(t("⭐ Favori") if i == 0 and self.list.count() > 1 else "")
 
@@ -106,7 +112,7 @@ class PhotoEditor(QWidget):
     def _add_photo_files(self, files):
         for f in files:
             img = load_image(f, 256)
-            self._add_entry(("new", f), QPixmap.fromImage(img))
+            self._add_entry(("new_fis" if self.receipts else "new", f), QPixmap.fromImage(img))
         self._mark()
 
     def _remove_photos(self):
@@ -154,7 +160,20 @@ class ItemDialog(QDialog):
         self.qty.setValue(1)
         self.qty.setSuffix(t(" adet"))
         self.qty.setMinimumWidth(140)
-        form.addRow(t("Adet:"), self.qty)
+        qrow = QHBoxLayout()
+        qrow.addWidget(self.qty)
+        qrow.addSpacing(18)
+        ml = QLabel(t("En az adet:"))
+        ml.setToolTip(t("Adet bunun altına düşünce eşya alışveriş listesine eklenir (0 = uyarı yok)"))
+        self.min_qty = QSpinBox()
+        self.min_qty.setRange(0, 1_000_000)
+        self.min_qty.setSpecialValueText(t("Uyarı yok"))
+        self.min_qty.setMinimumWidth(130)
+        self.min_qty.setToolTip(ml.toolTip())
+        qrow.addWidget(ml)
+        qrow.addWidget(self.min_qty)
+        qrow.addStretch()
+        form.addRow(t("Adet:"), qrow)
 
         self.category = TreeCombo(db, "categories")
         form.addRow(t("Kategori:"), self._with_add(self.category, "categories"))
@@ -226,8 +245,12 @@ class ItemDialog(QDialog):
         form.addRow(t("Notlar:"), self.notes)
         lay.addLayout(form)
 
-        self.photos = PhotoEditor(thumbs)
-        lay.addWidget(self.photos, 1)
+        self.photos = PhotoEditor(thumbs, title=False)
+        self.receipts = PhotoEditor(thumbs, receipts=True, title=False)
+        self.ptabs = QTabWidget()
+        self.ptabs.addTab(self.photos, t("📷  Fotoğraflar"))
+        self.ptabs.addTab(self.receipts, t("🧾  Fatura / fiş"))
+        lay.addWidget(self.ptabs, 1)
 
         buttons = QDialogButtonBox()
         save = buttons.addButton(t("Kaydet"), QDialogButtonBox.AcceptRole)
@@ -251,6 +274,10 @@ class ItemDialog(QDialog):
             self.created.setDateTime(QDateTime.fromString(item["created_at"], "yyyy-MM-dd HH:mm:ss"))
             self.notes.setPlainText(item["notes"])
             self.photos.set_existing(item["photos"])
+            self.receipts.set_existing(item.get("receipts") or [])
+            self.min_qty.setValue(int(item.get("min_qty") or 0))
+            if item.get("receipts"):
+                self.ptabs.setTabText(1, t("🧾  Fatura / fiş ({n})", n=len(item["receipts"])))
             self.shop_name.setText(item.get("shop_name") or "")
             self.shop_place.setText(item.get("shop_place") or "")
             self.shop_phone.setText(item.get("shop_phone") or "")
@@ -258,6 +285,10 @@ class ItemDialog(QDialog):
         else:
             self.category.set_current_id(defaults.get("category_id"))
             self.location.set_current_id(defaults.get("location_id"))
+            if defaults.get("name"):          # sesle ekleme: "3 ampul ekle"
+                self.name.setText(defaults["name"])
+            if defaults.get("quantity"):
+                self.qty.setValue(int(defaults["quantity"]))
         self.currency.setCurrentIndex(max(0, self.currency.findData(default_currency)))
         self.price.valueChanged.connect(lambda _: self.price_auto.setChecked(False))
         self.currency.currentIndexChanged.connect(lambda _: self.price_auto.setChecked(False))
@@ -322,10 +353,11 @@ class ItemDialog(QDialog):
             "shop_phone": self.shop_phone.text().strip(),
             **self.channels.values(),
             "price_auto": not self.price_auto.isHidden() and self.price_auto.isChecked() and price > 0,
+            "min_qty": self.min_qty.value(),
         }
 
     def photo_entries(self):
-        return self.photos.entries()
+        return self.photos.entries() + self.receipts.entries()
 
 
 class PhotoViewer(QDialog):

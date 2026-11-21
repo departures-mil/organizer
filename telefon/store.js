@@ -32,6 +32,51 @@ function norm(text) {
 
 function nowUtc() { return new Date().toISOString(); }
 
+// ------------------------------------------------------------------ v.1.0.8: yeni alanlar
+// Eski sürümden gelen kayıtta bu alanlar yoksa eldeki değer korunur (applyRemote).
+const ITEM_EXTRA = { trashed_at: "", min_qty: 0, to_buy: false, loan_to: "", loan_phone: "", loan_date: "", loan_due: "", loan_history: [] };
+const CONTACT_EXTRA = { jobs: [] };
+const TRASH_DAYS = 30;
+const RECEIPT_PREFIX = "fis-";   // fatura / fiş fotoğrafları (eşitlemede sıradan fotoğraf gibi gider)
+const isReceipt = n => String(n || "").startsWith(RECEIPT_PREFIX);
+function extraValue(def, v) {
+  if (Array.isArray(def)) return Array.isArray(v) ? v : [];
+  if (typeof def === "number") return Math.max(0, parseInt(v || 0, 10) || 0);
+  if (typeof def === "boolean") return !!v;
+  return v == null ? "" : String(v);
+}
+function todayStr() { const d = new Date(); return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`; }
+const isLow = d => (parseInt(d.min_qty || 0, 10) || 0) > 0 && (d.quantity || 0) < d.min_qty;
+function overdueDays(d) {
+  if (!d.loan_to || !/^\d{4}-\d\d-\d\d$/.test(d.loan_due || "")) return 0;
+  return Math.floor((new Date(todayStr()) - new Date(d.loan_due)) / 86400000);
+}
+
+// Sesli / yazılı soru: "Matkap nerede?" → yalnızca "matkap" aranır; "3 ampul ekle" → yeni eşya
+const QUESTION_WORDS = new Set(["nerede", "nerde", "neredeydi", "nerededir", "nereye", "koydum", "koymuştum", "benim", "acaba", "hani",
+  "var", "mı", "mi", "where", "is", "are", "the", "my", "did", "i", "put", "a", "an", "أين", "اين", "وين", "فين", "هو", "هي", "ال"].map(w => norm(w)));
+const QUESTION_MARKS = new Set(["nerede", "nerde", "neredeydi", "nerededir", "where", "أين", "اين", "وين", "فين"].map(w => norm(w)));
+const ADD_WORDS = new Set(["ekle", "ekleyin", "kaydet", "yeni", "add", "new", "save", "أضف", "اضف", "زد", "جديد", "سجل"].map(w => norm(w)));
+function parseVoice(text) {
+  const words = String(text || "").replace(/[?؟!.,،]+/g, " ").trim().split(/\s+/).filter(Boolean);
+  const nw = words.map(w => norm(w));
+  let intent = "search";
+  if (nw.some(w => QUESTION_MARKS.has(w))) intent = "where";
+  else if (nw.some(w => ADD_WORDS.has(w))) intent = "add";
+  let qty = null;
+  const keep = [];
+  words.forEach((w, i) => {
+    const n = nw[i];
+    if (intent === "add" && ADD_WORDS.has(n)) return;
+    if (intent === "where" && QUESTION_WORDS.has(n)) return;
+    if (intent === "add" && qty === null && /^\d+$/.test(w)) { qty = parseInt(w, 10); return; }
+    keep.push(w);
+  });
+  return { intent, query: keep.join(" ").trim(), qty };
+}
+/** Arapçadaki "ال" takısı olmadan da dener (المثقاب → مثقاب) */
+const termIn = (term, hay) => hay.includes(term) || (term.length > 3 && term.startsWith("ال") && hay.includes(term.slice(2)));
+
 function pad(n) { return String(n).padStart(2, "0"); }
 
 function nowStr(d) {
@@ -297,29 +342,30 @@ const Store = {
   },
 
   // -------------------------------------------------------------- eşyalar
-  liveItems() { return [...this.t.items.values()].filter(i => !i.deleted); },
+  liveItems() { return [...this.t.items.values()].filter(i => !i.deleted && !i.trashed_at); },
+  trashItemsList() { return [...this.t.items.values()].filter(i => !i.deleted && i.trashed_at); },
 
-  listItems({ search = "", categories = null, locations = null, sort = "newest" } = {}) {
+  listItems({ search = "", categories = null, locations = null, sort = "newest", trashed = false } = {}) {
     const catPaths = this.treePaths("categories"), locPaths = this.treePaths("locations");
-    const terms = norm(search).split(/\s+/).filter(Boolean);
+    const terms = norm(search).split(/\s+/).filter(w => w && !QUESTION_WORDS.has(w));
     const out = [];
-    for (const r of this.liveItems()) {
+    for (const r of (trashed ? this.trashItemsList() : this.liveItems())) {
       const cat = catPaths.has(r.category) ? r.category : "";
       const loc = locPaths.has(r.location) ? r.location : "";
       if (categories && !categories.has(cat)) continue;
       if (locations && !locations.has(loc)) continue;
       const d = { ...r, category: cat, location: loc, category_path: catPaths.get(cat) || "", location_path: locPaths.get(loc) || "" };
       if (terms.length) {
-        const hay = norm([d.name, d.notes, d.category_path, d.location_path, d.shop_name, d.shop_place, d.shop_phone,
+        const hay = norm([d.name, d.notes, d.category_path, d.location_path, d.shop_name, d.shop_place, d.shop_phone, d.loan_to,
           String(d.shop_phone || "").replace(/\D/g, "")].join(" "));
-        if (!terms.every(t => hay.includes(t))) continue;
+        if (!terms.every(t => termIn(t, hay))) continue;
       }
       out.push(d);
     }
     return sortRecords(out, sort, {
       created: d => d.created_at, name: d => norm(d.name), qty: d => d.quantity,
       price: d => [d.currency, d.price], category: d => norm(d.category_path), location: d => norm(d.location_path),
-      shop: d => norm(shopTitle(d)), place: d => norm(d.shop_place || ""),
+      shop: d => norm(shopTitle(d)), place: d => norm(d.shop_place || ""), trashed: d => d.trashed_at || "",
     }, { price: d => d.price == null, category: d => !d.category_path, location: d => !d.location_path, shop: d => !shopTitle(d),
       place: d => !String(d.shop_place || "").trim() });
   },
@@ -356,6 +402,8 @@ const Store = {
       price_auto: !!data.price_auto && !(data.price == null || data.price === ""),
       photos: photos, mtime: nowUtc(), deleted: false, dirty: true,
     };
+    // v.1.0.8 alanları: formda olmayanlar (çöp, ödünç, liste…) eldeki kayıttan korunur
+    for (const [f, def] of Object.entries(ITEM_EXTRA)) rec[f] = extraValue(def, f in data ? data[f] : (old ? old[f] : def));
     await this.save("items", rec);
     if (old) await this._dropPhotos(old.photos.filter(p => !photos.includes(p)));
     return rec.uid;
@@ -371,7 +419,70 @@ const Store = {
     await this.save("items", { ...r, quantity: Math.max(0, r.quantity + delta), updated_at: nowStr(), mtime: nowUtc(), dirty: true });
   },
 
-  async deleteItems(uids) {
+  // -------------------------------------------------------------- çöp kutusu (v.1.0.8)
+  async trashItems(uids) {
+    const ts = nowUtc();
+    await this.save("items", uids.map(u => this.t.items.get(u)).filter(Boolean)
+      .map(r => ({ ...r, trashed_at: ts, mtime: ts, dirty: true })));
+  },
+
+  async restoreItems(uids) {
+    const ts = nowUtc();
+    await this.save("items", uids.map(u => this.t.items.get(u)).filter(Boolean)
+      .map(r => ({ ...r, trashed_at: "", mtime: ts, dirty: true })));
+  },
+
+  async purgeOldTrash() {
+    const limit = new Date(Date.now() - TRASH_DAYS * 86400000).toISOString();
+    const old = this.trashItemsList().filter(r => r.trashed_at < limit).map(r => r.uid);
+    if (old.length) await this.purgeItems(old);
+    return old.length;
+  },
+
+  // -------------------------------------------------------------- ödünç / stok / geri al (v.1.0.8)
+  async patchItems(uids, patch) {
+    const ts = nowUtc();
+    await this.save("items", uids.map(u => this.t.items.get(u)).filter(Boolean)
+      .map(r => ({ ...r, ...(typeof patch === "function" ? patch(r) : patch), updated_at: nowStr(), mtime: ts, dirty: true })));
+  },
+
+  async lend(uid, to, phone, date, due) {
+    await this.patchItems([uid], { loan_to: to.trim(), loan_phone: (phone || "").trim(), loan_date: date || todayStr(), loan_due: due || "" });
+  },
+
+  async giveBack(uid) {
+    await this.patchItems([uid], r => ({ loan_to: "", loan_phone: "", loan_date: "", loan_due: "",
+      loan_history: [...(r.loan_history || []), { to: r.loan_to, phone: r.loan_phone || "", date: r.loan_date || "",
+        due: r.loan_due || "", returned: todayStr() }].slice(-50) }));
+  },
+
+  shoppingList() { return this.listItems({ sort: "name_asc" }).filter(d => d.to_buy || isLow(d)); },
+
+  async bought(uid, n) {
+    await this.patchItems([uid], r => ({ quantity: (r.quantity || 0) + Math.max(0, n | 0), to_buy: false }));
+  },
+
+  snapshot(uids) { return uids.map(u => this.t.items.get(u)).filter(Boolean).map(r => JSON.parse(JSON.stringify(r))); },
+
+  async restoreSnapshot(snap) {
+    const ts = nowUtc();
+    const recs = [];
+    for (const r of snap) {
+      const photos = [];
+      for (const p of r.photos || []) if (await this.hasPhoto(p)) photos.push(p);
+      for (const p of photos) if (this.photoSync.get(p) === "delete") await this.setPhotoState(p, null);
+      recs.push({ ...r, photos, mtime: ts, dirty: true });
+    }
+    await this.save("items", recs);
+  },
+
+  async saveJobs(uid, jobs) {
+    const c = this.t.contacts.get(uid);
+    if (c) await this.save("contacts", { ...c, jobs, mtime: nowUtc(), dirty: true });
+  },
+
+  /** Kalıcı silme (geri alınamaz) */
+  async purgeItems(uids) {
     const ts = nowUtc();
     const photos = [];
     const recs = uids.map(u => {
@@ -384,8 +495,8 @@ const Store = {
   },
 
   // -------------------------------------------------------------- fotoğraflar
-  async addPhoto(blob, thumb) {
-    const name = newUid() + ".jpg";
+  async addPhoto(blob, thumb, prefix) {
+    const name = (prefix || "") + newUid() + ".jpg";
     await this._put("photos", [{ name, blob }]);
     if (thumb) await this._put("thumbs", [{ name, blob: thumb }]);
     return name;
@@ -426,7 +537,8 @@ const Store = {
     const out = [...this.t.contacts.values()].filter(d => {
       if (d.deleted || (kind && d.kind !== kind)) return false;
       if (!terms.length) return true;
-      const hay = norm([d.name, d.profession, d.place, d.phone, (d.phone || "").replace(/\D/g, ""), d.notes].join(" "));
+      const hay = norm([d.name, d.profession, d.place, d.phone, (d.phone || "").replace(/\D/g, ""), d.notes,
+        ...(d.jobs || []).map(j => j.work || "")].join(" "));
       return terms.every(t => hay.includes(t));
     });
     return sortRecords(out, sort, {
@@ -441,6 +553,7 @@ const Store = {
     const old = uid ? this.t.contacts.get(uid) : null;
     if (photos === undefined) photos = old ? (old.photos || []) : [];
     const rec = {
+      jobs: extraValue([], "jobs" in data ? data.jobs : (old ? old.jobs : [])),
       uid: uid || newUid(), kind: data.kind || "usta", name: data.name.trim(), profession: (data.profession || "").trim(),
       place: (data.place || "").trim(), phone: (data.phone || "").trim(), has_whatsapp: !!data.has_whatsapp,
       has_telegram: !!data.has_telegram, has_call: !!data.has_call, notes: data.notes || "",
@@ -490,8 +603,21 @@ const Store = {
     }
   },
 
-  /** Buluttan gelen kayıtları birleştirir (son değişiklik kazanır). */
-  async applyRemote(table, records) {
+  /** Bütün kayıtlar (silinmişler dahil) — yerel ağ eşitlemesi için */
+  allRecords() {
+    const out = {};
+    for (const table of SYNC_TABLES) out[table] = [...this.t[table].values()].map(r => {
+      const { dirty, updated_at, ...rest } = r;  // eslint-disable-line no-unused-vars
+      if (table === "items" || table === "contacts") rest.photos = r.deleted ? [] : (r.photos || []);
+      rest.deleted = !!r.deleted;
+      return rest;
+    });
+    return out;
+  },
+
+  /** Buluttan (ya da yerel ağdan) gelen kayıtları birleştirir (son değişiklik kazanır).
+   *  keepDirty: kabul edilenler buluta da gönderilsin (yerel ağdan gelenler). */
+  async applyRemote(table, records, keepDirty) {
     const accepted = [];
     const dropPhotos = [];
     for (const rec of records) {
@@ -520,6 +646,7 @@ const Store = {
         // otomatik (tahmini) fiyat işareti; bilmeyen eski sürümden gelirse fiyat aynıysa eldeki işaret korunur
         r.price_auto = r.price != null && ("price_auto" in rec ? !!rec.price_auto
           : !!(cur && cur.price_auto && cur.price != null && Math.abs(cur.price - r.price) < 1e-9));
+        for (const [f, def] of Object.entries(ITEM_EXTRA)) r[f] = extraValue(def, f in rec ? rec[f] : (cur ? cur[f] : def));
       } else {
         // 4.0 sürümünden gelen kayıtlarda "photos" alanı yoktur; o zaman eldeki fotoğraflar kalır
         const photos = rec.deleted ? [] : ("photos" in rec ? (rec.photos || []) : (cur ? (cur.photos || []) : []));
@@ -528,7 +655,9 @@ const Store = {
           place: rec.place || "", phone: rec.phone || "", has_whatsapp: !!rec.has_whatsapp, has_telegram: !!rec.has_telegram,
           has_call: !!rec.has_call, notes: rec.notes || "", created_at: rec.created_at || nowStr(),
           mtime: rec.mtime, deleted: !!rec.deleted, dirty: false };
+        r.jobs = extraValue([], "jobs" in rec ? rec.jobs : (cur ? cur.jobs : []));
       }
+      if (keepDirty) r.dirty = true;
       accepted.push(r);
     }
     await this.save(table, accepted);
