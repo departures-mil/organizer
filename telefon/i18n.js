@@ -16,89 +16,338 @@ const I18N = Object.assign({
   ]
  ],
  "strings": {
- "⚡ Otomatik fiyat — henüz kontrol edilmedi": ["⚡ Automatic price — not checked yet", "⚡ سعر تلقائي — لم تتم مراجعته بعد"],
- "İşareti kaldırırsanız ya da fiyatı değiştirirseniz bu fiyat sizin girdiğiniz fiyat sayılır (✎).": ["If you untick this or change the price, it counts as a price you entered (✎).", "إذا أزلت العلامة أو غيّرت السعر، يُعتبر هذا السعر سعرًا أدخلته أنت (✎)."],
- "⚡ otomatik — kontrol edilmedi": ["⚡ automatic — not checked", "⚡ تلقائي — لم تتم مراجعته"],
- "Yalnızca otomatik girilmiş, henüz kontrol etmediğiniz fiyatları göster\n⚡ = otomatik fiyat · ✎ = sizin girdiğiniz fiyat": ["Show only automatically entered prices you have not checked yet\n⚡ = automatic price · ✎ = price you entered", "عرض الأسعار المُدخلة تلقائيًا التي لم تراجعها بعد فقط\n⚡ = سعر تلقائي · ✎ = سعر أدخلته أنت"],
- "⚡ Kontrol edilmemiş fiyatlar ({n})": ["⚡ Unchecked prices ({n})", "⚡ أسعار غير مُراجَعة ({n})"],
- "⚡ Otomatik (tahmini) fiyat — henüz kontrol edilmedi.\nDüzenleyip fiyatı değiştirince ya da sağ tık → \"Fiyatı onayla\" deyince sizin fiyatınız olur.": ["⚡ Automatic (estimated) price — not checked yet.\nIt becomes your price when you edit it or right-click → \"Confirm price\".", "⚡ سعر تلقائي (تقديري) — لم تتم مراجعته بعد.\nيصبح سعرك عند تعديله أو بالنقر الأيمن ← \"تأكيد السعر\"."],
- "✎ Sizin girdiğiniz fiyat": ["✎ Price you entered", "✎ سعر أدخلته أنت"],
- "Kontrol edilmemiş otomatik fiyat kalmadı. ✓": ["No unchecked automatic prices left. ✓", "لم يبقَ أي سعر تلقائي غير مُراجَع. ✓"],
- " · ⚡ {n} fiyat otomatik (kontrol edilmedi) · ✎ sizin girdiğiniz": [" · ⚡ {n} prices automatic (not checked) · ✎ entered by you", " · ⚡ {n} سعر تلقائي (غير مُراجَع) · ✎ أدخلته أنت"],
- "✎  Fiyatı onayla (benim fiyatım)": ["✎  Confirm price (my price)", "✎  تأكيد السعر (سعري)"],
- "⚡  Otomatik fiyat olarak işaretle": ["⚡  Mark as automatic price", "⚡  تعليم كسعر تلقائي"],
- "⚡ Otomatik (tahmini) fiyat — henüz kontrol edilmedi": ["⚡ Automatic (estimated) price — not checked yet", "⚡ سعر تلقائي (تقديري) — لم تتم مراجعته بعد"],
- "⚡ Otomatik fiyat olarak işaretlendi": ["⚡ Marked as automatic price", "⚡ تم التعليم كسعر تلقائي"],
- "✎ Fiyat onaylandı": ["✎ Price confirmed", "✎ تم تأكيد السعر"],
- "✎ Onayla": ["✎ Confirm", "✎ تأكيد"],
- "İsme göre (A → Z)": ["By name (A → Z)", "حسب الاسم (أ ← ي)"],
- "İsme göre (Z → A)": ["By name (Z → A)", "حسب الاسم (ي ← أ)"],
- "Türe göre": ["By type", "حسب النوع"],
- "Mesleğe göre (A → Z)": ["By trade (A → Z)", "حسب المهنة (أ ← ي)"],
- "Mesleğe göre (Z → A)": ["By trade (Z → A)", "حسب المهنة (ي ← أ)"],
- "Telefona göre": ["By phone", "حسب الهاتف"],
- "Güncelleme sunucusuna ulaşılamadı. İnternet bağlantısını denetleyin.": ["Could not reach the update server. Check your internet connection.", "تعذّر الوصول إلى خادم التحديثات. تحقّق من اتصال الإنترنت."],
- "🏪  Satın alındığı yer": ["🏪  Where it was bought", "🏪  مكان الشراء"],
- "Satın alındığı yer": ["Bought at", "مكان الشراء"],
- "Satın alındığı yer:": ["Bought at:", "مكان الشراء:"],
- "Dükkan/Kişi Adı:": ["Shop/Person name:", "اسم المحل / الشخص:"],
- "Dükkan/Kişi Yeri:": ["Shop/Person location:", "مكان المحل / الشخص:"],
- "Adres": ["Address", "العنوان"],
- "Dükkan/Kişi": ["Shop/Person", "المحل/الشخص"],
- "Konum": ["Location", "الموقع"],
- "Dükkan/Kişiye göre (A → Z)": ["By shop/person (A → Z)", "حسب المحل/الشخص (أ ← ي)"],
- "Dükkan/Kişiye göre (Z → A)": ["By shop/person (Z → A)", "حسب المحل/الشخص (ي ← أ)"],
- "Konuma göre (A → Z)": ["By location (A → Z)", "حسب الموقع (أ ← ي)"],
- "Konuma göre (Z → A)": ["By location (Z → A)", "حسب الموقع (ي ← أ)"],
- "🏷  Etiketler": ["🏷  Labels", "🏷  التسميات"],
- "🏷  Etiketleri düzenle…": ["🏷  Edit labels…", "🏷  تعديل التسميات…"],
- "Programdaki bütün yazıları (düğmeler, başlıklar, alan adları) kendinize göre değiştirebilirsiniz. Değişiklik yalnızca seçili dil için geçerlidir.": ["You can change every text in the program (buttons, headings, field names). Changes apply to the selected language only.", "يمكنك تغيير كل نصوص البرنامج (الأزرار والعناوين وأسماء الحقول). تنطبق التغييرات على اللغة المحددة فقط."],
- "{n} etiket değiştirildi": ["{n} labels changed", "تم تغيير {n} تسمية"],
- "Etiketleri düzenle": ["Edit labels", "تعديل التسميات"],
- "Etiket ara…": ["Search labels…", "ابحث في التسميات…"],
- "Yalnızca değiştirilenler": ["Changed only", "المعدلة فقط"],
- "Hepsini sıfırla": ["Reset all", "إعادة الكل"],
- "Bütün etiketler programın kendi yazısına dönsün mü?": ["Reset all labels to the program defaults?", "إعادة كل التسميات إلى نصوص البرنامج؟"],
- "{x} gibi yer tutucuları silmeyin; oraya sayı ya da ad gelir.": ["Keep placeholders like {x}; a number or name goes there.", "لا تحذف العناصر مثل {x}؛ يوضع مكانها رقم أو اسم."],
- "Yeni etiket (boş = programın yazısı):": ["New label (empty = program text):", "تسمية جديدة (فارغ = نص البرنامج):"],
- "Programdaki yazı": ["Program text", "نص البرنامج"],
- "Yeni etiket (boş = değişmesin)": ["New label (empty = unchanged)", "تسمية جديدة (فارغ = بلا تغيير)"],
- "İletişim numarası:": ["Contact number:", "رقم التواصل:"],
- "Örn. Yıldız Hırdavat": ["e.g. Star Hardware", "مثال: محل النجمة للعدد"],
- "Semt, çarşı, sokak ya da adres": ["District, market, street or address", "الحي أو السوق أو الشارع أو العنوان"],
- "Satın alınan yere göre (A → Z)": ["By shop (A → Z)", "حسب مكان الشراء (أ ← ي)"],
- "Satın alınan yere göre (Z → A)": ["By shop (Z → A)", "حسب مكان الشراء (ي ← أ)"],
- "Dükkan: {x}": ["Shop: {x}", "المحل: {x}"],
- "Yeri: {x}": ["Location: {x}", "المكان: {x}"],
- "Numara: {x}": ["Number: {x}", "الرقم: {x}"],
- "Çalışan: {x}": ["Works on: {x}", "يعمل على: {x}"],
- "WhatsApp / Telegram işaretlenmemiş": ["WhatsApp / Telegram not marked", "لم يتم تحديد واتساب / تيليجرام"],
- "{app} açılıyor…": ["Opening {app}…", "جارٍ فتح {app}…"],
- "{app} ile yaz: {p}": ["Message on {app}: {p}", "راسل عبر {app}: {p}"],
- "{app} bu numarada çalışıyor. Kapatmak için tıklayın.": ["{app} works on this number. Click to turn off.", "{app} يعمل على هذا الرقم. انقر للإيقاف."],
- "{app} bu numarada çalışıyorsa tıklayıp etkinleştirin.": ["If {app} works on this number, click to enable.", "إذا كان {app} يعمل على هذا الرقم فانقر للتفعيل."],
- "Bu numara için WhatsApp / Telegram seçilmedi. Çalışanın düğmesine tıklayın.": ["No WhatsApp / Telegram selected for this number. Click the one that works.", "لم يتم اختيار واتساب / تيليجرام لهذا الرقم. انقر على الذي يعمل."],
- "Bu numarada çalışan: {x}": ["Works on this number: {x}", "يعمل على هذا الرقم: {x}"],
- "(numara yazılmadı)": ["(no number entered)", "(لم يُكتب رقم)"],
- "Güncellemeler GitHub'dan denetleniyor…": ["Checking GitHub for updates…", "جارٍ البحث عن تحديثات في GitHub…"],
- "Dükkan": ["Shop", "المحل"],
- "Fiyatları gizle / göster": ["Hide / show prices", "إخفاء / إظهار الأسعار"],
- "Ad": ["Name", "الاسم"],
- "Tarih": ["Date", "التاريخ"],
- "Meslek": ["Trade", "المهنة"],
- "Kategoriye göre (A → Z)": ["By category (A → Z)", "حسب الفئة (أ ← ي)"],
- "Kategoriye göre (Z → A)": ["By category (Z → A)", "حسب الفئة (ي ← أ)"],
- "Yere göre (A → Z)": ["By location (A → Z)", "حسب المكان (أ ← ي)"],
- "Yere göre (Z → A)": ["By location (Z → A)", "حسب المكان (ي ← أ)"],
- "Fiyat (düşük → yüksek)": ["Price (low → high)", "السعر (من الأقل إلى الأعلى)"],
- "Hızlı ara": ["Quick search", "بحث سريع"],
- "Eşitle": ["Sync", "مزامنة"],
- "Güncelle": ["Update", "تحديث"],
- "Güncelle: {n}": ["Update: {n}", "تحديث: {n}"],
- "%{p} · {a}/{b} MB": ["{p}% · {a}/{b} MB", "%{p} · {a}/{b} MB"],
- "Yeniden başlatılıyor…": ["Restarting…", "جارٍ إعادة التشغيل…"],
- "Denetleniyor…": ["Checking…", "جارٍ التحقق…"],
- "Program güncel (sürüm {v}).": ["Up to date (version {v}).", "البرنامج محدّث (الإصدار {v})."],
+  "⚡ Otomatik fiyat — henüz kontrol edilmedi": [
+   "⚡ Automatic price — not checked yet",
+   "⚡ سعر تلقائي — لم تتم مراجعته بعد"
+  ],
+  "İşareti kaldırırsanız ya da fiyatı değiştirirseniz bu fiyat sizin girdiğiniz fiyat sayılır (✎).": [
+   "If you untick this or change the price, it counts as a price you entered (✎).",
+   "إذا أزلت العلامة أو غيّرت السعر، يُعتبر هذا السعر سعرًا أدخلته أنت (✎)."
+  ],
+  "⚡ otomatik — kontrol edilmedi": [
+   "⚡ automatic — not checked",
+   "⚡ تلقائي — لم تتم مراجعته"
+  ],
+  "Yalnızca otomatik girilmiş, henüz kontrol etmediğiniz fiyatları göster\n⚡ = otomatik fiyat · ✎ = sizin girdiğiniz fiyat": [
+   "Show only automatically entered prices you have not checked yet\n⚡ = automatic price · ✎ = price you entered",
+   "عرض الأسعار المُدخلة تلقائيًا التي لم تراجعها بعد فقط\n⚡ = سعر تلقائي · ✎ = سعر أدخلته أنت"
+  ],
+  "⚡ Kontrol edilmemiş fiyatlar ({n})": [
+   "⚡ Unchecked prices ({n})",
+   "⚡ أسعار غير مُراجَعة ({n})"
+  ],
+  "⚡ Otomatik (tahmini) fiyat — henüz kontrol edilmedi.\nDüzenleyip fiyatı değiştirince ya da sağ tık → \"Fiyatı onayla\" deyince sizin fiyatınız olur.": [
+   "⚡ Automatic (estimated) price — not checked yet.\nIt becomes your price when you edit it or right-click → \"Confirm price\".",
+   "⚡ سعر تلقائي (تقديري) — لم تتم مراجعته بعد.\nيصبح سعرك عند تعديله أو بالنقر الأيمن ← \"تأكيد السعر\"."
+  ],
+  "✎ Sizin girdiğiniz fiyat": [
+   "✎ Price you entered",
+   "✎ سعر أدخلته أنت"
+  ],
+  "Kontrol edilmemiş otomatik fiyat kalmadı. ✓": [
+   "No unchecked automatic prices left. ✓",
+   "لم يبقَ أي سعر تلقائي غير مُراجَع. ✓"
+  ],
+  " · ⚡ {n} fiyat otomatik (kontrol edilmedi) · ✎ sizin girdiğiniz": [
+   " · ⚡ {n} prices automatic (not checked) · ✎ entered by you",
+   " · ⚡ {n} سعر تلقائي (غير مُراجَع) · ✎ أدخلته أنت"
+  ],
+  "✎  Fiyatı onayla (benim fiyatım)": [
+   "✎  Confirm price (my price)",
+   "✎  تأكيد السعر (سعري)"
+  ],
+  "⚡  Otomatik fiyat olarak işaretle": [
+   "⚡  Mark as automatic price",
+   "⚡  تعليم كسعر تلقائي"
+  ],
+  "⚡ Otomatik (tahmini) fiyat — henüz kontrol edilmedi": [
+   "⚡ Automatic (estimated) price — not checked yet",
+   "⚡ سعر تلقائي (تقديري) — لم تتم مراجعته بعد"
+  ],
+  "⚡ Otomatik fiyat olarak işaretlendi": [
+   "⚡ Marked as automatic price",
+   "⚡ تم التعليم كسعر تلقائي"
+  ],
+  "✎ Fiyat onaylandı": [
+   "✎ Price confirmed",
+   "✎ تم تأكيد السعر"
+  ],
+  "✎ Onayla": [
+   "✎ Confirm",
+   "✎ تأكيد"
+  ],
+  "İsme göre (A → Z)": [
+   "By name (A → Z)",
+   "حسب الاسم (أ ← ي)"
+  ],
+  "İsme göre (Z → A)": [
+   "By name (Z → A)",
+   "حسب الاسم (ي ← أ)"
+  ],
+  "Türe göre": [
+   "By type",
+   "حسب النوع"
+  ],
+  "Mesleğe göre (A → Z)": [
+   "By trade (A → Z)",
+   "حسب المهنة (أ ← ي)"
+  ],
+  "Mesleğe göre (Z → A)": [
+   "By trade (Z → A)",
+   "حسب المهنة (ي ← أ)"
+  ],
+  "Telefona göre": [
+   "By phone",
+   "حسب الهاتف"
+  ],
+  "Güncelleme sunucusuna ulaşılamadı. İnternet bağlantısını denetleyin.": [
+   "Could not reach the update server. Check your internet connection.",
+   "تعذّر الوصول إلى خادم التحديثات. تحقّق من اتصال الإنترنت."
+  ],
+  "🏪  Satın alındığı yer": [
+   "🏪  Where it was bought",
+   "🏪  مكان الشراء"
+  ],
+  "Satın alındığı yer": [
+   "Bought at",
+   "مكان الشراء"
+  ],
+  "Satın alındığı yer:": [
+   "Bought at:",
+   "مكان الشراء:"
+  ],
+  "Dükkan/Kişi Adı:": [
+   "Shop/Person name:",
+   "اسم المحل / الشخص:"
+  ],
+  "Dükkan/Kişi Yeri:": [
+   "Shop/Person location:",
+   "مكان المحل / الشخص:"
+  ],
+  "Adres": [
+   "Address",
+   "العنوان"
+  ],
+  "Dükkan/Kişi": [
+   "Shop/Person",
+   "المحل/الشخص"
+  ],
+  "Konum": [
+   "Location",
+   "الموقع"
+  ],
+  "Dükkan/Kişiye göre (A → Z)": [
+   "By shop/person (A → Z)",
+   "حسب المحل/الشخص (أ ← ي)"
+  ],
+  "Dükkan/Kişiye göre (Z → A)": [
+   "By shop/person (Z → A)",
+   "حسب المحل/الشخص (ي ← أ)"
+  ],
+  "Konuma göre (A → Z)": [
+   "By location (A → Z)",
+   "حسب الموقع (أ ← ي)"
+  ],
+  "Konuma göre (Z → A)": [
+   "By location (Z → A)",
+   "حسب الموقع (ي ← أ)"
+  ],
+  "🏷  Etiketler": [
+   "🏷  Labels",
+   "🏷  التسميات"
+  ],
+  "🏷  Etiketleri düzenle…": [
+   "🏷  Edit labels…",
+   "🏷  تعديل التسميات…"
+  ],
+  "Programdaki bütün yazıları (düğmeler, başlıklar, alan adları) kendinize göre değiştirebilirsiniz. Değişiklik yalnızca seçili dil için geçerlidir.": [
+   "You can change every text in the program (buttons, headings, field names). Changes apply to the selected language only.",
+   "يمكنك تغيير كل نصوص البرنامج (الأزرار والعناوين وأسماء الحقول). تنطبق التغييرات على اللغة المحددة فقط."
+  ],
+  "{n} etiket değiştirildi": [
+   "{n} labels changed",
+   "تم تغيير {n} تسمية"
+  ],
+  "Etiketleri düzenle": [
+   "Edit labels",
+   "تعديل التسميات"
+  ],
+  "Etiket ara…": [
+   "Search labels…",
+   "ابحث في التسميات…"
+  ],
+  "Yalnızca değiştirilenler": [
+   "Changed only",
+   "المعدلة فقط"
+  ],
+  "Hepsini sıfırla": [
+   "Reset all",
+   "إعادة الكل"
+  ],
+  "Bütün etiketler programın kendi yazısına dönsün mü?": [
+   "Reset all labels to the program defaults?",
+   "إعادة كل التسميات إلى نصوص البرنامج؟"
+  ],
+  "{x} gibi yer tutucuları silmeyin; oraya sayı ya da ad gelir.": [
+   "Keep placeholders like {x}; a number or name goes there.",
+   "لا تحذف العناصر مثل {x}؛ يوضع مكانها رقم أو اسم."
+  ],
+  "Yeni etiket (boş = programın yazısı):": [
+   "New label (empty = program text):",
+   "تسمية جديدة (فارغ = نص البرنامج):"
+  ],
+  "Programdaki yazı": [
+   "Program text",
+   "نص البرنامج"
+  ],
+  "Yeni etiket (boş = değişmesin)": [
+   "New label (empty = unchanged)",
+   "تسمية جديدة (فارغ = بلا تغيير)"
+  ],
+  "İletişim numarası:": [
+   "Contact number:",
+   "رقم التواصل:"
+  ],
+  "Örn. Yıldız Hırdavat": [
+   "e.g. Star Hardware",
+   "مثال: محل النجمة للعدد"
+  ],
+  "Semt, çarşı, sokak ya da adres": [
+   "District, market, street or address",
+   "الحي أو السوق أو الشارع أو العنوان"
+  ],
+  "Satın alınan yere göre (A → Z)": [
+   "By shop (A → Z)",
+   "حسب مكان الشراء (أ ← ي)"
+  ],
+  "Satın alınan yere göre (Z → A)": [
+   "By shop (Z → A)",
+   "حسب مكان الشراء (ي ← أ)"
+  ],
+  "Dükkan: {x}": [
+   "Shop: {x}",
+   "المحل: {x}"
+  ],
+  "Yeri: {x}": [
+   "Location: {x}",
+   "المكان: {x}"
+  ],
+  "Numara: {x}": [
+   "Number: {x}",
+   "الرقم: {x}"
+  ],
+  "Çalışan: {x}": [
+   "Works on: {x}",
+   "يعمل على: {x}"
+  ],
+  "WhatsApp / Telegram işaretlenmemiş": [
+   "WhatsApp / Telegram not marked",
+   "لم يتم تحديد واتساب / تيليجرام"
+  ],
+  "{app} açılıyor…": [
+   "Opening {app}…",
+   "جارٍ فتح {app}…"
+  ],
+  "{app} ile yaz: {p}": [
+   "Message on {app}: {p}",
+   "راسل عبر {app}: {p}"
+  ],
+  "{app} bu numarada çalışıyor. Kapatmak için tıklayın.": [
+   "{app} works on this number. Click to turn off.",
+   "{app} يعمل على هذا الرقم. انقر للإيقاف."
+  ],
+  "{app} bu numarada çalışıyorsa tıklayıp etkinleştirin.": [
+   "If {app} works on this number, click to enable.",
+   "إذا كان {app} يعمل على هذا الرقم فانقر للتفعيل."
+  ],
+  "Bu numara için WhatsApp / Telegram seçilmedi. Çalışanın düğmesine tıklayın.": [
+   "No WhatsApp / Telegram selected for this number. Click the one that works.",
+   "لم يتم اختيار واتساب / تيليجرام لهذا الرقم. انقر على الذي يعمل."
+  ],
+  "Bu numarada çalışan: {x}": [
+   "Works on this number: {x}",
+   "يعمل على هذا الرقم: {x}"
+  ],
+  "(numara yazılmadı)": [
+   "(no number entered)",
+   "(لم يُكتب رقم)"
+  ],
+  "Güncellemeler GitHub'dan denetleniyor…": [
+   "Checking GitHub for updates…",
+   "جارٍ البحث عن تحديثات في GitHub…"
+  ],
+  "Dükkan": [
+   "Shop",
+   "محل"
+  ],
+  "Fiyatları gizle / göster": [
+   "Hide / show prices",
+   "إخفاء / إظهار الأسعار"
+  ],
+  "Ad": [
+   "Name",
+   "الاسم"
+  ],
+  "Tarih": [
+   "Date",
+   "التاريخ"
+  ],
+  "Meslek": [
+   "Trade",
+   "المهنة"
+  ],
+  "Kategoriye göre (A → Z)": [
+   "By category (A → Z)",
+   "حسب الفئة (أ ← ي)"
+  ],
+  "Kategoriye göre (Z → A)": [
+   "By category (Z → A)",
+   "حسب الفئة (ي ← أ)"
+  ],
+  "Yere göre (A → Z)": [
+   "By location (A → Z)",
+   "حسب المكان (أ ← ي)"
+  ],
+  "Yere göre (Z → A)": [
+   "By location (Z → A)",
+   "حسب المكان (ي ← أ)"
+  ],
+  "Fiyat (düşük → yüksek)": [
+   "Price (low → high)",
+   "السعر (من الأقل إلى الأعلى)"
+  ],
+  "Hızlı ara": [
+   "Quick search",
+   "بحث سريع"
+  ],
+  "Eşitle": [
+   "Sync",
+   "مزامنة"
+  ],
+  "Güncelle": [
+   "Update",
+   "تحديث"
+  ],
+  "Güncelle: {n}": [
+   "Update: {n}",
+   "تحديث: {n}"
+  ],
+  "%{p} · {a}/{b} MB": [
+   "{p}% · {a}/{b} MB",
+   "%{p} · {a}/{b} MB"
+  ],
+  "Yeniden başlatılıyor…": [
+   "Restarting…",
+   "جارٍ إعادة التشغيل…"
+  ],
+  "Denetleniyor…": [
+   "Checking…",
+   "جارٍ التحقق…"
+  ],
+  "Program güncel (sürüm {v}).": [
+   "Up to date (version {v}).",
+   "البرنامج محدّث (الإصدار {v})."
+  ],
   "Organizer": [
    "Organizer",
    "Organizer"
@@ -903,10 +1152,6 @@ const I18N = Object.assign({
    "Cloud account connected",
    "تم ربط الحساب السحابي"
   ],
-  "Dükkan": [
-   "Shop",
-   "محل"
-  ],
   "Usta": [
    "Craftsman",
    "حرفي"
@@ -1155,19 +1400,58 @@ const I18N = Object.assign({
    "⬆  Update: {n}",
    "⬆  تحديث: {n}"
   ],
-  "{x} MB/sn": ["{x} MB/s", "{x} م.ب/ث"],
-  "{x} KB/sn": ["{x} KB/s", "{x} ك.ب/ث"],
-  "hesaplanıyor…": ["calculating…", "جارٍ الحساب…"],
-  "yaklaşık {s} sn": ["about {s} s", "حوالي {s} ث"],
-  "yaklaşık {m} dk {s} sn": ["about {m} min {s} s", "حوالي {m} د {s} ث"],
-  "İnen": ["Downloaded", "تم تنزيله"],
-  "Kalan": ["Remaining", "المتبقي"],
-  "Hız": ["Speed", "السرعة"],
-  "Kalan süre": ["Time left", "الوقت المتبقي"],
-  "{a} / {b} MB": ["{a} / {b} MB", "{a} / {b} م.ب"],
-  "{a} MB": ["{a} MB", "{a} م.ب"],
-  "Güncelleme indiriliyor: {n}": ["Downloading update: {n}", "جارٍ تنزيل التحديث: {n}"],
-  "⬇  İndiriliyor %{p}": ["⬇  Downloading {p}%", "⬇  جارٍ التنزيل {p}%"],
+  "{x} MB/sn": [
+   "{x} MB/s",
+   "{x} م.ب/ث"
+  ],
+  "{x} KB/sn": [
+   "{x} KB/s",
+   "{x} ك.ب/ث"
+  ],
+  "hesaplanıyor…": [
+   "calculating…",
+   "جارٍ الحساب…"
+  ],
+  "yaklaşık {s} sn": [
+   "about {s} s",
+   "حوالي {s} ث"
+  ],
+  "yaklaşık {m} dk {s} sn": [
+   "about {m} min {s} s",
+   "حوالي {m} د {s} ث"
+  ],
+  "İnen": [
+   "Downloaded",
+   "تم تنزيله"
+  ],
+  "Kalan": [
+   "Remaining",
+   "المتبقي"
+  ],
+  "Hız": [
+   "Speed",
+   "السرعة"
+  ],
+  "Kalan süre": [
+   "Time left",
+   "الوقت المتبقي"
+  ],
+  "{a} / {b} MB": [
+   "{a} / {b} MB",
+   "{a} / {b} م.ب"
+  ],
+  "{a} MB": [
+   "{a} MB",
+   "{a} م.ب"
+  ],
+  "Güncelleme indiriliyor: {n}": [
+   "Downloading update: {n}",
+   "جارٍ تنزيل التحديث: {n}"
+  ],
+  "⬇  İndiriliyor %{p}": [
+   "⬇  Downloading {p}%",
+   "⬇  جارٍ التنزيل {p}%"
+  ],
   "Güncelleme indiriliyor… {p}": [
    "Downloading update… {p}",
    "جارٍ تنزيل التحديث… {p}"
@@ -1223,6 +1507,86 @@ const I18N = Object.assign({
   "Suriye Lirası": [
    "Syrian Pound",
    "ليرة سورية"
+  ],
+  "✉ Admin ile iletişime geç": [
+   "✉ Contact the admin",
+   "✉ التواصل مع المسؤول"
+  ],
+  "Programı geliştirmemiz için öneri, istek ve hata bildirimlerinizi yazın; mesajınız doğrudan yöneticiye ulaşır.": [
+   "Send suggestions, requests and bug reports to help us improve the program; your message goes straight to the administrator.",
+   "أرسل اقتراحاتك وطلباتك وبلاغات الأخطاء لمساعدتنا على تطوير البرنامج؛ تصل رسالتك مباشرة إلى المسؤول."
+  ],
+  "Adınız (isteğe bağlı)": [
+   "Your name (optional)",
+   "اسمك (اختياري)"
+  ],
+  "E-posta (yanıt için, isteğe bağlı)": [
+   "Email (for a reply, optional)",
+   "البريد الإلكتروني (للرد، اختياري)"
+  ],
+  "Mesajınız": [
+   "Your message",
+   "رسالتك"
+  ],
+  "✉  Gönder": [
+   "✉  Send",
+   "✉  إرسال"
+  ],
+  "Lütfen mesajınızı yazın.": [
+   "Please write your message.",
+   "يرجى كتابة رسالتك."
+  ],
+  "E-posta adresi geçerli değil.": [
+   "The email address is not valid.",
+   "عنوان البريد الإلكتروني غير صالح."
+  ],
+  "Mesajınız yöneticiye iletildi. Teşekkürler!": [
+   "Your message has been delivered to the administrator. Thank you!",
+   "تم إيصال رسالتك إلى المسؤول. شكرًا لك!"
+  ],
+  "Mesaj gönderilemedi. İnternet bağlantınızı kontrol edip tekrar deneyin.": [
+   "The message could not be sent. Check your internet connection and try again.",
+   "تعذّر إرسال الرسالة. تحقّق من اتصالك بالإنترنت وحاول مجددًا."
+  ],
+  "Hızlı ara / barkod okuyucu (Ctrl+F)": [
+   "Quick search / barcode reader (Ctrl+F)",
+   "بحث سريع / قارئ الباركود (Ctrl+F)"
+  ],
+  "Simge durumuna küçült": [
+   "Minimize",
+   "تصغير"
+  ],
+  "Yarım ekran": [
+   "Half screen",
+   "نصف الشاشة"
+  ],
+  "Tam ekran": [
+   "Full screen",
+   "ملء الشاشة"
+  ],
+  "Yeni sürüm hazır. Kurmak için tıklayın.": [
+   "A new version is ready. Click to install.",
+   "إصدار جديد جاهز. انقر للتثبيت."
+  ],
+  "%{p} · {a} / {b} MB · {s}": [
+   "{p}% · {a} / {b} MB · {s}",
+   "%{p} · {a} / {b} MB · {s}"
+  ],
+  "Kalan: {k} MB · {e}": [
+   "Remaining: {k} MB · {e}",
+   "المتبقي: {k} MB · {e}"
+  ],
+  "Yeni sürüm var mı diye bak (sürüm {v}).": [
+   "Check for a new version (version {v}).",
+   "التحقق من وجود إصدار جديد (الإصدار {v})."
+  ],
+  "Sıralamak için tıklayın, yeniden tıklayınca ters sıralanır · Genişlik: ayırıcıyı sürükleyin, çift tıklayınca otomatik · Yer değiştirmek için başlığı sürükleyin · Sağ tık: varsayılan düzen": [
+   "Click to sort, click again to reverse · Width: drag the divider, double-click to auto-fit · Drag a header to move the column · Right-click: default layout",
+   "انقر للترتيب، وانقر مرة أخرى لعكسه · العرض: اسحب الفاصل، وانقر نقرًا مزدوجًا للضبط التلقائي · اسحب العنوان لنقل العمود · نقرة يمنى: الترتيب الافتراضي"
+  ],
+  "Varsayılan sütun düzeni": [
+   "Default column layout",
+   "ترتيب الأعمدة الافتراضي"
   ]
  },
  "defaults": {

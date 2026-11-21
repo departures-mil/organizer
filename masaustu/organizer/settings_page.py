@@ -4,7 +4,7 @@ from pathlib import Path
 from PySide6.QtCore import Qt, QUrl, Signal
 from PySide6.QtGui import QDesktopServices
 from PySide6.QtWidgets import (QAbstractItemView, QComboBox, QFileDialog, QFormLayout, QGridLayout,
-                               QHBoxLayout, QInputDialog, QLabel, QLineEdit, QProgressBar, QPushButton, QScrollArea,
+                               QHBoxLayout, QInputDialog, QLabel, QLineEdit, QPlainTextEdit, QProgressBar, QPushButton, QScrollArea,
                                QTreeWidget, QTreeWidgetItem, QVBoxLayout, QWidget)
 
 from .common import Card, NewNodeDialog, confirm, info
@@ -308,6 +308,30 @@ class SettingsPage(QWidget):
         backup_btn.clicked.connect(self._backup)
         gl.addWidget(open_btn)
         gl.addWidget(backup_btn)
+
+        # --- admin ile iletişim (ayarların sonu)
+        gl.addSpacing(14)
+        ct = QLabel(t("✉ Admin ile iletişime geç"))
+        ct.setObjectName("SectionTitle")
+        gl.addWidget(ct)
+        cd = QLabel(t("Programı geliştirmemiz için öneri, istek ve hata bildirimlerinizi yazın; mesajınız doğrudan yöneticiye ulaşır."))
+        cd.setObjectName("Muted")
+        cd.setWordWrap(True)
+        gl.addWidget(cd)
+        self.c_name = QLineEdit()
+        self.c_name.setPlaceholderText(t("Adınız (isteğe bağlı)"))
+        self.c_name.setMaxLength(80)
+        self.c_mail = QLineEdit()
+        self.c_mail.setPlaceholderText(t("E-posta (yanıt için, isteğe bağlı)"))
+        self.c_mail.setMaxLength(120)
+        self.c_mail.setLayoutDirection(Qt.LeftToRight)
+        self.c_msg = QPlainTextEdit()
+        self.c_msg.setPlaceholderText(t("Mesajınız"))
+        self.c_msg.setMinimumHeight(110)
+        self.c_send = QPushButton(t("✉  Gönder"))
+        self.c_send.clicked.connect(self._send_contact)
+        for w in (self.c_name, self.c_mail, self.c_msg, self.c_send):
+            gl.addWidget(w)
         gl.addStretch()
         about = QLabel(t("Organizer {v}\nF11: tam ekran aç / kapat · Ctrl+F: ara · Ctrl+N: yeni kayıt · Ctrl+P: döküm", v=goster()))
         about.setObjectName("Muted")
@@ -406,6 +430,46 @@ class SettingsPage(QWidget):
         digits = "".join(ch for ch in self.cc.text() if ch.isdigit()) or "90"
         self.cc.setText(digits)
         self.db.set_setting("country_code", digits)
+
+    def _send_contact(self):
+        """Mesaj FormSubmit üzerinden yöneticinin e-postasına gider; adres programda görünmez."""
+        import base64, json, re, urllib.request
+        from PySide6.QtWidgets import QApplication
+        msg = self.c_msg.toPlainText().strip()[:5000]
+        mail = self.c_mail.text().strip()
+        if not msg:
+            info(self, t("✉ Admin ile iletişime geç"), t("Lütfen mesajınızı yazın."))
+            return
+        if mail and not re.match(r"^[^@\s]+@[^@\s]+\.[^@\s]+$", mail):
+            info(self, t("✉ Admin ile iletişime geç"), t("E-posta adresi geçerli değil."))
+            return
+        to = base64.b64decode("bW9jLmxpYW1ub3RvcnBANDMyMWxkaW50bWxkYmE=").decode()[::-1]
+        body = {"_subject": "Organizer: yeni mesaj", "_template": "table", "_captcha": "false",
+                "Ad": self.c_name.text().strip() or "-", "Mesaj": msg, "Surum": goster(), "Cihaz": "Windows",
+                "Dil": i18n.LANG}
+        if mail:
+            body["email"] = mail
+            body["_replyto"] = mail
+        self.c_send.setEnabled(False)
+        QApplication.setOverrideCursor(Qt.WaitCursor)
+        ok = False
+        try:
+            req = urllib.request.Request("https://formsubmit.co/ajax/" + to, data=json.dumps(body).encode("utf-8"),
+                                         headers={"Content-Type": "application/json", "Accept": "application/json",
+                                                  "User-Agent": "Mozilla/5.0 Organizer/" + __version__}, method="POST")
+            with urllib.request.urlopen(req, timeout=20) as r:
+                j = json.loads(r.read().decode("utf-8") or "{}")
+            ok = str(j.get("success")).lower() != "false" or "activat" in str(j.get("message", "")).lower()
+        except Exception:
+            ok = False
+        finally:
+            QApplication.restoreOverrideCursor()
+            self.c_send.setEnabled(True)
+        if ok:
+            self.c_msg.clear()
+            info(self, t("✉ Admin ile iletişime geç"), t("Mesajınız yöneticiye iletildi. Teşekkürler!"))
+        else:
+            info(self, t("✉ Admin ile iletişime geç"), t("Mesaj gönderilemedi. İnternet bağlantınızı kontrol edip tekrar deneyin."))
 
     def _backup(self):
         default = Path.home() / f"Organizer-yedek-{datetime.now():%Y-%m-%d}.zip"

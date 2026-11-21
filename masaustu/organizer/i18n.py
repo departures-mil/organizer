@@ -56,6 +56,16 @@ def t(text, **kw):
 
 # Türkçe: (English, العربية)
 STRINGS = {
+    "✉ Admin ile iletişime geç": ("✉ Contact the admin", "✉ التواصل مع المسؤول"),
+    "Programı geliştirmemiz için öneri, istek ve hata bildirimlerinizi yazın; mesajınız doğrudan yöneticiye ulaşır.": ("Send suggestions, requests and bug reports to help us improve the program; your message goes straight to the administrator.", "أرسل اقتراحاتك وطلباتك وبلاغات الأخطاء لمساعدتنا على تطوير البرنامج؛ تصل رسالتك مباشرة إلى المسؤول."),
+    "Adınız (isteğe bağlı)": ("Your name (optional)", "اسمك (اختياري)"),
+    "E-posta (yanıt için, isteğe bağlı)": ("Email (for a reply, optional)", "البريد الإلكتروني (للرد، اختياري)"),
+    "Mesajınız": ("Your message", "رسالتك"),
+    "✉  Gönder": ("✉  Send", "✉  إرسال"),
+    "Lütfen mesajınızı yazın.": ("Please write your message.", "يرجى كتابة رسالتك."),
+    "E-posta adresi geçerli değil.": ("The email address is not valid.", "عنوان البريد الإلكتروني غير صالح."),
+    "Mesajınız yöneticiye iletildi. Teşekkürler!": ("Your message has been delivered to the administrator. Thank you!", "تم إيصال رسالتك إلى المسؤول. شكرًا لك!"),
+    "Mesaj gönderilemedi. İnternet bağlantınızı kontrol edip tekrar deneyin.": ("The message could not be sent. Check your internet connection and try again.", "تعذّر إرسال الرسالة. تحقّق من اتصالك بالإنترنت وحاول مجددًا."),
     "⚡ Otomatik fiyat — henüz kontrol edilmedi": ("⚡ Automatic price — not checked yet", "⚡ سعر تلقائي — لم تتم مراجعته بعد"),
     "İşareti kaldırırsanız ya da fiyatı değiştirirseniz bu fiyat sizin girdiğiniz fiyat sayılır (✎).": ("If you untick this or change the price, it counts as a price you entered (✎).", "إذا أزلت العلامة أو غيّرت السعر، يُعتبر هذا السعر سعرًا أدخلته أنت (✎)."),
     "⚡ otomatik — kontrol edilmedi": ("⚡ automatic — not checked", "⚡ تلقائي — لم تتم مراجعته"),
