@@ -1,10 +1,10 @@
 {
- "surum": "2.1.0.9",
- "notlar": "Admin ile iletişime geç düzeltildi: mesajlar artık doğrudan gönderiliyor; bağlantı yoksa kaybolmaz, kaydedilir ve program kendiliğinden yeniden gönderir.",
- "boyut": 199030,
- "sha256": "3e14d5953d083fe3b653f2da06634d4bf91236281ac74ea5835d9c157974a542",
- "imza": "GrzaTOG/9ffstWUmhviQtvnoafdKpKkLjexRcArLXDt6VkPwZftetI1wPt+PFd7rnjMtysv2hs3YYSi4J9mjVhkWS5i85uufgkUOMHkEzQBDd5XPE/9RzYUnKUGB9gz8F7jDGtaL5QMJTdJBH4bJdci/G9CQX7ryiHNwjBPYMILH2TombZSsm4nEF3p0SUAk6BAKN26+YKtun9blcYOw4XHS9W7VmCQ15jwpTqgjvyO6jmKAIJIfnmcl3oYlM0keTCv7YtvkW+zD5iAF7yf9QBVIy85oZINxxYT66iKVUxyyBI8bIBFYvcaX4a1en7DEHwMwKXKvHYx3ERIvDp65CVe3RCWmrFJ2SJrLe1XpEIY9nanHAXE1uDMMowKiPyKSlopM8tlaGPx3iJP8/SFSwvd0r9Gr79T89Etvi8qFC4rRaG1yDOdH/eRVQNajwOuEHayj58yWLIBOETNQpBXWrOnJnbxFBaCKPYni2mzMqKzAwZTHNoCDnprCuskQ1p1Z",
- "yayin": "2026-11-22 03:30 UTC",
+ "surum": "2.1.0.10",
+ "notlar": "v.1.0.10: ⚙ Ayarlar > Kullanım Limitleri eklendi (bulut kullanımını gösterir). Artık herkes kendi ücretsiz Firebase hesabını bağlar; senin hesabın aynen devam eder.",
+ "boyut": 206805,
+ "sha256": "fde902a1605fbc9bce40143c90e32265d50be0273439c3dd1e8655f05c6a8e77",
+ "imza": "n51OAalrczcPLeJaz3RrDk5JnmeTNtOFOXvufJJ84kq50OnqmI47z/VImGrMYSvXwpRBGpOKaCHDTU3YwpteTVL+t1uTx963Qoi72dCsB7Cn0L9JaWwbqeuhlrUSLgQaQj26FiprTXVH0O3f5SCX9MG7rskBOqxKzZZVDxsg02wAjBswQyT3TD7Wl6I6TbFtwSS5B1PAOG8lDkkcotrtvUORPsayeWe1eg1mEQ+N2CwbmhQEGQi6E2vJ0S7rAzyZM2Ygf0arY6fI4ktmsNRLk2Ck79mKUhBX4EW2RUpbpgsqlyeytiMsoRDNCBy+rijSmN7mrKdJFBobRUuAcbIP2+Yg3obK90W4CMuAN0cpbY7J3nsA+GS3aC1II/MHA7nlFMvcDN2FKddCJU8xE/N5m2Q0m2saZ8aqwSHlqLeIaI0LVpq1fPMz54ui64sLX0Cpo6v/XcaPP2cqw4ZPkRazkd47DzpwZcPLzrDJVDLwq6OvLD9FenwUrQKjcxty0/8T",
+ "yayin": "2026-11-22 09:14 UTC",
  "sistem": 1,
- "dosya": "organizer-masaustu-2.1.0.9.zip"
+ "dosya": "organizer-masaustu-2.1.0.10.zip"
 }
