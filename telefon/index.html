@@ -30,10 +30,12 @@
 <input type="file" id="galInput" accept="image/*" multiple hidden>
 <script src="i18n.js"></script>
 <script src="store.js"></script>
+<script src="kullanim.js"></script>
 <script src="sync.js"></script>
 <script src="icons.js"></script>
 <script src="updater.js"></script>
 <script src="app.js"></script>
 <script src="ekler.js"></script>
+<script>Kullanim.baslat({uygulama:"organizer",bulut:true,ai:false,linkAc:function(u){openUrl(u)},dil:function(){return I18N.lang},proje:function(){try{return Cloud.isConnected()?(Cloud.config()||{}).projectId:""}catch(e){return ""}}});</script>
 </body>
 </html>

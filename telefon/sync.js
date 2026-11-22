@@ -8,8 +8,11 @@ class SyncError extends Error {
   constructor(code, detail) { super(`${code}: ${detail || ""}`); this.code = code; this.detail = detail || ""; }
 }
 
-/* Programla gelen Firebase projesi: hesap kurarken ayar yapıştırmak gerekmez, e-posta ve şifre yeter. */
-const DEFAULT_FB_CONFIG = `const firebaseConfig = {
+/* v.1.0.10: Programla gelen ortak Firebase projesi KALDIRILDI — herkes kendi ücretsiz Firebase hesabını kullanır
+ * (yöneticinin günlük sınırı başkalarınca harcanmasın). Eski ortak projeye bağlı yönetici hesabı aynen devam eder. */
+const DEFAULT_FB_CONFIG = "";
+const FB_REHBER = "https://github.com/departures-mil/duyurular/blob/main/firebase-kurulum.md";
+const ESKI_ORTAK_FB = `const firebaseConfig = {
   apiKey: "AIzaSyDWK8jDUdNW0k3vwHDbNBgud6gTEIdqhcg",
   authDomain: "duzenli-evim.firebaseapp.com",
   projectId: "duzenli-evim",
@@ -17,6 +20,7 @@ const DEFAULT_FB_CONFIG = `const firebaseConfig = {
   messagingSenderId: "1059030151497",
   appId: "1:1059030151497:web:0e320562bdc00ff4a7aa98"
 };`;
+const YONETICI_EPOSTA = "yonetici@example.invalid";
 
 function parseConfig(text) {
   text = text || "";
@@ -328,13 +332,24 @@ const Cloud = {
   listeners: [],
   timer: null,
 
-  config() { try { const raw = Store.get("fb_config") || DEFAULT_FB_CONFIG; return raw ? parseConfig(raw) : null; } catch (e) { return null; } },
+  config() {
+    try {
+      let raw = Store.get("fb_config") || DEFAULT_FB_CONFIG;
+      if (!raw && Store.get("fb_refresh")) {        // eski ortak projeden geçiş (bir kez)
+        if (String(Store.get("fb_email", "") || "").trim().toLowerCase() === YONETICI_EPOSTA) { raw = ESKI_ORTAK_FB; Store.set("fb_config", raw); }
+        else { Store.set("fb_refresh", null); Store.set("fb_ortak_kesildi", "1"); }
+      }
+      return raw ? parseConfig(raw) : null;
+    } catch (e) { return null; }
+  },
   isConnected() { return !!(this.config() && Store.get("fb_refresh")); },
   email() { return Store.get("fb_email", ""); },
   emit() { for (const f of this.listeners) f(this.statusText()); },
 
   statusText() {
-    if (!this.isConnected()) return t("Bulut hesabı bağlı değil");
+    if (!this.isConnected()) return Store.get("fb_ortak_kesildi") === "1"
+      ? t("Artık herkes kendi ücretsiz Firebase hesabını kullanıyor. Bulut hesabı bölümünden kendi hesabınızı bağlayın.")
+      : t("Bulut hesabı bağlı değil");
     if (this.busy) return t("Eşitleniyor…");
     if (this.lastError) return "⚠ " + this.lastError;
     const last = Store.get("sync_last");

@@ -9,8 +9,12 @@ from .db import Database
 from .i18n import t
 from .sync import FirebaseClient, SyncError, parse_config, sync
 
-# Programla gelen Firebase projesi: hesap kurarken ayar yapıştırmak gerekmez, e-posta ve şifre yeter.
-DEFAULT_FB_CONFIG = """const firebaseConfig = {
+# v.1.0.10: Programla gelen ortak Firebase projesi KALDIRILDI — herkes kendi ücretsiz Firebase hesabını kullanır
+# (yöneticinin günlük sınırı başkalarınca harcanmasın). Kurulum rehberi: REHBER.
+DEFAULT_FB_CONFIG = ""
+REHBER = "https://github.com/departures-mil/duyurular/blob/main/firebase-kurulum.md"
+# Eski ortak projeye bağlı tek hesap (yönetici) ayarı kendi ayarı olarak saklanır; diğer cihazların bağlantısı kesilir.
+_ESKI_ORTAK = """const firebaseConfig = {
   apiKey: "AIzaSyDWK8jDUdNW0k3vwHDbNBgud6gTEIdqhcg",
   authDomain: "duzenli-evim.firebaseapp.com",
   projectId: "duzenli-evim",
@@ -18,6 +22,19 @@ DEFAULT_FB_CONFIG = """const firebaseConfig = {
   messagingSenderId: "1059030151497",
   appId: "1:1059030151497:web:0e320562bdc00ff4a7aa98"
 };"""
+_YONETICI = "yonetici@example.invalid"
+
+
+def ortak_projeden_tasi(db):
+    """fb_config boşken eski ortak projeye bağlı kurulumları ayarlar: yönetici aynen devam eder, diğerleri kendi hesabını kurar."""
+    if db.get_setting("fb_config") or not db.get_setting("fb_refresh"):
+        return
+    if (db.get_setting("fb_email", "") or "").strip().lower() == _YONETICI:
+        db.set_setting("fb_config", _ESKI_ORTAK)
+    else:
+        db.set_setting("fb_refresh", "")
+        db.set_setting("fb_ortak_kesildi", "1")
+
 
 AUTO_INTERVAL_MS = 3 * 60 * 1000
 
@@ -75,6 +92,10 @@ class SyncManager(QObject):
     def __init__(self, db, parent=None):
         super().__init__(parent)
         self.db = db
+        try:
+            ortak_projeden_tasi(db)
+        except Exception:
+            pass
         self.worker = None
         self.last_error = ""
         self.timer = QTimer(self, interval=AUTO_INTERVAL_MS)
@@ -100,6 +121,8 @@ class SyncManager(QObject):
 
     def status_text(self):
         if not self.is_connected():
+            if self.db.get_setting("fb_ortak_kesildi") == "1":
+                return t("Artık herkes kendi ücretsiz Firebase hesabını kullanıyor. Bulut hesabı bölümünden kendi hesabınızı bağlayın.")
             return t("Bulut hesabı bağlı değil")
         if self.busy():
             return t("Eşitleniyor…")
@@ -176,6 +199,11 @@ class AccountDialog(QDialog):
         hint.setObjectName("Muted")
         hint.setWordWrap(True)
         lay.addWidget(hint)
+        hint2 = QLabel(t("Eşitleme kendi ücretsiz Firebase hesabınızla yapılır; kayıtlarınız ve günlük sınırınız yalnızca size aittir.")
+                       + f' <a href="{REHBER}">' + t("Kendi Firebase hesabınızı kurun (rehber)") + "</a>")
+        hint2.setWordWrap(True)
+        hint2.setOpenExternalLinks(True)
+        lay.addWidget(hint2)
         form = QFormLayout()
         form.setVerticalSpacing(10)
         self.config = QPlainTextEdit(self.m.db.get_setting("fb_config", "") or DEFAULT_FB_CONFIG)

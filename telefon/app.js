@@ -2,7 +2,7 @@
  * tarih, not), sınıflandırma ağaçları, arama, sıralama, toplu taşıma/silme, ustalar ve dükkanlar, ayarlar, yedek, bulut. */
 "use strict";
 
-const APP_VERSION = "2.1.0.9";   // iç numara; baştaki "2." sürüm dizisi. Ekranda v.1.0.9 görünür (goster()).
+const APP_VERSION = "2.1.0.10";   // iç numara; baştaki "2." sürüm dizisi. Ekranda v.1.0.9 görünür (goster()).
 function goster(v) {
   const p = String(v === undefined ? APP_VERSION : (v || "")).trim().split(".").filter(x => x !== "");
   if (!p.length) return "";
@@ -1114,6 +1114,8 @@ function accountForm() {
   };
   fullPage({ title: t("Bulut hesabı (Firebase)"), build: close => el("div", null, [
     el("div.hint", { text: t("Telefon ve bilgisayarda aynı Firebase ayarlarını ve aynı e-posta/şifreyi kullanın. Böylece iki cihaz aynı arşivi görür.") }),
+    el("div.hint", { text: t("Eşitleme kendi ücretsiz Firebase hesabınızla yapılır; kayıtlarınız ve günlük sınırınız yalnızca size aittir.") }),
+    el("button.btn.block", { text: t("Kendi Firebase hesabınızı kurun (rehber)"), onclick: () => openUrl(FB_REHBER) }),
     el("label.f", { text: t("Firebase ayarları:") }), config,
     el("div.hint", { text: t("Firebase konsolunda Proje ayarları › Uygulamalarınız › firebaseConfig bölümünü kopyalayıp buraya yapıştırın.") }),
     el("label.f", { text: t("E-posta:") }), email,
@@ -1222,6 +1224,7 @@ const SettingsPage = {
       el("button.btn.block", { text: t("💾  Yedek al (.json) ve paylaş"), onclick: backup }),
       el("button.btn.block", { text: t("🗑 Çöp kutusu ({n})", { n: Store.trashItemsList().length }), onclick: trashPage }),
     ]));
+    if (window.Kullanim) { const kk = Kullanim.kart(); kk.classList.add("card", "section"); root.append(kk); }
     root.append(el("div.card.section", null, [
       el("h3", { text: t("✉  Admin ile iletişime geç") }),
       el("div.hint", { text: t("Öneri, istek ya da hata bildirimlerinizi geliştiriciye gönderin; program sizin önerilerinizle gelişir.") }),
