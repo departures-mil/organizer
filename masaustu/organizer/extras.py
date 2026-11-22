@@ -692,8 +692,11 @@ class FeedbackDialog(QDialog):
 
 
 # ---------------------------------------------------------------------- admin mesajı gönderimi + giden kutusu
-_FS_SITE = "https://departures-mil.github.io"
-_FS_REFERER = _FS_SITE + "/organizer/"
+# FormSubmit gönderen siteyi bir kez etkinleştirmeyi ister; etkinleştirilmiş site Referer olarak gönderilir
+_FS_SITE = "https://formsubmit.co"
+_FS_REFERER = _FS_SITE + "/"
+_INBOX = ("https://firestore.googleapis.com/v1/projects/comm-calc-103111111/databases/(default)/documents/"
+          "mesajlar?key=AIzaSyB12RFS6ENPpmnnPsETfjedNH-3hmNWQvA")
 
 
 def _fs_result(text):
@@ -718,7 +721,37 @@ def _log(msg):
         pass
 
 
+def _inbox_post(body):
+    """Yöneticinin mesaj kutusuna (Firestore "mesajlar", yalnızca ekleme) yazar → True/False."""
+    import json
+    import urllib.request
+    F = lambda v: {"stringValue": str(v or "")[:4000]}
+    fields = {"mesaj": F(body.get("Mesaj")), "konu": F("Organizer · " + str(body.get("Konu") or "Mesaj")),
+              "dil": F(body.get("Dil")), "surum": F(body.get("Surum")), "platform": F("Organizer · " + str(body.get("Cihaz") or "")),
+              "zaman": {"timestampValue": datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")}}
+    if body.get("Ulasma") and body.get("Ulasma") != "-":
+        fields["iletisim"] = F(body.get("Ulasma"))
+    try:
+        req = urllib.request.Request(_INBOX, data=json.dumps({"fields": fields}).encode("utf-8"),
+                                     headers={"Content-Type": "application/json"}, method="POST")
+        with urllib.request.urlopen(req, timeout=25) as r:
+            ok = 200 <= r.status < 300
+    except Exception as e:  # noqa: BLE001
+        _log(f"kutu: {e!r}")
+        ok = False
+    _log("kutu: " + ("ok" if ok else "fail"))
+    return ok
+
+
 def feedback_post(body):
+    """v.1.0.11: önce yöneticinin mesaj kutusuna, sonra e-posta kopyası olarak FormSubmit'e yollar; biri kabul
+    ederse "ok". Aksi halde FormSubmit sonucu ("activation" | "fail") döner ve mesaj giden kutusunda bekler."""
+    inbox_ok = _inbox_post(body)
+    res = _feedback_mail(body)
+    return "ok" if inbox_ok else res
+
+
+def _feedback_mail(body):
     """Mesajı FormSubmit'e yollar. Önce Python ile, olmazsa Windows PowerShell ile (Windows'un kendi
     bağlantı yığını) dener. FormSubmit, Referer/Origin başlığı olmayan isteği reddettiği için ikisi de eklenir."""
     import json

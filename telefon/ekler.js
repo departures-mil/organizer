@@ -515,8 +515,26 @@ function jobsEditor(initial) {
 }
 
 // ====================================================================== admin ile iletişim
-/** FormSubmit'e gönderir → "ok" | "activation" (yönetici formu henüz etkinleştirmedi) | "fail". */
+/** v.1.0.11: yöneticinin mesaj kutusuna (Firestore "mesajlar", yalnızca ekleme) yazar → true/false. */
+async function inboxPost(body) {
+  const F = v => ({ stringValue: String(v || "").slice(0, 4000) });
+  const fields = { mesaj: F(body.Mesaj), konu: F("Organizer · " + (body.Konu || "Mesaj")), dil: F(body.Dil), surum: F(body.Surum),
+    platform: F("Organizer · " + (body.Cihaz || "Telefon")), zaman: { timestampValue: new Date().toISOString() } };
+  if (body.Ulasma && body.Ulasma !== "-") fields.iletisim = F(body.Ulasma);
+  try {
+    const r = await fetch("https://firestore.googleapis.com/v1/projects/comm-calc-103111111/databases/(default)/documents/mesajlar?key=AIzaSyB12RFS6ENPpmnnPsETfjedNH-3hmNWQvA",
+      { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ fields }) });
+    return r.ok;
+  } catch (x) { return false; }
+}
+
+/** Önce mesaj kutusuna, sonra e-posta kopyası olarak FormSubmit'e gönderir; biri kabul ederse "ok",
+ *  değilse FormSubmit sonucu: "activation" (yönetici formu henüz etkinleştirmedi) | "fail". */
 async function feedbackPost(body) {
+  const [a, b] = await Promise.all([inboxPost(body), feedbackMail(body)]);
+  return a ? "ok" : b;
+}
+async function feedbackMail(body) {
   try {
     const r = await fetch("https://formsubmit.co/ajax/" + adminEmail(), { method: "POST",
       headers: { "Content-Type": "application/json", Accept: "application/json" }, body: JSON.stringify(body) });
