@@ -1,10 +1,10 @@
 {
- "surum": "2.1.0.10",
- "notlar": "v.1.0.10: ⚙ Ayarlar > Kullanım Limitleri eklendi (bulut kullanımını gösterir). Artık herkes kendi ücretsiz Firebase hesabını bağlar; senin hesabın aynen devam eder.",
- "boyut": 156489,
- "sha256": "7ba099bd5625d33d183c91d196e9fdabaa19dc507647846429c5020c227efae4",
- "imza": "ARPSsGB0QxAma3HiAhHyp3XZSV6oEiXiGAA+QXlz47T9w56USpBTDYrxs/I4uEy2CPSvwndxw8GAk87GlDgrccpTOxUvYiPpcIcJRtB6YR8q2gZDRTdnBC2uTguKexUJvdwIDwj7IVwH/+h4sIskdN/fVBcYzEoRDxgdRL/aY6exsttiWN/GlPHedmHgCWjXTHYpZ6/b29n3oGC4nsyEMISEpxSS/+6ulJ12B5BPsj61bPYk1BX94CESbUUYOBlmqpw5NPFRNE6JltkCLWSOiXW6qYY14FRyiqglXKcLn1zYoYOw2whhJqi9l9OFdq9vm/MM+1IxLyteKLIPARhcokwu6ViWgh1xpIlgUwswbuFMC7BcrJLEvSwvZ5OyH4hHsaT8qUYjl7DJSiNSi0qXe9odJff0p/rKg5UUkvLq/n4kHVcNz5UN+vAK2HZoQ70QXc8xdYbBnsoJLzrbXfqwVgnPLxxQOyXYcCqFf9tjLG3tTTgNMTSYRBqtjso4EOUX",
- "yayin": "2026-11-22 09:14 UTC",
- "kabuk": 3,
- "dosya": "organizer-telefon-2.1.0.10.zip"
+ "surum": "2.1.0.11",
+ "notlar": "v.1.0.11: «Admin ile iletişime geç» düzeltildi — mesajlarınız artık yöneticiye güvenilir biçimde ulaşıyor. Kayıtlarınız olduğu gibi kalır.",
+ "boyut": 156917,
+ "sha256": "1fef2ea8beea342b55fc27af567d885b236e2caf56d1dc04da2f3dd1d3b44c74",
+ "imza": "EPJs//CkkMv6Fb9Yg+0BUXtcmlqtDl6/KStdEf6afYFgBAXdZv3t5jXDCeBTUisuNFEVGS42ZIpp72tJpW74blGnDI9hQnoCV26RKER10/A8j5DTYmtLDk2MKvdaFKj1IwvNHT6dcqg78+AbDvDbxrLkmJUwikWQoyNjMnZxyGkZBwNLtLRsICMNpA5h2hBH0O31+DsWcypjhlGjpX+UXt1nQRSChDucjJIpCePpEdvpUjl9r71zoM87p/uW0waP0b0NZeeQ7kjgznZE8W90mYShtx6fnPUxOTUhHhHdWnTYtNAx+2r12E1cAUI9WhZm2cdN+LQl0c2hFEey6SzG9hjzb3YGQqtAPaibmnEiNImR0dbpaq2mzsjTbnO0jroarOXTb4fo99hZ0Civibq6vGFoS8NNp80KCo9HE4SZwc2oC89oFn/9oQmzT+4qhObAF1Q4skJjKfU0srKI3iiodRwtHJpnojOERSTVlZfkLUuAGduggtfk8mf1A5dHFjty",
+ "yayin": "2026-11-22 11:27 UTC",
+ "kabuk": 1,
+ "dosya": "organizer-telefon-2.1.0.11.zip"
 }
