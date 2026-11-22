@@ -1,8 +1,8 @@
 """Organizer: ev eşyaları arşivi."""
 
 # İç sürüm numarası. Baştaki "2." sürüm dizisidir (1.x dizisi 1.4.0'da bitti); kullanıcıya gösterilmez.
-# Ekranda "v.1.0.8" olarak görünür. Bir sonraki sürüm 2.1.0.9 → "v.1.0.9" olur.
-__version__ = "2.1.0.8"
+# Ekranda "v.1.0.9" olarak görünür. Bir sonraki sürüm 2.1.0.10 → "v.1.0.10" olur.
+__version__ = "2.1.0.9"
 
 
 def goster(v=None):

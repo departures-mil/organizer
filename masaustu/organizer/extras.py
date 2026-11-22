@@ -634,39 +634,42 @@ class FeedbackDialog(QDialog):
         return True
 
     def _send(self):
-        """Doğrudan gönderim (FormSubmit). İnternet yoksa e-posta / Gmail / kopyala yolları kalır."""
-        import json
+        """Doğrudan gönderim (FormSubmit). Gönderilemezse mesaj kaybolmaz: giden kutusuna yazılır ve
+        bağlantı kurulunca (ya da yönetici formu etkinleştirince) program kendiliğinden yeniden gönderir."""
         import re
-        import urllib.request
+        import threading
         from PySide6.QtWidgets import QApplication
-        from . import __version__, i18n
+        from . import i18n
         if not self._ready():
             return
         contact = self.name.text().strip()
         body = {"_subject": "Organizer: " + self.kind.currentText(), "_template": "table", "_captcha": "false",
                 "Konu": self.kind.currentText(), "Ulasma": contact or "-", "Mesaj": self.msg.toPlainText().strip()[:5000],
-                "Surum": goster(), "Cihaz": "Windows", "Dil": i18n.LANG}
+                "Surum": goster(), "Cihaz": "Windows", "Dil": i18n.LANG,
+                "Tarih": datetime.now().strftime("%d.%m.%Y %H:%M")}
         m = re.search(r"[^@\s]+@[^@\s]+\.[^@\s]+", contact)
         if m:
             body["email"] = body["_replyto"] = m.group(0)
         self.send_btn.setEnabled(False)
         QApplication.setOverrideCursor(Qt.WaitCursor)
-        ok = False
-        try:
-            req = urllib.request.Request("https://formsubmit.co/ajax/" + admin_email(), data=json.dumps(body).encode(),
-                                         headers={"Content-Type": "application/json", "Accept": "application/json",
-                                                  "User-Agent": "Mozilla/5.0 Organizer/" + __version__}, method="POST")
-            with urllib.request.urlopen(req, timeout=20) as r:
-                j = json.loads(r.read().decode("utf-8") or "{}")
-            ok = str(j.get("success")).lower() != "false" or "activat" in str(j.get("message", "")).lower()
-        except Exception:
-            ok = False
-        finally:
-            QApplication.restoreOverrideCursor()
-            self.send_btn.setEnabled(True)
-        if ok:
+        res = {}
+        th = threading.Thread(target=lambda: res.update(r=feedback_post(body)), daemon=True)
+        th.start()
+        while th.is_alive():                      # arayüz donmasın
+            QApplication.processEvents()
+            th.join(0.05)
+        QApplication.restoreOverrideCursor()
+        self.send_btn.setEnabled(True)
+        if res.get("r") == "ok":
             self.msg.clear()
             info(self, t("✉  Admin ile iletişime geç"), t("Mesajınız yöneticiye iletildi. Teşekkürler!"))
+            return
+        db = _find_db(self)
+        if db is not None:
+            outbox_add(db, body)
+            self.msg.clear()
+            info(self, t("✉  Admin ile iletişime geç"),
+                 t("Mesajınız kaydedildi; bağlantı kurulunca program kendiliğinden yöneticiye gönderecek. Teşekkürler!"))
         else:
             info(self, t("✉  Admin ile iletişime geç"),
                  t("Mesaj gönderilemedi. İnternet bağlantınızı kontrol edip tekrar deneyin."))
@@ -686,3 +689,143 @@ class FeedbackDialog(QDialog):
         if self._ready():
             QGuiApplication.clipboard().setText(f"{self._subject()}\n\n{self._body()}")
             info(self, t("📋  Kopyala"), t("Mesaj kopyalandı."))
+
+
+# ---------------------------------------------------------------------- admin mesajı gönderimi + giden kutusu
+_FS_SITE = "https://departures-mil.github.io"
+_FS_REFERER = _FS_SITE + "/organizer/"
+
+
+def _fs_result(text):
+    """FormSubmit cevabı → "ok" | "activation" (yönetici formu henüz etkinleştirmedi) | "fail"."""
+    import json
+    try:
+        j = json.loads(text or "{}")
+    except ValueError:
+        return "fail"
+    if str(j.get("success")).lower() == "true":
+        return "ok"
+    return "activation" if "activat" in str(j.get("message", "")).lower() else "fail"
+
+
+def _log(msg):
+    """Gönderim sonuçları <veri>\\admin-mesaj.log dosyasına yazılır (sorun ararken işe yarar)."""
+    try:
+        from .paths import data_dir
+        with open(data_dir() / "admin-mesaj.log", "a", encoding="utf-8") as f:
+            f.write(datetime.now().strftime("%Y-%m-%d %H:%M:%S ") + str(msg)[:400] + "\n")
+    except Exception:
+        pass
+
+
+def feedback_post(body):
+    """Mesajı FormSubmit'e yollar. Önce Python ile, olmazsa Windows PowerShell ile (Windows'un kendi
+    bağlantı yığını) dener. FormSubmit, Referer/Origin başlığı olmayan isteği reddettiği için ikisi de eklenir."""
+    import json
+    import urllib.error
+    import urllib.request
+    from . import __version__
+    url = "https://formsubmit.co/ajax/" + admin_email()
+    data = json.dumps(body, ensure_ascii=False).encode("utf-8")
+    hdr = {"Content-Type": "application/json", "Accept": "application/json", "Referer": _FS_REFERER,
+           "Origin": _FS_SITE, "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Organizer/" + __version__}
+    res = "fail"
+    try:
+        req = urllib.request.Request(url, data=data, headers=hdr, method="POST")
+        with urllib.request.urlopen(req, timeout=25) as r:
+            res = _fs_result(r.read().decode("utf-8", "replace"))
+    except urllib.error.HTTPError as e:
+        try:
+            res = _fs_result(e.read().decode("utf-8", "replace"))
+        except Exception:
+            res = "fail"
+        _log(f"python HTTP {e.code}")
+    except Exception as e:  # noqa: BLE001
+        _log(f"python: {e!r}")
+    if res == "fail" and sys.platform == "win32":
+        res = _post_powershell(url, data, hdr) or res
+    _log("sonuç: " + res)
+    return res
+
+
+def _post_powershell(url, data, hdr):
+    import base64
+    import subprocess
+    b64 = base64.b64encode(data).decode()
+    ps = ("[Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12;"
+          "$b=[Convert]::FromBase64String('" + b64 + "');"
+          "$h=@{'Accept'='application/json';'Referer'='" + hdr["Referer"] + "';'Origin'='" + hdr["Origin"] + "'};"
+          "try{$r=Invoke-WebRequest -UseBasicParsing -Uri '" + url + "' -Method Post -Headers $h "
+          "-ContentType 'application/json; charset=utf-8' -Body $b -TimeoutSec 25;"
+          "[Console]::Out.Write($r.Content)}catch{[Console]::Out.Write('{}')}")
+    try:
+        out = subprocess.run(["powershell", "-NoProfile", "-NonInteractive", "-Command", ps], capture_output=True,
+                             timeout=40, creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
+        res = _fs_result(out.stdout.decode("utf-8", "replace").strip())
+        _log("powershell: " + res)
+        return res if res != "fail" else None
+    except Exception as e:  # noqa: BLE001
+        _log(f"powershell: {e!r}")
+        return None
+
+
+def _find_db(widget):
+    w = widget
+    while w is not None:
+        if getattr(w, "db", None) is not None:
+            return w.db
+        w = w.parent()
+    from PySide6.QtWidgets import QApplication
+    for top in QApplication.topLevelWidgets():
+        if getattr(top, "db", None) is not None:
+            return top.db
+    return None
+
+
+def outbox_add(db, body):
+    import json
+    try:
+        box = json.loads(db.get_setting("admin_outbox") or "[]")
+    except ValueError:
+        box = []
+    box.append(body)
+    db.set_setting("admin_outbox", json.dumps(box[-50:], ensure_ascii=False))
+
+
+def outbox_flush(db):
+    """Bekleyen mesajları arka planda göndermeyi dener (açılışta ve 15 dakikada bir).
+    Veritabanına yalnızca ana iş parçacığında dokunulur."""
+    import json
+    import threading
+    try:
+        box = json.loads(db.get_setting("admin_outbox") or "[]")
+    except ValueError:
+        box = []
+    if not box:
+        return
+    results = {}
+
+    def work():
+        for i, b in enumerate(box):
+            r = feedback_post(b)
+            results[i] = r
+            if r != "ok":
+                break                              # bağlantı yok / form etkin değil: sonra yine denenir
+
+    th = threading.Thread(target=work, daemon=True)
+    th.start()
+
+    def poll():
+        if th.is_alive():
+            QTimer.singleShot(500, poll)
+            return
+        sent = [box[i] for i, r in results.items() if r == "ok"]
+        if sent:
+            try:
+                cur = json.loads(db.get_setting("admin_outbox") or "[]")
+            except ValueError:
+                cur = []
+            rest = [b for b in cur if b not in sent]
+            db.set_setting("admin_outbox", json.dumps(rest, ensure_ascii=False) if rest else None)
+
+    QTimer.singleShot(500, poll)
