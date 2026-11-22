@@ -1,10 +1,10 @@
 {
- "surum": "2.1.0.8",
- "notlar": "v.1.0.8: 🗑 Çöp kutusu (silinenler 30 gün saklanır) ve ↶ Geri al · 📷 Fatura/fiş fotoğrafları · 🎤 Sesle arama ve ekleme ('Matkap nerede?', '3 ampul ekle') · 🤝 Ödünç takibi · 🛒 Az kalanlar için alışveriş listesi · 🧾 Ustalarla yapılan işler ve ödemeler · 🌙 Koyu görünüm · 📶 İnternetsiz yerel ağ eşitlemesi · ✉ Admin ile iletişim (Bu sefer Android bir kez 'Güncelle' onayı ister.)",
- "boyut": 338265,
- "sha256": "f6dd2a97763e4d3e18bac6452cbd2cbab1d1e1c55855bcb7a026224774de8639",
- "imza": "TtyOIPfHUPal7adxzPyxFWBd8VKaL7iihEfKDAePDU5d0NUXt0V8eMzz+JmJuGOidnHP8rIlXdDAPT8YnIeN+wrdhu4OHV0q0pyCfvVb/Klp9baKtJyZxEfs/S8EHcUohRuZAwXeGLDIdDEUUBz6XwiV2WgjN/cW3f6L2hye6Vm9HCE3ou0Tkwhi14ukO5QK8Haww2IYL0yNFy22LD073f1XW1hmPhl7Ww7nhD9tkdEu3F2EzXJC3cBKbdSCBVp9UDYW2bGcO+O+Ac+NofyTVKNi+DkkkDPFuMoaxnJO/QihwdblfFDu5xfl70W3AOKtE1vdN0KcAy61bTIyTkDPPndKOipRY2rKzYo+LqtYv9+NWjo6gcNWXtA3/7JO73j/aeIUqg8QsLipfCnJR9V4qoUadcXdzGqmC9cTj2twFQEuAbZl9jfliyezlcoJUhIi6B7CmuIoM1Hzp5rGbWa2nG+ELDrtBn3kpPGnc5r04Ojal2FCrdikTvQmU6RA6qyK",
- "yayin": "2026-11-21 21:06 UTC",
+ "surum": "2.1.0.11",
+ "notlar": "v.1.0.11: «Admin ile iletişime geç» düzeltildi — mesajlarınız artık yöneticiye güvenilir biçimde ulaşıyor. Kayıtlarınız olduğu gibi kalır. (Yeni imza: eski Organizer'ı silip bu sürümü bir kez elle kurun; önce eşitleme yapın.)",
+ "boyut": 346525,
+ "sha256": "a2c724d5540e65489f773c5e6935b8c748c1efa2eb7d34b30530fd40390ac6c0",
+ "imza": "dTuW3YezD7KmH3bj65YA4cREUpVX9NKmKuo1zCrShkWFlInjOVdgUV8RuL7IKqP0dh1E/EeZixHADZk+tnkLgcULltbPFYL3omSjdBnU/XclMEqjxeGZM/cPM/75VIvDLnWSy8M+7rrNfN8ujZh0Y+pC6kHb+cAnWB+jUmPojWKlQUb14QC6LRVbrXWueWwRNCAIw9ozRnR1afMc6NpoDIQQ2bnbOgEh++HpZmaHQcQxeMuvINAnGhGDFzhw9VW24z/yS2EPbYL4I8t1xNLNJsaNHvJo5JLjr+gvE4NbEHC+cIPI4rHBLgUFEwBHiw6jvwFs4Q/5ICii5G6JHwpGGCs93lN0dG36iIxlTioD5rsk7naZrLaBoeX67HgqWEcJcOuJcA6BkBEGz6c2quWRs7isO/QexRPy/svmcbu5z0ZCRMaUgoElZbVuy10YGfS6WxuHr7a8qq8Z3/m8bpxAnLhFhyk/USrIaZjSKu1KkvMEPylvHTxx+6Ggf6XNNlPT",
+ "yayin": "2026-11-22 11:27 UTC",
  "kabuk": 3,
- "dosya": "organizer-telefon-apk-2.1.0.8.apk"
+ "dosya": "organizer-telefon-apk-2.1.0.11.apk"
 }

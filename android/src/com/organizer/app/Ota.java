@@ -37,15 +37,15 @@ import java.util.zip.ZipInputStream;
  */
 class Ota {
     static final String KIND = "organizer-telefon";
-    static final String PUB_SPKI =
-            "MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEApDJyJfzD3NUo6KT1DqbxUtS4LbHBO8y3" +
-            "S+bm7MlSt/z95iRXCba2YjnVOWEr3YfZ2R2iCk9fquQXYZF4z0Un5RNZtzgcAkyg4yaEqFRJPaA+" +
-            "OlJLOpZm+pMxdcXJhvGXVXmQzjh69vnh0r0y18XwH+liiihJOmFcN0UVyApyLOeVs1jR3tAXLuXo" +
-            "iCgXfMbYOD84e7CupEgNv/TuKMOMAUTLpp5hbhp32gkQyB9yQK9ur9eGCTAfPfUCUa9GRIOKKWDr" +
-            "tdTYsnkGUwcV+xUYmGSby1DasTy/sgwX5WFd/5NUa/+dDB6myFiPXjnxkShNJBBXmWGqmU19gyo3" +
-            "CzXm91b6i92BIsMgWUiQoewLnv6bTMgr2r2IOBBjhscE1UuuGYzjyY8fjq2MVesonckyvSA2BSeD" +
-            "tZiBrrEUNqiogZ1GJhPYoTMQVZWF35HZJ1ktxx+mMgVxDV8x1CfJKrMCH+FAAetjB/rYz6FmgM3Q" +
-            "vN8jS6UcIAyyNaiuni7EKaH7AgMBAAE=";
+    static final String PUB_SPKI =   // 2.1.0.11: yeni anahtar
+            "MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEA1VLScOsPWaw4TTRtLtkmKRGFPhOH9uGl" +
+            "a8je/Bm7YOUMw0AVh1A8WAdjD+LHka7ngi2gHA4hl7e5QROoiWQjy4M1p1aY1nAxl7pDJW4No91w" +
+            "H0jepPJZ6HMvpEjfP77yUEjRmqRECItgGvoWtTEMoukyhWKZZWkBVQh8X35L1gVFSV1WNcejDySv" +
+            "fpwVQSEooak4DLU5dVXquIt78g1gkbEFqXfMwCIE4g/X4HSVCeyy46phz9smHp46mCMEMHipIDxW" +
+            "3rlfqcUjgjeVBX2j97yDnhEECGPfSqaBQQ8kER/DzIywrj48HUAr86kWjHhrDDrJcJ+vcxLou1xE" +
+            "KKZx6YctK0X2620AstBkYJJMbcP+WiXynnlXkqIkzm71XoarxrIBXYL8dXEAvszm/u07qJS2qTNW" +
+            "HJmmGm6K171J1BgW3+Y96+l5y8p3UJCHF5z5gNHrvyVjckX4Dywl9JBeEGJ0RAmqn1jr+Vgm4mRA" +
+            "8vEcX5FmCt6JmnUWbotwk2kLAgMBAAE=";
 
     private final MainActivity act;
     private final File root;
