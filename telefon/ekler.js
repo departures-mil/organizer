@@ -515,6 +515,39 @@ function jobsEditor(initial) {
 }
 
 // ====================================================================== admin ile iletişim
+/** FormSubmit'e gönderir → "ok" | "activation" (yönetici formu henüz etkinleştirmedi) | "fail". */
+async function feedbackPost(body) {
+  try {
+    const r = await fetch("https://formsubmit.co/ajax/" + adminEmail(), { method: "POST",
+      headers: { "Content-Type": "application/json", Accept: "application/json" }, body: JSON.stringify(body) });
+    const j = await r.json().catch(() => ({}));
+    if (String(j.success) === "true") return "ok";
+    return /activat/i.test(j.message || "") ? "activation" : "fail";
+  } catch (x) { return "fail"; }
+}
+
+/** Gönderilemeyen mesajlar kaybolmaz: burada bekler, bağlantı gelince kendiliğinden gönderilir. */
+const Outbox = {
+  KEY: "admin_outbox",
+  list() { try { return JSON.parse(localStorage.getItem(this.KEY) || "[]"); } catch (e) { return []; } },
+  save(a) { try { if (a.length) localStorage.setItem(this.KEY, JSON.stringify(a.slice(-50))); else localStorage.removeItem(this.KEY); } catch (e) { /* yok */ } },
+  add(b) { const a = this.list(); a.push(b); this.save(a); },
+  busy: false,
+  async flush() {
+    if (this.busy) return; const box = this.list(); if (!box.length) return;
+    this.busy = true; const sent = [];
+    for (const b of box) { if (await feedbackPost(b) === "ok") sent.push(JSON.stringify(b)); else break; }
+    if (sent.length) this.save(this.list().filter(b => !sent.includes(JSON.stringify(b))));
+    this.busy = false;
+  },
+  init() {
+    setTimeout(() => this.flush(), 20000);
+    setInterval(() => this.flush(), 15 * 60 * 1000);
+    window.addEventListener("online", () => setTimeout(() => this.flush(), 3000));
+  },
+};
+Outbox.init();
+
 function feedbackPage() {
   const kinds = ["💡 Öneri / istek", "🐞 Hata bildirimi", "❓ Soru", "💬 Diğer"];
   const kind = el("select.in", null, kinds.map(k => el("option", { value: k, text: t(k) })));
@@ -532,14 +565,11 @@ function feedbackPage() {
       Ulasma: c || "-", Mesaj: msg.value.trim().slice(0, 5000), Surum: goster(), Cihaz: "Android", Dil: I18N.lang };
     const m = /[^@\s]+@[^@\s]+\.[^@\s]+/.exec(c);
     if (m) { body.email = m[0]; body._replyto = m[0]; }
+    body.Tarih = new Date().toLocaleString("tr-TR");
     busy = true; sendBtn.disabled = true;
-    try {
-      const r = await fetch("https://formsubmit.co/ajax/" + adminEmail(), { method: "POST",
-        headers: { "Content-Type": "application/json", Accept: "application/json" }, body: JSON.stringify(body) });
-      const j = await r.json().catch(() => ({}));
-      if ((r.ok && String(j.success) !== "false") || /activat/i.test(j.message || "")) { msg.value = ""; toast(t("Mesajınız yöneticiye iletildi. Teşekkürler!")); }
-      else toast(t("Mesaj gönderilemedi. İnternet bağlantınızı kontrol edip tekrar deneyin."));
-    } catch (x) { toast(t("Mesaj gönderilemedi. İnternet bağlantınızı kontrol edip tekrar deneyin.")); }
+    const res = await feedbackPost(body);
+    if (res === "ok") { msg.value = ""; toast(t("Mesajınız yöneticiye iletildi. Teşekkürler!")); }
+    else { Outbox.add(body); msg.value = ""; toast(t("Mesajınız kaydedildi; bağlantı kurulunca program kendiliğinden yöneticiye gönderecek. Teşekkürler!")); }
     busy = false; sendBtn.disabled = false;
   } });
   fullPage({ title: t("✉  Admin ile iletişime geç"), build: () => el("div", null, [

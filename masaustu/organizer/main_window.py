@@ -121,6 +121,12 @@ class MainWindow(QMainWindow):
         else:
             self.topbar.update_btn.hide()
 
+        # Gönderilemeyen admin mesajları: açılıştan 20 sn sonra ve 15 dakikada bir yeniden denenir.
+        from .extras import outbox_flush
+        QTimer.singleShot(20000, lambda: outbox_flush(self.db))
+        self._outbox_timer = QTimer(self, interval=15 * 60 * 1000, timeout=lambda: outbox_flush(self.db))
+        self._outbox_timer.start()
+
         QShortcut(QKeySequence(Qt.Key_F11), self, activated=self.toggle_fullscreen)
         QShortcut(QKeySequence.Find, self, activated=self._focus_search)
         QShortcut(QKeySequence.Undo, self, activated=lambda: self.stack.currentWidget() is self.items_page

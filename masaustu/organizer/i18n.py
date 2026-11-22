@@ -532,6 +532,7 @@ STRINGS = {
     "Mesajınız yöneticiye iletildi. Teşekkürler!": ("Your message has been delivered to the administrator. Thank you!", "تم إيصال رسالتك إلى المسؤول. شكرًا لك!"),
     "Mesaj gönderilemedi. İnternet bağlantınızı kontrol edip tekrar deneyin.": ("The message could not be sent. Check your internet connection and try again.", "تعذّر إرسال الرسالة. تحقّق من اتصالك بالإنترنت وحاول مجددًا."),
     "Mesaj kopyalandı.": ("Message copied.", "تم نسخ الرسالة."),
+    "Mesajınız kaydedildi; bağlantı kurulunca program kendiliğinden yöneticiye gönderecek. Teşekkürler!": ("Your message has been saved; the program will send it to the administrator automatically once a connection is available. Thank you!", "تم حفظ رسالتك؛ سيرسلها البرنامج إلى المسؤول تلقائيًا عند توفّر الاتصال. شكرًا لك!"),
     # ---- v.1.0.8: çöp kutusu, geri al, alışveriş listesi, ödünç, iş geçmişi, sesli arama, yerel ağ, koyu görünüm, iletişim
     ' · ⚠ {n} gecikti': (' · ⚠ {n} overdue', ' · ⚠ {n} متأخر'),
     '(ağ bağlantısı yok)': ('(no network connection)', '(لا يوجد اتصال بالشبكة)'),
