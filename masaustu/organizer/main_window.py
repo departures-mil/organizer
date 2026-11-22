@@ -104,6 +104,14 @@ class MainWindow(QMainWindow):
         self.topbar.update_clicked.connect(self._update_clicked)
         self.topbar.minimize_clicked.connect(self.showMinimized)
         self.topbar.size_clicked.connect(self.toggle_fullscreen)
+        # admin duyuruları (🔔): yeni duyuru bir kez pencere olarak açılır, sonra düğmeden okunur
+        try:
+            from . import duyuru_istemci
+            self.duyuru = duyuru_istemci.DuyuruIstemci(self, "organizer", goster(), dil=lambda: i18n.LANG,
+                                                       guncelle=self._update_clicked)
+            self.topbar.add_before_update(self.duyuru.dugme)
+        except Exception as e:  # duyuru yoksa program yine çalışır
+            print("duyuru:", e)
         self.topbar.close_clicked.connect(self.close)
         right.addWidget(self.topbar)
         right.addWidget(self.stack, 1)
