@@ -362,6 +362,11 @@ class SettingsPage(QWidget):
         gl.addWidget(open_btn)
         gl.addWidget(backup_btn)
 
+        # ---- v.1.0.10: kullanım limitleri (kendi Firebase hesabının günlük sınırı)
+        gl.addSpacing(14)
+        from . import kullanim_sayac
+        gl.addWidget(kullanim_sayac.KullanimKarti(self))
+
         # ---- v.1.0.8: admin ile iletişim (öneri / hata bildirimi)
         gl.addSpacing(14)
         at = QLabel(t("✉  Admin ile iletişime geç"))

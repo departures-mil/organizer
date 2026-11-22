@@ -9,6 +9,7 @@ Kurallar: son değiştirilen kazanır (mtime), silinenler "deleted" işaretiyle 
 """
 import base64
 import json
+from . import kullanim_sayac
 import os
 import re
 import time
@@ -138,10 +139,13 @@ class FirebaseClient:
         try:
             with urllib.request.urlopen(req, timeout=60) as r:
                 raw = r.read()
-                return json.loads(raw) if raw else {}
+                out = json.loads(raw) if raw else {}
+                kullanim_sayac.kaydet(method, url, body, r.status, out)  # Ayarlar > Kullanım Limitleri
+                return out
         except urllib.error.HTTPError as e:
             try:
                 err = json.loads(e.read())
+                kullanim_sayac.kaydet(method, url, body, e.code, err)
                 msg = err.get("error", {}).get("message", "") if isinstance(err.get("error"), dict) \
                     else str(err.get("error", ""))
             except Exception:

@@ -30,6 +30,9 @@ class Controller:
         self.app, self.db = app, db
         self.translator = None
         self.win = None
+        from . import kullanim_sayac, i18n as _i18n
+        kullanim_sayac.baslat(str(db.data_dir), dil=lambda: _i18n.LANG, bulut=True, ai=False,
+                              proje=lambda: ((self.sync.config() or {}).get("projectId", "") if self.sync.is_connected() else ""))
         self.sync = SyncManager(db)
         self.updater = Updater(self.sync)
         self._checked_update = False
