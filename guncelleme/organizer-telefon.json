@@ -1,10 +1,10 @@
 {
- "surum": "2.1.0.11",
- "notlar": "v.1.0.11: «Admin ile iletişime geç» düzeltildi — mesajlarınız artık yöneticiye güvenilir biçimde ulaşıyor. Kayıtlarınız olduğu gibi kalır.",
- "boyut": 156917,
- "sha256": "1fef2ea8beea342b55fc27af567d885b236e2caf56d1dc04da2f3dd1d3b44c74",
- "imza": "EPJs//CkkMv6Fb9Yg+0BUXtcmlqtDl6/KStdEf6afYFgBAXdZv3t5jXDCeBTUisuNFEVGS42ZIpp72tJpW74blGnDI9hQnoCV26RKER10/A8j5DTYmtLDk2MKvdaFKj1IwvNHT6dcqg78+AbDvDbxrLkmJUwikWQoyNjMnZxyGkZBwNLtLRsICMNpA5h2hBH0O31+DsWcypjhlGjpX+UXt1nQRSChDucjJIpCePpEdvpUjl9r71zoM87p/uW0waP0b0NZeeQ7kjgznZE8W90mYShtx6fnPUxOTUhHhHdWnTYtNAx+2r12E1cAUI9WhZm2cdN+LQl0c2hFEey6SzG9hjzb3YGQqtAPaibmnEiNImR0dbpaq2mzsjTbnO0jroarOXTb4fo99hZ0Civibq6vGFoS8NNp80KCo9HE4SZwc2oC89oFn/9oQmzT+4qhObAF1Q4skJjKfU0srKI3iiodRwtHJpnojOERSTVlZfkLUuAGduggtfk8mf1A5dHFjty",
- "yayin": "2026-11-22 11:27 UTC",
+ "surum": "2.1.0.12",
+ "notlar": "Admin duyuruları: yeni duyurular uygulamada görünür, 🔔 düğmesinden tekrar okunur.",
+ "boyut": 160735,
+ "sha256": "66801ae1803c2018c8cb24b3b047ad1fe1316736f15ea74226f1ca648fdcb15c",
+ "imza": "o3emzp5SyTkAWBPVTtPvhFjBixlyP4jFjTdbm6p3fsRvxZw2p+at6CFfXvVLdNR3WfxaqtkKgDbmI4r7NeR4bnuVFaUtJeEK1u5YkvvFSpD22ahuO0swfP7rQnpvUBlIZaV9KDc5u4v8gGTOL4auxkBsbxi3/Yfd9ULYGR+cVyqCMdUhhOv1JHEfwuwIDDAdsOLHy6Vz0JDDWIlt/DFKYZTIcY5iK/827eyWqNUzTX2WcXRQdcS8O7RbDocFwQIXeN5qJPDvM4KiwPEJrW36zbS+nzyczodzTB6mcKAX9Qn8l4YZ00zNAHRgNF+MKqQfTW06fwb2xGu0eokI5hNyXBxAzoa1eJEt+i6MqYuY5eGdEZ5zy+E452u2rqnTYGv70e/rzoyVpCTZ/lNTW4PmrEWzRlH8n58l+OE4o7664FgEEOvSqrXMBWu2DqCpcWau+lsJ+FDLoj8ot2FMWqMPXulCmWHyEx/BGf0QUuXUjYvCx5oaC5AnFBVjYv3pbbRe",
+ "yayin": "2026-11-22 13:42 UTC",
  "kabuk": 1,
- "dosya": "organizer-telefon-2.1.0.11.zip"
+ "dosya": "organizer-telefon-2.1.0.12.zip"
 }

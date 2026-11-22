@@ -149,6 +149,11 @@ class TopBar(QFrame):
             wl.addWidget(b)
         lay.addWidget(win)
 
+    def add_before_update(self, w):
+        lay = self.layout()
+        i = lay.indexOf(self.update_btn)
+        lay.insertWidget(i if i >= 0 else lay.count(), w)
+
     # ------------------------------------------------------------ yapı
     def _icon_btn(self, name, tip, checkable=False, obj="TbIcon"):
         b = QPushButton()

@@ -1,10 +1,10 @@
 {
- "surum": "2.1.0.11",
- "notlar": "v.1.0.11: «Admin ile iletişime geç» düzeltildi — mesajlarınız artık yöneticiye güvenilir biçimde ulaşıyor. Kayıtlarınız olduğu gibi kalır.",
- "boyut": 207394,
- "sha256": "a726680bb48cb721d7fbcd1c00edd0bddb63e1aabf59d8115c1b4b58b70eb60e",
- "imza": "Qiy6voP49CiFQC9xbXR006Lo+9/aUf0rp9VrPlVYJk0XSl7MgpqnfhNo16Hh/IIuCVfRmOCyhy9Nkvf4LOnns6WZUmq/eiGabpgX1GwjYSJ56eK4x2W0Fx5fNJPpqcbGkzWyhMxr1GKTbHO+B5Dvx0ysB1724+PdT7de3PpSzB/iDRj4Jzrkx5rD5WCO6NOcvr9VCje2VQ9ozvGC4hmxJiohtnuEmYuDNzXisncnrixYRmbwz2xhyamFJq1URKHlwr+AH2w2yjII8Vxh/nf4UwQirvD3r5si5SwvgtHVLCvIE5SAq4Lo4+f3HE5AKBkqcH9EE69QHOJa1T99RmKsTIM9VXKGQZs8JW323HWBDYZgULOTfH3IcbSBq127hlrzXVR8HzAaQEWQQGdjKz+OkzdjmujaVoJKzuMvosLv3/AHaZ1zlwb3qAw6Ur3PTshlGN2T68DiUg8e7eri30DbVaF3nJZSP8Ecyf2gIQYM6clqRFWq4DcuWAPfIWzYLpMS",
- "yayin": "2026-11-22 11:27 UTC",
+ "surum": "2.1.0.12",
+ "notlar": "Admin duyuruları: yeni duyurular programda görünür, 🔔 düğmesinden tekrar okunur.",
+ "boyut": 211114,
+ "sha256": "9c7fc29f0d2b2fe80f621eccc2e63a4e8b2fbf5b5f6005259ef9fbef2f3fae24",
+ "imza": "074CuBQCCiYCNPjw/I1RIwbHlA8O8S7zvubIUAlkYNV9Je8mqFp7LQouzuTD+R27Uq62JRtcDu5B+CxYI0Qmt9pQ/ByoirQtmgnUuSr4l4PvUktZzMtT5PTQI+kPIK+1EJNXu356HUGdHAzSBLfJgzTj0I5aVegnvrSppr/Xjs7Q8ct89rBga8ypeIOoA4P3UuHjS0Aiau+li5w7o1O//PEzo9y9a+gZCUmwKVE/YCvYv8vqjdJleNON+aMogrP3yXC42sNhsflZUIarAnszSvvixi5bVsorK0QvkfVX1wF4UhNNC3jhoUe4fVO71ZTOnmElomgdzLWdnwupXHJz6l9MwnAXSp475J/NENaJtUKyG4c891PnUa3Thb1OtdV0MvqJaW5/aJaYgOaMfyJ8IPvyvKscmoD/6s4A5u6feFpwiHxbYjQqyhS84UuhGvcr8XX0HzUpLKA+1TT4k239t2wfgzlVH/9sl3eZRQ3Zo07GbFIJq3JbG834PstaXnhK",
+ "yayin": "2026-11-22 13:42 UTC",
  "sistem": 1,
- "dosya": "organizer-masaustu-2.1.0.11.zip"
+ "dosya": "organizer-masaustu-2.1.0.12.zip"
 }
