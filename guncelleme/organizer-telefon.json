@@ -1,10 +1,10 @@
 {
- "surum": "2.1.0.8",
- "notlar": "v.1.0.8: 🗑 Çöp kutusu (silinenler 30 gün saklanır) ve ↶ Geri al · 📷 Fatura/fiş fotoğrafları · 🎤 Sesle arama ve ekleme ('Matkap nerede?', '3 ampul ekle') · 🤝 Ödünç takibi · 🛒 Az kalanlar için alışveriş listesi · 🧾 Ustalarla yapılan işler ve ödemeler · 🌙 Koyu görünüm · 📶 İnternetsiz yerel ağ eşitlemesi · ✉ Admin ile iletişim",
- "boyut": 146890,
- "sha256": "a680b14e80d4567739467bbe2c86015f51830865ec8c3b5ca6e70176195a5862",
- "imza": "NdkUVZLWnxAvOPERKVBz7pVJGLnOsFLBMqk/xm8FustedxoxX0CjPgnEGeG/TDGVxUKfhy6z3klO3E2LcBfZTIvTht/rKjr0dSYIdPJdWIL8VRhYYyr2iydBH0jbT5v/GJQnxb5r2bEQOmYY/rjNFiZl1RmT512WFZIZX+Y1frsr+jKAmLkn4tWj8FgV2SQlq15KbccFe9ZPiYdyyVyBTwqADcHg321p2gk3jWTjdDLVIY2beMGPkF7znNOotTewBSlIyMPoubA//IRmb0YouCjpCDT/+LQKTOniK6h2MS4KRue+jkw246LZkykRKZTMwBeH9ShKoq7XJ6g2uEv4o2aK7EL5P6fNbw9ZMFqtjyuSrIeqlWAkyuUB+2Ejw5f+6a2KlHVM6vIdN9OpAJylZq37yw4coMkKU0JA1KI48SHxoixY2Tcok+9OwV5iS3hT9xkicfUYVqmo2Kvi0WNHNP3OWA5oKspNqFr0YWgx6EBA/G6g/sO1piDRZ50nu4IC",
- "yayin": "2026-11-21 21:06 UTC",
+ "surum": "2.1.0.9",
+ "notlar": "Admin ile iletişime geç düzeltildi: mesajlar artık doğrudan gönderiliyor; bağlantı yoksa kaybolmaz, kaydedilir ve program kendiliğinden yeniden gönderir.",
+ "boyut": 147434,
+ "sha256": "40c42b83375c64e5b9b91fd03e5f64b5b149dcd1cccdcc1be4defa23c0cdd4da",
+ "imza": "bQjmOunutgsqfQa6L2JjLxY+CbH79BKxtH6dGJ/Vy6265BqH+ctkARYYZBPxUlELOAb68893nCTFv3579T92xu5WBPssw6o/zBlgkxppKQBm1aQLEG/XmtXijS+S0/4EOfgGdc1Q1oObRcfAHRA5MF5LV+RSkKnJhWF+EQsRUeIWAsanbatrBzwIFiLYrgPyngL+PleXhC5dMFFJDr/hE7P9IDP40uYJr4wsbw3lsHXXap2GejrjVQDTSQ4nADflDDo6pNAC+rdsT1PiR9bwdg+Ev5I/UQ/6Wd4RVxDzFs9gMFOcnGHeUdvxRBUJPBkVbUmevOwJVG8g96VGfub1JcswV6wwMVH0eGnyr5WON00DZ+67PyaLYGpKskZHaBSLZM+ghnIB1EzvcaPpgUK7pjxQIhwqYe9s3vAtJNZ/gpNX1gUP1/mD7+Wk0k/agP05sjWPRAfTc2TUcHk917Qnl0IjS0AcF9LTiFFlgEUGcNqqEQsK+3UEXRHZUpQckJLX",
+ "yayin": "2026-11-22 03:30 UTC",
  "kabuk": 3,
- "dosya": "organizer-telefon-2.1.0.8.zip"
+ "dosya": "organizer-telefon-2.1.0.9.zip"
 }
