@@ -19,7 +19,7 @@ kullanıcının Firebase hesabı üzerinden eşitlenir; **kayıtlar bu depoda bu
 3. `ANAHTAR=<gizli anahtar> python3 araclar/yayinla.py telefon telefon "notlar" --kabuk 1`
 4. `git add -A && git commit -m "Organizer X.Y.Z" && git push`
 
-## v.1.0.10 (kaynak hazır, YAYIN BEKLİYOR — imza anahtarı bu oturumda yoktu)
+## v.1.0.10 (2026-11-22 yayınlandı; commit 31c7688)
 - Ayarlar > Kullanım Limitleri (masaüstü `organizer/kullanim_sayac.py`, telefon `telefon/kullanim.js`; ortak kaynak
   `departures-mil/duyurular/istemci`). Firestore istekleri `_request` içinde sayılır.
 - Programla gelen ortak Firebase projesi (duzenli-evim) kaldırıldı: herkes kendi ücretsiz Firebase hesabını kullanır
