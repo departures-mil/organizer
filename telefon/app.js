@@ -2,7 +2,7 @@
  * tarih, not), sınıflandırma ağaçları, arama, sıralama, toplu taşıma/silme, ustalar ve dükkanlar, ayarlar, yedek, bulut. */
 "use strict";
 
-const APP_VERSION = "2.1.0.13";   // iç numara; baştaki "2." sürüm dizisi. Ekranda v.1.0.9 görünür (goster()).
+const APP_VERSION = "2.2.0";   // semver (2.2.0'dan beri ekranda da aynı); eski 2.1.0.x güncelleyicileri bunu "daha yeni" görür
 function goster(v) {
   const p = String(v === undefined ? APP_VERSION : (v || "")).trim().split(".").filter(x => x !== "");
   if (!p.length) return "";
@@ -1142,33 +1142,27 @@ async function backup() {
 const SettingsPage = {
   render(root) {
     root.append(el("div.pagetitle", { text: t("Ayarlar") }));
-    const lang = el("select.in", { onchange: () => App.changeLanguage(lang.value) }, I18N.languages.map(([c, n]) => el("option", { value: c, text: n })));
-    lang.value = I18N.lang;
+    const cards = [];   // 2.2.0: kartlar ortak çekirdeğin ayar ızgarasına girer (Görünüm başta, Admin ile iletişim EN SONDA)
     const cur = el("select.in", { onchange: () => Store.set("default_currency", cur.value) },
       CURRENCIES.map(([c, sym, n]) => el("option", { value: c, text: `${sym}  ${t(n)}` })));
     cur.value = Store.get("default_currency", "TRY");
     const cc = el("input.in.ltr", { type: "tel", value: Store.get("country_code", "90"), style: { width: "110px" } });
     cc.addEventListener("change", () => { const v = cc.value.replace(/\D/g, "") || "90"; cc.value = v; Store.set("country_code", v); });
-    const theme = el("select.in", { onchange: () => Theme.set(theme.value) },
-      [["light", "☀  Açık"], ["dark", "🌙  Koyu"], ["auto", "🖥  Sistemle aynı"]].map(([v, l]) => el("option", { value: v, text: t(l) })));
-    theme.value = Theme.mode();
-    root.append(el("div.card.section", null, [
+    cards.push(el("div.card.section", null, [
       el("h3", { text: t("⚙  Genel") }),
-      el("label.f", { text: t("Dil:") }), lang,
-      el("label.f", { text: t("Görünüm:") }), theme,
       el("label.f", { text: t("Varsayılan para birimi:") }), cur,
       el("label.f", { text: t("Ülke telefon kodu:") }), cc,
       el("div.hint", { text: t("WhatsApp / Telegram bağlantıları için kullanılır. Numara + ile yazılmışsa kendi kodu geçerlidir.") }),
     ]));
     const nLab = Object.keys(I18N.overrides[I18N.lang] || {}).length;
-    root.append(el("div.card.section", null, [
+    cards.push(el("div.card.section", null, [
       el("h3", { text: t("🏷  Etiketler") }),
       el("div.hint", { text: t("Programdaki bütün yazıları (düğmeler, başlıklar, alan adları) kendinize göre değiştirebilirsiniz. Değişiklik yalnızca seçili dil için geçerlidir.") }),
       nLab ? el("div.hint", { text: t("{n} etiket değiştirildi", { n: nLab }) }) : null,
       el("button.btn.block", { text: t("🏷  Etiketleri düzenle…"), style: { textAlign: "start", marginTop: "8px" }, onclick: labelEditor }),
     ]));
     const nLoc = Store.treeRows("locations").length, nCat = Store.treeRows("categories").length;
-    root.append(el("div.card.section", null, [
+    cards.push(el("div.card.section", null, [
       el("h3", { text: t("Sınıflandırma") }),
       el("button.btn.block", { text: `${t("🏠  Yerler")}  (${nLoc})`, style: { textAlign: "start" }, onclick: () => treeEditor("locations") }),
       el("button.btn.block", { text: `${t("🗂  Kategoriler")}  (${nCat})`, style: { textAlign: "start" }, onclick: () => treeEditor("categories") }),
@@ -1189,7 +1183,7 @@ const SettingsPage = {
     };
     this.cloudDraw = draw;
     draw();
-    root.append(el("div.card.section", null, [
+    cards.push(el("div.card.section", null, [
       el("h3", { text: t("☁  Bulut hesabı (Firebase)") }), status,
       el("div.hrow", { style: { marginTop: "10px" } }, [acc, sync]),
     ]));
@@ -1211,25 +1205,22 @@ const SettingsPage = {
     };
     this.lanDraw = lanDraw;
     lanDraw();
-    root.append(el("div.card.section", null, [
+    cards.push(el("div.card.section#lanCard", null, [
       el("h3", { text: t("📶  Yerel ağ eşitlemesi (internetsiz)") }),
       el("div.hint", { text: t("İnternet olmadığında telefon ve bilgisayarlar aynı modem / Wi-Fi üzerinden eşitlenir. Kayıtlar bulut eşitlemesindeki gibi birleştirilir: her kaydın en son değiştirilen hali kalır, hiçbir şey silinmez ya da üst üste yazılmaz. İnternet gelince değişiklikler buluta da gider.") }),
       el("div.hint", { text: t("Bilgisayarda Organizer açık olmalı. İlk seferde bilgisayarın Ayarlar sayfasındaki 6 haneli eşleme kodu sorulur (iki cihaz aynı bulut hesabındaysa sorulmaz).") }),
       lanStatus, lanBtns,
     ]));
-    root.append(Updater.card());
-    root.append(el("div.card.section", null, [
+    cards.push(el("div.card.section", null, [
       el("h3", { text: t("Veriler ve yedek") }),
       el("div.hint", { text: t("Kayıtlar ve fotoğraflar bu telefonda saklanır. Bulut hesabı bağlıysa bilgisayarla da eşitlenir.") }),
       el("button.btn.block", { text: t("💾  Yedek al (.json) ve paylaş"), onclick: backup }),
       el("button.btn.block", { text: t("🗑 Çöp kutusu ({n})", { n: Store.trashItemsList().length }), onclick: trashPage }),
     ]));
-    if (window.Kullanim) { const kk = Kullanim.kart(); kk.classList.add("card", "section"); root.append(kk); }
-    root.append(el("div.card.section", null, [
-      el("h3", { text: t("✉  Admin ile iletişime geç") }),
-      el("div.hint", { text: t("Öneri, istek ya da hata bildirimlerinizi geliştiriciye gönderin; program sizin önerilerinizle gelişir.") }),
-      el("button.btn.primary.block", { text: t("✉  Mesaj yaz…"), onclick: feedbackPage }),
-    ]));
+    cards.push(Kabuk.arsivKarti());
+    // Görünüm (tema, şema, yazı boyutu, dil) · uygulama kartları · Asistan Agent · Kullanım Limitleri · Otomatik hata raporu ·
+    // Hakkında (güncelleme) · Admin ile iletişim (EN SON)
+    Kabuk.ayarlar(root, cards);
     root.append(el("div.about", null, [el("img", { src: "img/logo.png", alt: "" }), el("div", { text: `Organizer ${goster()}` }),
       el("div", { text: t("Evdeki her şey yerli yerinde") })]));
   },
@@ -1250,66 +1241,11 @@ function svgIcon(name) {
 }
 
 const TopBar = {
-  init() {
-    $("#eyeBtn").onclick = async () => {
-      PRICES_HIDDEN = !PRICES_HIDDEN;
-      await Store.set("prices_hidden", PRICES_HIDDEN ? "1" : "0");
-      App.render(true);
-    };
-    $("#scanBtn").onclick = () => {
-      if (App.tab === 2) { App.tab = 0; App.render(); }
-      window.scrollTo(0, 0);
-      const inp = $("#page .search input");
-      if (inp) { inp.focus(); inp.select(); }
-    };
-    $("#updBtn").onclick = () => {
-      const u = Updater;
-      if (u.state === "available") { App.tab = 2; App.render(); u.install(); }
-      else if (u.state === "installing") { App.tab = 2; App.render(); }
-      else if (u.state === "ready") u.restart();
-      else u.check();
-    };
-    $("#syncIcon").innerHTML = svgIcon("sync");
-    $("#updIcon").innerHTML = svgIcon("download");
-  },
-  draw() {
-    const eye = $("#eyeBtn");
-    eye.innerHTML = svgIcon(PRICES_HIDDEN ? "eyeOff" : "eye");
-    eye.classList.toggle("on", PRICES_HIDDEN);
-    eye.title = t("Fiyatları gizle / göster");
-    $("#scanBtn").innerHTML = svgIcon("scan");
-    $("#scanBtn").title = t("Hızlı ara");
-    const seg = $("#langSeg");
-    seg.innerHTML = "";
-    seg.append(el("span.gl", { html: svgIcon("lang") }));
-    for (const [code, label] of [["tr", "TR"], ["en", "EN"], ["ar", "AR"]]) {
-      seg.append(el("button" + (I18N.lang === code ? ".on" : ""), { text: label, onclick: () => App.changeLanguage(code) }));
-    }
-    $("#syncBtn").setAttribute("aria-label", t("Eşitle"));
-    this.drawUpdate();
-  },
-  drawUpdate() {
-    const u = Updater, b = $("#updBtn");
-    if (!b) return;
-    const n = goster((u.manifest || {}).surum || "");
-    let title = t("Güncelle"), hot = false, dis = false, prog = null, fill = 0;
-    if (u.state === "available") { title = t("Güncelle: {n}", { n }); hot = true; }
-    else if (u.state === "installing") {
-      prog = t("%{p} · {a}/{b} MB", { p: u.percent(), a: u.mb(u.done), b: u.mb(u.total) })
-        + " · " + t("Kalan") + " " + t("{a} MB", { a: u.mb(Math.max(u.total - u.done, 0)) }) + " · " + u.rows()[2][1];
-      fill = u.percent(); hot = true;
-    } else if (u.state === "ready") { prog = t("Yeniden başlatılıyor…"); fill = 100; hot = true; }
-    else if (u.state === "checking") { title = t("Denetleniyor…"); dis = true; }
-    else if (u.state === "none") title = t("Program güncel (sürüm {v}).", { v: goster() });
-    $("#updIcon").classList.toggle("spin", u.state === "checking");
-    b.classList.toggle("hot", hot);
-    b.disabled = dis;
-    b.title = title;
-    b.setAttribute("aria-label", title);
-    const box = $("#updProg");
-    box.hidden = prog === null;
-    if (prog !== null) { $("#updTxt").textContent = prog; $("#updFill").style.width = Math.max(0, Math.min(100, +fill || 0)) + "%"; }
-  },
+  // 2.2.0: üst çubuk ortak çekirdekten (kabuk.js → FC.topbar.mount): Fiyatları gizle · Hızlı ara · Duyurular · Eşitle · Wi‑Fi ·
+  // Güncelle · Tema · Dil | Kapat
+  init() { Kabuk.ustCubuk(); },
+  draw() { Kabuk.ciz(); },
+  drawUpdate() {},
 };
 
 // ====================================================================== uygulama
@@ -1322,11 +1258,11 @@ const App = {
     I18N.setLanguage(Store.get("language", "tr"));
     I18N.setOverrides(Store.get("labels_v1", "{}"));
     await Store.seed(I18N.lang);
+    Kabuk.baslat();   // ortak çekirdek: görünüm, dil, güncelleme, duyurular, ilk açılış rehberi, çökme raporu
     await Icons.init();
     await Icons.warm();
     PhotoInput.init();
     Theme.apply();
-    if (window.matchMedia) try { matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => Theme.apply()); } catch (e) { /* yok */ }
     try { if (await Store.purgeOldTrash()) Cloud.soon(); } catch (e) { /* çöp temizliği açılışı engellemesin */ }
     PRICES_HIDDEN = Store.get("prices_hidden", "0") === "1";
     if (!Store.get("price_auto_v1", null)) {
@@ -1335,11 +1271,6 @@ const App = {
       await Store.set("price_auto_v1", "1");
     }
     TopBar.init();
-    $("#syncBtn").onclick = () => {
-      if (Cloud.isConnected()) { Cloud.syncNow(); toast(Cloud.statusText()); }
-      else if (Lan.peer() && Lan.available()) Lan.run();     // bulut yoksa: yerel ağdaki bilgisayarla
-      else { this.tab = 2; this.render(); accountForm(); }
-    };
     Cloud.listeners.push(text => this.syncState(text));
     Store.listeners.push(what => { if (what === "sync") this.render(true); });
     this.render();
@@ -1352,8 +1283,7 @@ const App = {
       else if (Object.values(Store.dirtyRecords()).some(a => a.length) || Store.photosToUpload().length) Cloud.syncNow();
     });
     window.onBack = () => this.back();
-    Updater.init();
-    if (Native && Native.bootOk) Native.bootOk();   // yeni sürüm sağlam açıldı
+    if (Native && Native.bootOk) Native.bootOk();   // açılış sağlam (eski web paketi düzeninin geri dönüş işareti)
   },
 
   back() {
@@ -1368,6 +1298,7 @@ const App = {
     document.documentElement.dir = I18N.rtl ? "rtl" : "ltr";
     $("#appTitle").textContent = "Organizer";
     $("#appSub").textContent = t("Evdeki her şey yerli yerinde");
+    $("#verBadge").textContent = "v" + APP_VERSION;
     TopBar.draw();
     const y = window.scrollY;
     const tabs = $("#tabs");
@@ -1386,14 +1317,18 @@ const App = {
   },
 
   syncState(text) {
-    const dot = $("#syncDot"), icon = $("#syncIcon");
-    const busy = Cloud.busy || Lan.busy;
-    dot.className = busy ? "busy" : !Cloud.isConnected() ? (Lan.peer() && !Lan.lastError ? "ok" : "") : Cloud.lastError ? "err" : "ok";
-    icon.classList.toggle("spin", busy);
-    $("#syncBtn").title = text;
+    Kabuk.esitleme(text);
     if (this.tab === 2 && SettingsPage.cloudDraw) SettingsPage.cloudDraw();
   },
 
+  /** Üst çubuktaki Eşitle: bulut bağlıysa bulut, yoksa yerel ağdaki bilgisayar, o da yoksa hesap formu */
+  syncClick() {
+    if (Cloud.isConnected()) { Cloud.syncNow(); toast(Cloud.statusText()); }
+    else if (Lan.peer() && Lan.available()) Lan.run();
+    else { this.tab = 2; this.render(); accountForm(); }
+  },
+
+  /** Dil değişimi yalnız ortak çekirdekten gelir (üst çubuk / Görünüm kartı → FC.i18n.onChange). */
   async changeLanguage(lang) {
     const old = I18N.lang;
     if (lang === old) return;

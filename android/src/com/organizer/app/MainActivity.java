@@ -63,11 +63,15 @@ import java.util.Map;
  * KABUK 2 (v.1.0.5): yeniden başlatma kurulan sürümü gerçekten açar (güncelleme döngüsü düzeltmesi).
  * KABUK 3 (v.1.0.8): sesli arama (listen), sesli cevap (speak), yerel ağ eşitlemesi (lanDiscover, lanPost),
  *                    koyu görünümde sistem çubukları (setDark, isNight).
+ * KABUK 4 (2.2.0): ortak çekirdek — window.AndroidBridge (FcBridge): GitHub Releases latest.json + FCD1 yama
+ *                    (kurulu APK + yama → yeni APK, ApkPatchInstaller), github.com/departures-mil/organizer/releases/…
+ *                    istekleri yerelde çekilip CORS başlığıyla verilir. Eski imzalı web paketi (Ota) yalnız açılışta
+ *                    APK'daki paketten eskiyse yok sayılır; yeni güncellemeler APK olarak gelir.
  */
 public class MainActivity extends Activity {
     static final String HOST = "app.organizer.local";
     static final String BASE = "https://" + HOST + "/index.html";
-    static final int KABUK = 3;
+    static final int KABUK = 4;
 
     private WebView web;
     private ValueCallback<Uri[]> fileCallback;
@@ -78,6 +82,12 @@ public class MainActivity extends Activity {
     private TextToSpeech tts;
     private boolean ttsReady = false;
     private Ota ota;
+    private FcBridge fc;
+
+    /** JS çalıştır (her iş parçacığından). */
+    void js(final String code) {
+        runOnUiThread(new Runnable() { public void run() { if (web != null) web.evaluateJavascript(code, null); } });
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,13 +122,16 @@ public class MainActivity extends Activity {
         web.setBackgroundColor(Color.WHITE);
         web.setOverScrollMode(View.OVER_SCROLL_NEVER);
         web.addJavascriptInterface(new Native(), "Native");
+        fc = new FcBridge(this);
+        web.addJavascriptInterface(fc, "AndroidBridge");   // ortak çekirdek (FC.host android)
+        fc.cleanupIfUpdated();
 
         web.setWebViewClient(new WebViewClient() {
             @Override
             public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest req) {
                 Uri u = req.getUrl();
                 if (u != null && HOST.equals(u.getHost())) return serve(u.getPath());
-                return null;
+                return githubProxy(req);
             }
 
             @Override
@@ -422,13 +435,13 @@ public class MainActivity extends Activity {
             public void run() {
                 Window w = getWindow();
                 if (Build.VERSION.SDK_INT >= 21) {
-                    w.setStatusBarColor(Color.parseColor(dark ? "#0b2229" : "#2e7d6b"));
-                    w.setNavigationBarColor(Color.parseColor(dark ? "#172126" : "#ffffff"));
+                    w.setStatusBarColor(Color.parseColor(dark ? "#070b14" : "#1d5f74"));
+                    w.setNavigationBarColor(Color.parseColor(dark ? "#070b14" : "#eef2f7"));
                 }
                 if (Build.VERSION.SDK_INT >= 26) {
                     w.getDecorView().setSystemUiVisibility(dark ? 0 : View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);
                 }
-                web.setBackgroundColor(Color.parseColor(dark ? "#111a1e" : "#ffffff"));
+                web.setBackgroundColor(Color.parseColor(dark ? "#070b14" : "#eef2f7"));
             }
         });
     }
@@ -514,6 +527,39 @@ public class MainActivity extends Activity {
         } finally {
             if (c != null) c.disconnect();
         }
+    }
+
+    /** latest.json için: github.com/departures-mil/organizer/releases/… GET isteğini yerelde çeker, CORS başlığı ekler. */
+    private WebResourceResponse githubProxy(WebResourceRequest req) {
+        Uri u = req.getUrl();
+        String p = u == null ? null : u.getPath();
+        if (u == null || !"GET".equalsIgnoreCase(req.getMethod()) || !"https".equals(u.getScheme()) || !"github.com".equals(u.getHost())
+                || p == null || !p.startsWith("/departures-mil/organizer/releases/")) return null;
+        Map<String, String> h = new HashMap<>();
+        h.put("Access-Control-Allow-Origin", "*");
+        h.put("Cache-Control", "no-store");
+        try {
+            HttpURLConnection c = (HttpURLConnection) new URL(u.toString()).openConnection();
+            c.setInstanceFollowRedirects(true);
+            c.setConnectTimeout(15000);
+            c.setReadTimeout(30000);
+            c.setUseCaches(false);
+            c.setRequestProperty("User-Agent", "Organizer-Android");
+            int code = c.getResponseCode();
+            InputStream in = code >= 400 ? c.getErrorStream() : c.getInputStream();
+            if (in == null) in = new ByteArrayInputStream(new byte[0]);
+            String msg = c.getResponseMessage();
+            return new WebResourceResponse(p.endsWith(".json") ? "application/json" : "application/octet-stream", "utf-8",
+                    code, msg == null || msg.isEmpty() ? (code < 400 ? "OK" : "Error") : msg, h, in);
+        } catch (Exception e) {
+            return new WebResourceResponse("text/plain", "utf-8", 502, "Bad Gateway", h, new ByteArrayInputStream(new byte[0]));
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (fc != null) fc.resumeInstall();
     }
 
     @Override

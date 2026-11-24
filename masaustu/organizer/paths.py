@@ -88,22 +88,43 @@ def _old_data_folders(target: Path):
     return [f for _, f in sorted(out, key=lambda x: x[0], reverse=True)]
 
 
+POINTER = "eski-veri-konumu.txt"   # 2.2.0 köprüsü: eski taşınabilir sürümün veri klasörü (kurulu sürüm oradan kopyalar)
+
+
+def _pointer_folder(target: Path):
+    """Köprü sürümünün (eski taşınabilir program) bıraktığı işaret: eski veri klasörü."""
+    try:
+        p = Path((target / POINTER).read_text(encoding="utf-8").strip())
+    except OSError:
+        return None
+    try:
+        if _old_db(p) and p.resolve() != target.resolve():
+            return p
+    except OSError:
+        pass
+    return None
+
+
 def adopt_old_data(target: Path):
-    """Yeni taşınabilir sürüm ilk kez açıldığında eski verileri (Firebase ayarları dahil bütün
-    ayarlar, kayıtlar, fotoğraflar) kopyalar: en son kullanılan eski taşınabilir klasör ya da
-    bilgisayarda kurulu sürüm. Eski veriler silinmez. Kopyalanan yeri döndürür."""
+    """Yeni sürüm ilk kez açıldığında eski verileri (Firebase ayarları dahil bütün ayarlar, kayıtlar, fotoğraflar)
+    kopyalar: köprünün bildirdiği eski taşınabilir klasör (2.2.0 kurulumu), en son kullanılan eski taşınabilir klasör
+    ya da bilgisayarda kurulu sürüm. Eski veriler silinmez. Kopyalanan yeri döndürür."""
     import shutil
     import sqlite3
-    if (target / "organizer.db").exists() or not os.environ.get("ORGANIZER_DATA"):
+    if (target / "organizer.db").exists():
         return None
-    olds = _old_data_folders(target)
-    if not olds:
-        return None
-    old = olds[0]
+    old = _pointer_folder(target)
+    if old is None:
+        if not os.environ.get("ORGANIZER_DATA"):
+            return None
+        olds = _old_data_folders(target)
+        if not olds:
+            return None
+        old = olds[0]
     target.mkdir(parents=True, exist_ok=True)
     for f in old.iterdir():
         dest = target / f.name
-        if f.name == "guncelleme":   # eski sürümün kendi güncellemeleri taşınmaz
+        if f.name in ("guncelleme", "fccore", POINTER):   # eski sürümün kendi güncellemeleri taşınmaz
             continue
         if f.is_dir():
             shutil.copytree(f, dest, dirs_exist_ok=True)

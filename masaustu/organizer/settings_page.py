@@ -8,10 +8,9 @@ from PySide6.QtWidgets import (QAbstractItemView, QComboBox, QFileDialog, QFormL
                                QTreeWidget, QTreeWidgetItem, QVBoxLayout, QWidget)
 
 from .common import Card, NewNodeDialog, confirm, info
-from . import __version__, goster
+from . import __version__
 from .db import CURRENCIES
-from . import i18n
-from .i18n import LANGUAGES, t
+from .i18n import t
 
 
 class DragTree(QTreeWidget):
@@ -147,267 +146,252 @@ class TreeEditor(Card):
         self.changed.emit()
 
 
-class SettingsPage(QWidget):
-    changed = Signal()
-    language_changed = Signal(str)
-    labels_changed = Signal()
-    theme_changed = Signal(str)
 
-    def __init__(self, db, sync=None, updater=None, lan=None, parent=None):
+
+class SettingsPage(QScrollArea):
+    """Ayarlar: üstte Yerler + Kategoriler; altında ortak çekirdek ayar ızgarası:
+    Görünüm (çekirdek) · Genel · Bulut hesabı · Yerel ağ · Veriler ve yedek · Arşiv · Asistan Agent ·
+    Kullanım Limitleri · Otomatik hata raporu · Hakkında (güncelleme) · Admin ile iletişim (HER ZAMAN SON)."""
+    changed = Signal()
+    labels_changed = Signal()
+
+    def __init__(self, db, sync=None, ctl=None, lan=None, parent=None):
         super().__init__(parent)
-        self.db = db
-        self.sync = sync
-        self.updater = updater
-        self.lan = lan
+        self.db, self.sync, self.ctl, self.lan = db, sync, ctl, lan
         self._lan_worker = None
-        root = QVBoxLayout(self)
-        root.setContentsMargins(0, 0, 0, 0)
-        root.setSpacing(14)
-        title = QLabel(t("Ayarlar"))
-        title.setObjectName("PageTitle")
-        root.addWidget(title)
+        self.setWidgetResizable(True)
+        self.setFrameShape(QScrollArea.NoFrame)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        host = QWidget()
+        host.setObjectName("fcContent")
+        self.setWidget(host)
+        self.viewport().setAutoFillBackground(False)
+        root = QVBoxLayout(host)
+        root.setContentsMargins(0, 0, 6, 20)
+        root.setSpacing(18)
 
         row = QHBoxLayout()
-        row.setSpacing(16)
+        row.setSpacing(18)
         self.locations = TreeEditor(db, "locations", t("🏠  Yerler"))
         self.categories = TreeEditor(db, "categories", t("🗂  Kategoriler"))
         for ed in (self.locations, self.categories):
+            ed.setMinimumHeight(380)
             ed.changed.connect(self.changed)
             row.addWidget(ed, 1)
+        root.addLayout(row)
 
-        general = Card()
-        gl = QVBoxLayout(general)
-        gl.setContentsMargins(18, 16, 18, 16)
-        gt = QLabel(t("⚙  Genel"))
-        gt.setObjectName("SectionTitle")
-        gl.addWidget(gt)
-        form = QFormLayout()
-        form.setVerticalSpacing(12)
-        self.language = QComboBox()
-        for code, name in LANGUAGES:
-            self.language.addItem(name, code)
-        self.language.setCurrentIndex(max(0, self.language.findData(i18n.LANG)))
-        self.language.currentIndexChanged.connect(lambda _: self.language_changed.emit(self.language.currentData()))
-        form.addRow(t("Dil:"), self.language)
-        self.theme = QComboBox()
-        for code, name in (("light", "☀  Açık"), ("dark", "🌙  Koyu"), ("auto", "🖥  Sistemle aynı")):
-            self.theme.addItem(t(name), code)
-        self.theme.setCurrentIndex(max(0, self.theme.findData(db.get_setting("theme", "light"))))
-        self.theme.currentIndexChanged.connect(lambda _: self.theme_changed.emit(self.theme.currentData()))
-        form.addRow(t("Görünüm:"), self.theme)
+        from fccore import settings as fcsettings
+        cards = [self._general_card()]
+        if sync is not None:
+            cards.append(self._cloud_card())
+        if lan is not None:
+            cards.append(self._lan_card())
+        cards += [self._data_card(), self._archive_card()]
+        core = getattr(ctl, "core", None)
+        about = {"version": __version__}
+        if core is not None and core.updates is not None:
+            about["on_check"] = lambda: core.updates.check()
+        self.grid = fcsettings.build(cards=cards, usage={"firebase": True, "ai": False}, about=about,
+                                     onboarding=ctl.onboarding_opts() if ctl is not None else None)
+        from . import ajan as _ajan
+        if _ajan.AJAN is not None:
+            try:
+                self.grid.add(_ajan.AJAN.card(self))      # iletişim kartının önüne
+            except Exception:
+                pass
+        root.addWidget(self.grid)
+        root.addStretch(1)
+
+    # ------------------------------------------------------------ kartlar
+    @staticmethod
+    def _card(title, icon, desc=None):
+        from fccore.widgets import Card as FcCard
+        return FcCard("", title, icon, desc)
+
+    def _general_card(self):
+        from fccore.widgets import field, label
+        db = self.db
+        c = self._card(t("⚙  Genel").replace("⚙", "").strip(), "settings")
         self.currency = QComboBox()
         for code, sym, name in CURRENCIES:
             self.currency.addItem(f"{sym}  {t(name)}", code)
         self.currency.setCurrentIndex(max(0, self.currency.findData(db.get_setting("default_currency", "TRY"))))
-        self.currency.currentIndexChanged.connect(
-            lambda _: db.set_setting("default_currency", self.currency.currentData()))
-        form.addRow(t("Varsayılan para birimi:"), self.currency)
+        self.currency.currentIndexChanged.connect(lambda _: db.set_setting("default_currency", self.currency.currentData()))
+        c.add(field(t("Varsayılan para birimi:").rstrip(":"), self.currency))
         self.cc = QLineEdit(db.get_setting("country_code", "90"))
-        self.cc.setMaximumWidth(90)
+        self.cc.setMaximumWidth(110)
         self.cc.setToolTip(t("0 ile başlayan numaralara eklenecek ülke kodu (Türkiye 90, Suriye 963)"))
         self.cc.editingFinished.connect(self._save_cc)
-        form.addRow(t("Ülke telefon kodu:"), self.cc)
-        gl.addLayout(form)
-        cc_hint = QLabel(t("WhatsApp / Telegram bağlantıları için kullanılır. "
-                           "Numara + ile yazılmışsa kendi kodu geçerlidir."))
-        cc_hint.setObjectName("Muted")
-        cc_hint.setWordWrap(True)
-        gl.addWidget(cc_hint)
-
-        gl.addSpacing(14)
-        lt = QLabel(t("🏷  Etiketler"))
-        lt.setObjectName("SectionTitle")
-        gl.addWidget(lt)
-        lh = QLabel(t("Programdaki bütün yazıları (düğmeler, başlıklar, alan adları) kendinize göre değiştirebilirsiniz. "
-                      "Değişiklik yalnızca seçili dil için geçerlidir."))
-        lh.setObjectName("Muted")
-        lh.setWordWrap(True)
-        gl.addWidget(lh)
+        c.add(field(t("Ülke telefon kodu:").rstrip(":"), self.cc,
+                    t("WhatsApp / Telegram bağlantıları için kullanılır. Numara + ile yazılmışsa kendi kodu geçerlidir.")))
+        c.add(label(t("🏷  Etiketler"), "fc-sub"), 16)
+        c.add(label(t("Programdaki bütün yazıları (düğmeler, başlıklar, alan adları) kendinize göre değiştirebilirsiniz. "
+                      "Değişiklik yalnızca seçili dil için geçerlidir."), "card-desc", wrap=True), 6)
         from . import labels as _labels
         n = _labels.count()
         if n:
-            ln = QLabel(t("{n} etiket değiştirildi", n=n))
-            ln.setObjectName("Muted")
-            gl.addWidget(ln)
+            c.add(label(t("{n} etiket değiştirildi", n=n), "muted"), 4)
         lbtn = QPushButton(t("🏷  Etiketleri düzenle…"))
+        lbtn.setProperty("fc", "btn small")
         lbtn.clicked.connect(self._edit_labels)
-        gl.addWidget(lbtn)
+        c.add(lbtn, 8)
+        c.add(label(t("F11: tam ekran aç / kapat · Ctrl+F: ara · Ctrl+N: yeni kayıt · Ctrl+P: döküm"), "field-hint", wrap=True), 14)
+        return c
 
-        if sync is not None:
-            gl.addSpacing(14)
-            ct = QLabel(t("☁  Bulut hesabı (Firebase)"))
-            ct.setObjectName("SectionTitle")
-            gl.addWidget(ct)
-            self.cloud_status = QLabel()
-            self.cloud_status.setObjectName("Muted")
-            self.cloud_status.setWordWrap(True)
-            gl.addWidget(self.cloud_status)
-            crow = QHBoxLayout()
-            self.account_btn = QPushButton()
-            self.account_btn.clicked.connect(self.open_account)
-            self.sync_btn = QPushButton(t("⟳  Şimdi eşitle"))
-            self.sync_btn.clicked.connect(sync.sync_now)
-            crow.addWidget(self.account_btn)
-            crow.addWidget(self.sync_btn)
-            gl.addLayout(crow)
-            sync.state_changed.connect(self._cloud_state)
-            self._cloud_state()
+    def _cloud_card(self):
+        from fccore.widgets import hbox, label
+        c = self._card(t("☁  Bulut hesabı (Firebase)").replace("☁", "").strip(), "cloud")
+        self.cloud_status = label("", "card-desc", wrap=True)
+        c.add(self.cloud_status)
+        self.account_btn = QPushButton()
+        self.account_btn.setProperty("fc", "btn small")
+        self.account_btn.clicked.connect(self.open_account)
+        self.sync_btn = QPushButton(t("⟳  Şimdi eşitle"))
+        self.sync_btn.setProperty("fc", "btn small primary")
+        self.sync_btn.clicked.connect(self.sync.sync_now)
+        c.add(hbox(self.account_btn, self.sync_btn, None), 12)
+        c.add(label(t("Kayıtlar eşitlenirken hiçbir kayıt silinmez ya da üstüne yazılmaz: başka cihazda silinen kayıt "
+                      "bu cihazda Arşiv'e alınır, çakışmada eski hal çakışma yedeğine kaydedilir."), "field-hint", wrap=True), 12)
+        self.sync.state_changed.connect(self._cloud_state)
+        self._cloud_state()
+        return c
 
-        if lan is not None:
-            # ---- v.1.0.8: internet yokken aynı modem / router üzerinden eşitleme
-            gl.addSpacing(14)
-            lt2 = QLabel(t("📶  Yerel ağ eşitlemesi (internetsiz)"))
-            lt2.setObjectName("SectionTitle")
-            gl.addWidget(lt2)
-            lh2 = QLabel(t("İnternet olmadığında telefon ve bilgisayarlar aynı modem / Wi-Fi üzerinden eşitlenir. "
-                           "Kayıtlar bulut eşitlemesindeki gibi birleştirilir: her kaydın en son değiştirilen hali kalır, "
-                           "hiçbir şey silinmez ya da üst üste yazılmaz. İnternet gelince değişiklikler buluta da gider."))
-            lh2.setObjectName("Muted")
-            lh2.setWordWrap(True)
-            gl.addWidget(lh2)
-            from PySide6.QtWidgets import QCheckBox
-            self.lan_on = QCheckBox(t("Bu bilgisayar aynı ağdaki cihazlarla eşitlensin"))
-            self.lan_on.setChecked(lan.enabled())
-            self.lan_on.toggled.connect(lan.set_enabled)
-            gl.addWidget(self.lan_on)
-            self.lan_status = QLabel()
-            self.lan_status.setObjectName("Muted")
-            self.lan_status.setWordWrap(True)
-            self.lan_status.setTextInteractionFlags(Qt.TextSelectableByMouse)
-            gl.addWidget(self.lan_status)
-            krow = QHBoxLayout()
-            self.lan_code = QLabel()
-            self.lan_code.setStyleSheet("font-size: 15pt; font-weight: 700; letter-spacing: 3px;")
-            self.lan_code.setTextInteractionFlags(Qt.TextSelectableByMouse)
-            newk = QPushButton(t("Yeni kod"))
-            newk.clicked.connect(lan.new_code)
-            krow.addWidget(QLabel(t("Eşleme kodu:")))
-            krow.addWidget(self.lan_code)
-            krow.addStretch()
-            krow.addWidget(newk)
-            gl.addLayout(krow)
-            kh = QLabel(t("Telefonda: Ayarlar → Yerel ağ eşitlemesi → „Bilgisayarı bul“. İlk seferde bu kod sorulur "
-                          "(iki cihaz aynı bulut hesabındaysa sorulmaz). Windows güvenlik duvarı sorarsa „Erişime izin ver“ deyin."))
-            kh.setObjectName("Muted")
-            kh.setWordWrap(True)
-            gl.addWidget(kh)
-            self.lan_btn = QPushButton(t("🔍  Ağdaki başka bir bilgisayarla eşitle"))
-            self.lan_btn.clicked.connect(self._lan_sync)
-            gl.addWidget(self.lan_btn)
-            lan.state_changed.connect(self._lan_state)
-            self._lan_state()
+    def _lan_card(self):
+        from PySide6.QtWidgets import QCheckBox
+        from fccore.widgets import hbox, label
+        lan = self.lan
+        c = self._card(t("📶  Yerel ağ eşitlemesi (internetsiz)").replace("📶", "").strip(), "wifi",
+                       t("İnternet olmadığında telefon ve bilgisayarlar aynı modem / Wi-Fi üzerinden eşitlenir. "
+                         "Kayıtlar bulut eşitlemesindeki gibi birleştirilir: her kaydın en son değiştirilen hali kalır, "
+                         "hiçbir şey silinmez ya da üst üste yazılmaz. İnternet gelince değişiklikler buluta da gider."))
+        self.lan_card = c
+        self.lan_on = QCheckBox(t("Bu bilgisayar aynı ağdaki cihazlarla eşitlensin"))
+        self.lan_on.setChecked(lan.enabled())
+        self.lan_on.toggled.connect(lan.set_enabled)
+        c.add(self.lan_on, 10)
+        self.lan_status = label("", "muted", wrap=True)
+        self.lan_status.setTextInteractionFlags(Qt.TextSelectableByMouse)
+        c.add(self.lan_status, 6)
+        self.lan_code = QLabel()
+        self.lan_code.setStyleSheet("font-size: 20px; font-weight: 700; letter-spacing: 3px;")
+        self.lan_code.setTextInteractionFlags(Qt.TextSelectableByMouse)
+        newk = QPushButton(t("Yeni kod"))
+        newk.setProperty("fc", "btn small")
+        newk.clicked.connect(lan.new_code)
+        c.add(hbox(QLabel(t("Eşleme kodu:")), self.lan_code, None, newk), 8)
+        c.add(label(t("Telefonda: Ayarlar → Yerel ağ eşitlemesi → „Bilgisayarı bul“. İlk seferde bu kod sorulur "
+                      "(iki cihaz aynı bulut hesabındaysa sorulmaz). Windows güvenlik duvarı sorarsa „Erişime izin ver“ deyin."),
+                    "field-hint", wrap=True), 6)
+        self.lan_btn = QPushButton(t("🔍  Ağdaki başka bir bilgisayarla eşitle"))
+        self.lan_btn.setProperty("fc", "btn small primary")
+        self.lan_btn.clicked.connect(lambda: self._lan_sync())
+        c.add(self.lan_btn, 10)
+        lan.state_changed.connect(self._lan_state)
+        self._lan_state()
+        return c
 
-        if updater is not None:
-            gl.addSpacing(14)
-            ut = QLabel(t("⬆  Güncelleme"))
-            ut.setObjectName("SectionTitle")
-            gl.addWidget(ut)
-            self.update_status = QLabel()
-            self.update_status.setObjectName("Muted")
-            self.update_status.setWordWrap(True)
-            gl.addWidget(self.update_status)
-            # indirme sırasında: başlık + yüzde, ilerleme çubuğu ve alt alta düzenli bilgi satırları
-            self.dl_box = QWidget()
-            dv = QVBoxLayout(self.dl_box)
-            dv.setContentsMargins(0, 4, 0, 4)
-            dv.setSpacing(6)
-            head = QHBoxLayout()
-            self.dl_title = QLabel()
-            self.dl_title.setStyleSheet("font-weight: 700;")
-            self.dl_pct = QLabel()
-            self.dl_pct.setStyleSheet("font-weight: 700;")
-            self.dl_pct.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-            head.addWidget(self.dl_title, 1)
-            head.addWidget(self.dl_pct)
-            dv.addLayout(head)
-            self.dl_bar = QProgressBar()
-            self.dl_bar.setRange(0, 100)
-            self.dl_bar.setTextVisible(False)
-            self.dl_bar.setFixedHeight(8)
-            dv.addWidget(self.dl_bar)
-            grid = QGridLayout()
-            grid.setHorizontalSpacing(14)
-            grid.setVerticalSpacing(3)
-            self.dl_rows = []
-            for r in range(4):
-                k, v = QLabel(), QLabel()
-                k.setObjectName("Muted")
-                v.setStyleSheet("font-weight: 600;")
-                grid.addWidget(k, r, 0)
-                grid.addWidget(v, r, 1)
-                self.dl_rows.append((k, v))
-            grid.setColumnStretch(1, 1)
-            dv.addLayout(grid)
-            self.dl_box.setVisible(False)
-            gl.addWidget(self.dl_box)
-            self.update_btn = QPushButton()
-            self.update_btn.clicked.connect(self._update_clicked)
-            gl.addWidget(self.update_btn)
-            updater.changed.connect(self._update_state)
-            self._update_state()
-
-        gl.addSpacing(14)
-        dt = QLabel(t("Veriler ve yedek"))
-        dt.setObjectName("SectionTitle")
-        gl.addWidget(dt)
-        path = QLabel(str(db.data_dir))
-        path.setObjectName("Muted")
-        path.setWordWrap(True)
+    def _data_card(self):
+        from fccore.widgets import label
+        db = self.db
+        c = self._card(t("Veriler ve yedek"), "download")
+        path = label(str(db.data_dir), "muted", wrap=True)
         path.setTextInteractionFlags(Qt.TextSelectableByMouse)
-        gl.addWidget(path)
+        c.add(path)
         open_btn = QPushButton(t("📂  Veri klasörünü aç"))
+        open_btn.setProperty("fc", "btn small")
         open_btn.clicked.connect(lambda: QDesktopServices.openUrl(QUrl.fromLocalFile(str(db.data_dir))))
         backup_btn = QPushButton(t("💾  Yedek al (.zip)"))
+        backup_btn.setProperty("fc", "btn small")
         backup_btn.clicked.connect(self._backup)
-        gl.addWidget(open_btn)
-        gl.addWidget(backup_btn)
+        c.add(open_btn, 10)
+        c.add(backup_btn, 8)
+        return c
 
-        # ---- v.1.0.10: kullanım limitleri (kendi Firebase hesabının günlük sınırı)
-        gl.addSpacing(14)
-        from . import kullanim_sayac
-        gl.addWidget(kullanim_sayac.KullanimKarti(self))
+    def _archive_card(self):
+        """Başka cihazda silinen kayıtlar ve çakışma yedekleri (eşitleme kuralı: hiçbir şey kalıcı silinmez)."""
+        from fccore.widgets import label
+        c = self._card(t("Arşiv ve çakışma yedekleri"), "archive",
+                       t("Başka cihazda silinen kayıtlar bu cihazda silinmez, burada arşivlenir. Eşitlemede üstüne "
+                         "yazılan değişikliklerinizin eski hali de burada durur. İstediğinizi geri alabilirsiniz."))
+        self.archive_box = QWidget()
+        self.archive_lay = QVBoxLayout(self.archive_box)
+        self.archive_lay.setContentsMargins(0, 0, 0, 0)
+        self.archive_lay.setSpacing(6)
+        c.add(self.archive_box, 10)
+        self._archive_draw()
+        return c
 
-        # ---- Asistan Agent (admin iletişimin önünde)
-        from . import ajan as _ajan
-        if _ajan.AJAN is not None:
-            gl.addSpacing(14)
-            gl.addWidget(_ajan.AJAN.card(self))
+    def _archive_draw(self):
+        from fccore.widgets import hbox, label
+        lay = self.archive_lay
+        while lay.count():
+            w = lay.takeAt(0).widget()
+            if w:
+                w.deleteLater()
+        try:
+            rows = self.db.archive_list(30)
+            total = self.db.archive_count()
+        except Exception:
+            rows, total = [], 0
+        if not rows:
+            lay.addWidget(label(t("Arşivde kayıt yok."), "muted"))
+            return
+        kinds = {"silindi": t("başka cihazda silindi"), "cakisma": t("çakışma yedeği"), "temizlendi": t("çöp kutusundan temizlendi")}
+        tables = {"items": t("Eşya"), "contacts": t("Usta / dükkan"), "locations": t("Yer"), "categories": t("Kategori")}
+        for r in rows:
+            name = r["name"] or "—"
+            txt = label(f"{tables.get(r['table'], r['table'])}: {name}\n{kinds.get(r['kind'], r['kind'])} · {fmt_ts(r['at'])}",
+                        "muted", wrap=True)
+            b = QPushButton(t("Geri al"))
+            b.setProperty("fc", "btn small")
+            b.clicked.connect(lambda _=False, i=r["id"], n=name: self._restore(i, n))
+            row = hbox(txt, None, b)
+            row.setProperty("fc", "fc-li")
+            lay.addWidget(row)
+        if total > len(rows):
+            lay.addWidget(label(t("… ve {n} kayıt daha", n=total - len(rows)), "muted"))
 
-        # ---- v.1.0.8: admin ile iletişim (öneri / hata bildirimi)
-        gl.addSpacing(14)
-        at = QLabel(t("✉  Admin ile iletişime geç"))
-        at.setObjectName("SectionTitle")
-        gl.addWidget(at)
-        ah = QLabel(t("Öneri, istek ya da hata bildirimlerinizi geliştiriciye gönderin; program sizin önerilerinizle gelişir."))
-        ah.setObjectName("Muted")
-        ah.setWordWrap(True)
-        gl.addWidget(ah)
-        fb = QPushButton(t("✉  Mesaj yaz…"))
-        fb.setObjectName("Primary")
-        fb.clicked.connect(self._feedback)
-        gl.addWidget(fb)
-        gl.addStretch()
-        about = QLabel(t("Organizer {v}\nF11: tam ekran aç / kapat · Ctrl+F: ara · Ctrl+N: yeni kayıt · Ctrl+P: döküm", v=goster()))
-        about.setObjectName("Muted")
-        gl.addWidget(about)
-        scroll = QScrollArea()
-        scroll.setWidgetResizable(True)
-        scroll.setFrameShape(QScrollArea.NoFrame)
-        scroll.setStyleSheet("QScrollArea, QScrollArea > QWidget > QWidget { background: transparent; }")
-        scroll.setWidget(general)
-        row.addWidget(scroll, 1)
-        root.addLayout(row, 1)
+    def _restore(self, aid, name):
+        try:
+            self.db.archive_restore(aid)
+        except Exception as e:  # noqa: BLE001
+            info(self, t("Arşiv ve çakışma yedekleri"), str(e))
+            return
+        from fccore.widgets import toast
+        toast(t("Geri alındı: {s}", s=name), "", 4000)
+        self._archive_draw()
+        self.changed.emit()
+        if self.sync is not None and self.sync.is_connected():
+            self.sync.sync_now()
 
-    def _feedback(self):
-        from .extras import FeedbackDialog
-        FeedbackDialog(self).exec()
+    def refresh_archive(self):
+        if not hasattr(self, "archive_lay"):
+            return
+        try:
+            self._archive_draw()
+        except RuntimeError:
+            pass
+
+    # ------------------------------------------------------------ yerel ağ
+    def lan_busy(self):
+        return self._lan_worker is not None and self._lan_worker.isRunning()
+
+    def show_lan(self):
+        if getattr(self, "lan_card", None) is not None:
+            self.ensureWidgetVisible(self.lan_card, 0, 40)
 
     def _lan_state(self, *_):
-        self.lan_status.setText(self.lan.status_text())
-        self.lan_code.setText(self.lan.code())
-        busy = self._lan_worker is not None and self._lan_worker.isRunning()
-        self.lan_btn.setEnabled(not busy)
-        self.lan_btn.setText(t("⟳  Eşitleniyor…") if busy else t("🔍  Ağdaki başka bir bilgisayarla eşitle"))
+        try:
+            self.lan_status.setText(self.lan.status_text())
+            self.lan_code.setText(self.lan.code())
+            busy = self.lan_busy()
+            self.lan_btn.setEnabled(not busy)
+            self.lan_btn.setText(t("⟳  Eşitleniyor…") if busy else t("🔍  Ağdaki başka bir bilgisayarla eşitle"))
+        except RuntimeError:
+            return
+        w = self.window()
+        if hasattr(w, "_lan_state") and w is not self:
+            w._lan_state()
 
     def _lan_sync(self, host=None, port=None, name=None):
         from PySide6.QtWidgets import QApplication
@@ -460,7 +444,10 @@ class SettingsPage(QWidget):
             self.db.set_setting("lan_peer", f"{host}:{port}")
             self._lan_state()
             self.changed.emit()
-            self.window()._remote_data()
+            win = self.window()
+            if hasattr(win, "_remote_data"):
+                win._remote_data()
+            self.refresh_archive()
             info(self, t("Yerel ağ eşitlemesi"), t("{name} ile eşitlendi.\n{a} kayıt alındı · {b} fotoğraf gönderildi · {c} fotoğraf alındı.",
                                                     name=name, a=res["received"], b=res["sent"], c=res["photos"]))
 
@@ -480,70 +467,20 @@ class SettingsPage(QWidget):
         w.start()
         self._lan_state()
 
+    # ------------------------------------------------------------ bulut
     def _cloud_state(self, *_):
-        connected = self.sync.is_connected()
-        text = self.sync.status_text()
-        if connected:
-            text = t("Bağlı hesap: {e}", e=self.sync.email()) + "\n" + text
-        self.cloud_status.setText(text)
-        self.account_btn.setText(t("🔌  Hesabı kaldır") if connected else t("🔑  Hesaba bağlan"))
-        self.sync_btn.setEnabled(connected and not self.sync.busy())
-
-    def _update_state(self):
-        u = self.updater
-        v = u.version
-        man = u.manifest or {}
-        new = goster(man.get("surum", ""))
-        btn, enabled, primary = t("🔄  Güncellemeleri denetle"), True, False
-        if u.state == "checking":
-            text, enabled = t("Sürüm {v} · Güncellemeler denetleniyor…", v=v), False
-        elif u.state == "none":
-            text = t("Sürüm {v} · Program güncel.", v=v)
-        elif u.state == "available":
-            text = t("Sürüm {v} · Yeni sürüm hazır: {n}", v=v, n=new)
-            if man.get("notlar"):
-                text += "\n" + man["notlar"]
-            btn, primary = t("⬆  Şimdi güncelle ({n})", n=new), True
-        elif u.state == "installing":
-            text, enabled = t("Sürüm {v}", v=v), False
-            btn = t("⬇  İndiriliyor %{p}", p=u.percent())
-        elif u.state == "ready":
-            text = t("{n} kuruldu. Program yeniden başlatılıyor…", n=goster(u.installed))
-            btn, primary = t("↻  Yeniden başlat"), True
-        elif u.state == "error":
-            if u.message == "cloud":
-                text = t("Sürüm {v} · Güncellemeler bulut hesabı üzerinden gelir; önce hesaba bağlanın.", v=v)
-            elif u.message == "sistem":
-                text = t("Sürüm {v} · {n} sürümü uygulama içinden kurulamıyor; yeni tam paket gerekiyor.", v=v, n=new)
-            else:
-                text = t("Sürüm {v}", v=v) + "\n⚠ " + u.message
-        else:
-            text = t("Sürüm {v}", v=v)
-        self.update_status.setText(text)
-        downloading = u.state == "installing"
-        self.dl_box.setVisible(downloading)
-        if downloading:
-            from .updater import progress_rows
-            self.dl_title.setText(t("Güncelleme indiriliyor: {n}", n=new))
-            self.dl_pct.setText(f"%{u.percent()}")
-            self.dl_bar.setValue(u.percent())
-            for (k, v), (a, b) in zip(self.dl_rows, progress_rows(u)):
-                k.setText(a)
-                v.setText(b)
-        self.update_btn.setText(btn)
-        self.update_btn.setEnabled(enabled)
-        self.update_btn.setObjectName("Primary" if primary else "")
-        self.update_btn.style().unpolish(self.update_btn)
-        self.update_btn.style().polish(self.update_btn)
-
-    def _update_clicked(self):
-        u = self.updater
-        if u.state == "available":
-            u.install()
-        elif u.state == "ready":
-            self.window().restart_for_update()
-        else:
-            u.check()
+        try:
+            connected = self.sync.is_connected()
+            text = self.sync.status_text()
+            if connected:
+                text = t("Bağlı hesap: {e}", e=self.sync.email()) + "\n" + text
+            self.cloud_status.setText(text)
+            self.account_btn.setText(t("🔌  Hesabı kaldır") if connected else t("🔑  Hesaba bağlan"))
+            self.sync_btn.setEnabled(connected and not self.sync.busy())
+        except RuntimeError:
+            return
+        if not self.sync.busy():
+            self.refresh_archive()
 
     def open_account(self):
         if self.sync is None:
@@ -557,6 +494,7 @@ class SettingsPage(QWidget):
         from .cloud import AccountDialog
         AccountDialog(self.sync, self).exec()
 
+    # ------------------------------------------------------------ diğer
     def _edit_labels(self):
         from .labels import LabelEditor
         if LabelEditor(self.db, self).exec():
@@ -577,3 +515,15 @@ class SettingsPage(QWidget):
     def refresh(self):
         self.locations.reload()
         self.categories.reload()
+        self.refresh_archive()
+
+
+def fmt_ts(v):
+    """ISO zaman (UTC) → yerel 'gg.aa.yyyy ss:dd'."""
+    try:
+        d = datetime.fromisoformat(str(v).replace("Z", "+00:00"))
+        if d.tzinfo is not None:
+            d = d.astimezone()
+        return d.strftime("%d.%m.%Y %H:%M")
+    except Exception:
+        return str(v or "")

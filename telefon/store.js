@@ -31,6 +31,15 @@ function norm(text) {
 }
 
 function nowUtc() { return new Date().toISOString(); }
+/** İki kayıt (eşitleme biçimi) zaman damgaları ve yerel alanlar dışında aynı mı? */
+function sameRecord(a, b) {
+  const skip = new Set(["mtime", "synced_at", "updated_at", "dirty"]);
+  for (const k of new Set([...Object.keys(a), ...Object.keys(b)])) {
+    if (skip.has(k) || !(k in a) || !(k in b)) continue;
+    if (JSON.stringify(a[k]) !== JSON.stringify(b[k])) return false;
+  }
+  return true;
+}
 
 // ------------------------------------------------------------------ v.1.0.8: yeni alanlar
 // Eski sürümden gelen kayıtta bu alanlar yoksa eldeki değer korunur (applyRemote).
@@ -481,10 +490,12 @@ const Store = {
     if (c) await this.save("contacts", { ...c, jobs, mtime: nowUtc(), dirty: true });
   },
 
-  /** Kalıcı silme (geri alınamaz) */
+  /** Çöp kutusundan temizleme: "silindi" olarak yayılır; kaydın kendisi (fotoğrafsız) Arşiv'de kalır (2.2.0) */
   async purgeItems(uids) {
     const ts = nowUtc();
     const photos = [];
+    await this._archive(uids.map(u => this.t.items.get(u)).filter(r => r && !r.deleted)
+      .map(r => ["items", { ...r, photos: [] }, "temizlendi", "yerel"]));
     const recs = uids.map(u => {
       const r = this.t.items.get(u);
       photos.push(...r.photos);
@@ -567,6 +578,8 @@ const Store = {
   async deleteContacts(uids) {
     const ts = nowUtc();
     const photos = [];
+    await this._archive(uids.map(u => this.t.contacts.get(u)).filter(c => c && !c.deleted)
+      .map(c => ["contacts", { ...c, photos: [] }, "temizlendi", "yerel"]));
     await this.save("contacts", uids.map(u => {
       const c = this.t.contacts.get(u);
       photos.push(...(c.photos || []));
@@ -620,6 +633,9 @@ const Store = {
   async applyRemote(table, records, keepDirty) {
     const accepted = [];
     const dropPhotos = [];
+    // 2.2.0 eşitleme kuralı (ortak çekirdek lan-sync-merge): uzak silme yerelde kaydı yok etmez — son hali (fotoğraflarıyla)
+    // arşive alınır; gönderilmemiş yerel değişikliğin üstüne yazılırsa eski hal çakışma yedeğine.
+    const archive = [], keepPhotos = new Set();
     for (const rec of records) {
       const cur = this.t[table].get(rec.uid);
       if (cur && cur.mtime >= (rec.mtime || "")) {
@@ -627,6 +643,13 @@ const Store = {
         if (table === "items" && cur.mtime === rec.mtime && "price_auto" in rec && !!cur.price_auto !== !!rec.price_auto)
           accepted.push({ ...cur, price_auto: !!rec.price_auto });
         continue;
+      }
+      if (cur && !cur.deleted) {
+        const kind = rec.deleted ? "silindi" : cur.dirty && !sameRecord(cur, rec) ? "cakisma" : null;
+        if (kind) {
+          archive.push([table, { ...cur }, kind, "esitleme"]);
+          for (const p of cur.photos || []) keepPhotos.add(p);
+        }
       }
       let r;
       if (TREE_TABLES.includes(table)) {
@@ -660,9 +683,47 @@ const Store = {
       if (keepDirty) r.dirty = true;
       accepted.push(r);
     }
+    if (archive.length) await this._archive(archive);
     await this.save(table, accepted);
-    if (dropPhotos.length) await this._removePhotoData(dropPhotos);
+    const drop = dropPhotos.filter(p => !keepPhotos.has(p));
+    if (drop.length) await this._removePhotoData(drop);
     return accepted.length;
+  },
+
+  // -------------------------------------------------------------- arşiv (2.2.0: hiçbir kayıt kalıcı silinmez)
+  archiveAll() { try { return JSON.parse(this.get("arsiv_v1", "[]")) || []; } catch (e) { return []; } },
+  async _archive(entries) {
+    if (!entries.length) return;
+    const list = this.archiveAll();
+    let id = list.reduce((m, a) => Math.max(m, a.id || 0), 0);
+    for (const [table, rec, kind, src] of entries) {
+      const { dirty, ...data } = rec;  // eslint-disable-line no-unused-vars
+      list.push({ id: ++id, table, uid: rec.uid, kind, source: src, at: nowUtc(), name: String(rec.name || "").slice(0, 120), data, restored: "" });
+    }
+    // en çok 1000 kayıt (en eskiler, geri alınmışlar önce düşer)
+    const keep = list.filter(a => !a.restored).slice(-1000);
+    await this.set("arsiv_v1", JSON.stringify(keep));
+  },
+  archiveList(limit) { return this.archiveAll().filter(a => !a.restored).reverse().slice(0, limit || 50); },
+  archiveCount() { return this.archiveAll().filter(a => !a.restored).length; },
+  async archiveRestore(id) {
+    const list = this.archiveAll();
+    const a = list.find(x => x.id === id);
+    if (!a) return null;
+    const cur = this.t[a.table].get(a.uid);
+    let ts = nowUtc();
+    if (cur && cur.mtime >= ts) ts = new Date(Date.parse(cur.mtime) + 1).toISOString();
+    const rec = { ...a.data, deleted: false, mtime: ts };
+    if (a.table === "items") rec.trashed_at = "";
+    if (a.table === "items" || a.table === "contacts") {
+      const ok = [];
+      for (const p of rec.photos || []) if (await this.hasPhoto(p)) ok.push(p);
+      rec.photos = ok;
+    }
+    await this.applyRemote(a.table, [rec], true);
+    a.restored = nowUtc();
+    await this.set("arsiv_v1", JSON.stringify(list.filter(x => !x.restored)));
+    return a.uid;
   },
 
   /** Eşya ve usta/dükkan fotoğrafları: [[dosya, sahibin uid'si]] */

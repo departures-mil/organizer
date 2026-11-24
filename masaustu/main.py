@@ -78,7 +78,9 @@ if __name__ == "__main__":
             sys.stderr = sys.stdout = open(_log_file(), "a", encoding="utf-8")
         except OSError:
             pass
-    folder, ver = _updated_folder()
+    # 2.1'in uygulama içi paket güncellemesi (veri/guncelleme/etkin.txt) yalnız eski taşınabilir kurulumda geçerliydi;
+    # 2.2.0'dan beri program kurulumla gelir ve fccore ile güncellenir (PyInstaller: sys.frozen) → eski paketler yüklenmez.
+    folder, ver = (None, "") if getattr(sys, "frozen", False) else _updated_folder()
     if folder:
         sys.path.insert(0, folder)
         os.environ["ORGANIZER_OTA"] = ver

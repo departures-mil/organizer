@@ -9,7 +9,6 @@ Kurallar: son değiştirilen kazanır (mtime), silinenler "deleted" işaretiyle 
 """
 import base64
 import json
-from . import kullanim_sayac
 import os
 import re
 import time
@@ -140,12 +139,12 @@ class FirebaseClient:
             with urllib.request.urlopen(req, timeout=60) as r:
                 raw = r.read()
                 out = json.loads(raw) if raw else {}
-                kullanim_sayac.kaydet(method, url, body, r.status, out)  # Ayarlar > Kullanım Limitleri
+                _count(method, url, body, r.status, out)  # Ayarlar > Kullanım Limitleri (fccore.usage)
                 return out
         except urllib.error.HTTPError as e:
             try:
                 err = json.loads(e.read())
-                kullanim_sayac.kaydet(method, url, body, e.code, err)
+                _count(method, url, body, e.code, err)
                 msg = err.get("error", {}).get("message", "") if isinstance(err.get("error"), dict) \
                     else str(err.get("error", ""))
             except Exception:
@@ -322,3 +321,12 @@ def sync(db: Database, client: FirebaseClient, progress=None):
             (db.photos_dir / fname).write_bytes(doc["data"])
             db.set_photo_state(fname, "up")
     return {"received": received, "sent": sent}
+
+
+def _count(method, url, body, status, resp):
+    """Firestore / Auth isteğini ortak çekirdeğin Kullanım Limitleri sayacına yazar (hata olursa sessiz)."""
+    try:
+        from fccore import usage
+        usage.count_http(method, url, body, status, resp)
+    except Exception:
+        pass

@@ -1,3 +1,4 @@
+import json
 import re
 import shutil
 import sqlite3
@@ -115,6 +116,12 @@ CREATE TABLE IF NOT EXISTS contact_photos(
 );
 CREATE TABLE IF NOT EXISTS settings(key TEXT PRIMARY KEY, value TEXT);
 CREATE TABLE IF NOT EXISTS photo_sync(filename TEXT PRIMARY KEY, state TEXT NOT NULL);
+-- 2.2.0 eşitleme kuralı: hiçbir kayıt kalıcı silinmez. Başka cihazda silinen kayıt (tur='silindi'), eşitlemede üstüne
+-- yazılan gönderilmemiş değişiklik (tur='cakisma') ve çöp kutusundan temizlenen kayıt (tur='temizlendi') burada durur.
+CREATE TABLE IF NOT EXISTS arsiv(
+    id INTEGER PRIMARY KEY AUTOINCREMENT, tablo TEXT NOT NULL, uid TEXT NOT NULL, tur TEXT NOT NULL,
+    kaynak TEXT NOT NULL DEFAULT '', zaman TEXT NOT NULL, ad TEXT NOT NULL DEFAULT '', veri TEXT NOT NULL,
+    geri_alindi TEXT NOT NULL DEFAULT '');
 CREATE INDEX IF NOT EXISTS ix_items_cat ON items(category_id);
 CREATE INDEX IF NOT EXISTS ix_items_loc ON items(location_id);
 CREATE INDEX IF NOT EXISTS ix_photos_item ON item_photos(item_id);
@@ -256,6 +263,32 @@ def phone_for_links(phone: str, country_code: str = "90") -> str:
     if len(digits) <= 10:
         return country_code + digits
     return digits
+
+
+def _later_than(mtime):
+    """Şimdiki zaman; yerel kayıt (ör. saati ileri bir cihazdan gelmiş) daha yeniyse ondan 1 ms sonrası."""
+    now = now_utc()
+    if not mtime or mtime < now:
+        return now
+    from datetime import timedelta
+    try:
+        d = datetime.strptime(mtime.rstrip("Z")[:23], "%Y-%m-%dT%H:%M:%S.%f") + timedelta(milliseconds=1)
+        return d.strftime("%Y-%m-%dT%H:%M:%S.") + f"{d.microsecond // 1000:03d}Z"
+    except ValueError:
+        return mtime + "1"
+
+
+def _record_name(table, rec):
+    return str(rec.get("name") or "")[:120]
+
+
+_VOLATILE = {"mtime", "synced_at", "updated_at"}
+
+
+def _same_record(a, b):
+    """İki kayıt (eşitleme biçimi) zaman damgaları dışında aynı mı?"""
+    keys = (set(a) | set(b)) - _VOLATILE
+    return all(a.get(k) == b.get(k) for k in keys if k in a and k in b)
 
 
 def now_utc() -> str:
@@ -758,9 +791,11 @@ class Database:
         return len(ids)
 
     def purge_items(self, item_ids):
-        """Kalıcı silme (geri alınamaz): kayıt "silindi" işaretiyle yayılır, fotoğraflar silinir."""
+        """Çöp kutusundan temizleme: kayıt "silindi" işaretiyle yayılır, fotoğraflar silinir; kaydın kendisi
+        (fotoğrafsız) Ayarlar → Arşiv'de kalır (2.2.0: hiçbir veri kalıcı silinmez)."""
         for item_id in item_ids:
             photos = self.item_photos(item_id)
+            self._archive_local("items", item_id, "temizlendi")
             with self.conn:
                 self.conn.execute("UPDATE items SET deleted=1, mtime=?, dirty=1 WHERE id=?",
                                   (now_utc(), item_id))
@@ -935,6 +970,7 @@ class Database:
     def delete_contacts(self, ids):
         for cid in ids:
             photos = self.contact_photos(cid)
+            self._archive_local("contacts", cid, "temizlendi")
             with self.conn:
                 self.conn.execute("UPDATE contacts SET deleted=1, mtime=?, dirty=1 WHERE id=?", (now_utc(), cid))
                 self.conn.execute("DELETE FROM contact_photos WHERE contact_id=?", (cid,))
@@ -1026,7 +1062,7 @@ class Database:
         """Buluttan (ya da yerel ağdan) gelen kayıtları birleştirir (son değişiklik kazanır).
         keep_dirty: kabul edilen kayıt buluta da gönderilsin (yerel ağdan gelenler). Değişen kayıt sayısını döndürür."""
         changed = 0
-        local = {r["uid"]: r for r in self.conn.execute(f"SELECT uid, mtime, id FROM {table}")}
+        local = {r["uid"]: r for r in self.conn.execute(f"SELECT uid, mtime, id, deleted, dirty FROM {table}")}
         accepted = []
         for rec in records:
             cur = local.get(rec["uid"])
@@ -1040,6 +1076,29 @@ class Database:
         if not accepted:
             self.conn.commit()
             return 0
+        # 2.2.0 eşitleme kuralı (ortak çekirdek lan-sync-merge): uzak silme yerelde kaydı yok etmez — kaydın son hali
+        # (fotoğraf dosyalarıyla) arşive alınır; gönderilmemiş yerel değişikliğin üstüne yazılırsa eski hal çakışma yedeğine.
+        keep_photos = set()
+        archive = []
+        for rec in accepted:
+            cur = local.get(rec["uid"])
+            if cur is None or cur["deleted"]:
+                continue
+            if rec.get("deleted"):
+                kind = "silindi"
+            elif cur["dirty"]:
+                kind = "cakisma"
+            else:
+                continue
+            old = self._export_one(table, cur["id"])
+            if old is None or (kind == "cakisma" and _same_record(old, rec)):
+                continue
+            keep_photos.update(old.get("photos") or [])
+            archive.append((table, rec["uid"], kind, "esitleme", now_utc(), _record_name(table, old),
+                            json.dumps(old, ensure_ascii=False)))
+        if archive:
+            self.conn.executemany("INSERT INTO arsiv(tablo, uid, tur, kaynak, zaman, ad, veri) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                                  archive)
         with self.conn:
             if table in TREE_TABLES:
                 for rec in accepted:
@@ -1100,7 +1159,7 @@ class Database:
                     self.conn.execute("DELETE FROM item_photos WHERE item_id=?", (item_id,))
                     self.conn.executemany("INSERT INTO item_photos(item_id, filename, sort) VALUES (?, ?, ?)",
                                           [(item_id, f, i) for i, f in enumerate(new)])
-                    self._unlink_photos(old - set(new))
+                    self._unlink_photos(old - set(new) - keep_photos)
                     changed += 1
             elif table == "contacts":
                 for rec in accepted:
@@ -1129,7 +1188,7 @@ class Database:
                         self.conn.execute("DELETE FROM contact_photos WHERE contact_id=?", (cid,))
                         self.conn.executemany("INSERT INTO contact_photos(contact_id, filename, sort) VALUES (?, ?, ?)",
                                               [(cid, f, i) for i, f in enumerate(new)])
-                        self._unlink_photos(old - set(new))
+                        self._unlink_photos(old - set(new) - keep_photos)
                     changed += 1
             if keep_dirty:
                 self.conn.executemany(f"UPDATE {table} SET dirty=1 WHERE uid=?", [(r["uid"],) for r in accepted])
@@ -1178,6 +1237,57 @@ class Database:
                 self.conn.execute(f"UPDATE {table} SET dirty=1")
             self.conn.execute("DELETE FROM photo_sync")
             self.conn.execute("DELETE FROM settings WHERE key LIKE 'sync_cursor_%'")
+
+    # ------------------------------------------------------------------ arşiv (2.2.0)
+    def dirty_count(self):
+        """Buluta henüz gönderilmemiş kayıt sayısı (üst çubuktaki Eşitle rozeti)."""
+        return sum(self.conn.execute(f"SELECT COUNT(*) FROM {t} WHERE dirty=1").fetchone()[0] for t in SYNC_TABLES)
+
+    def _export_one(self, table, row_id):
+        uid = self.conn.execute(f"SELECT uid FROM {table} WHERE id=?", (row_id,)).fetchone()
+        if not uid:
+            return None
+        recs = self._records(f"id={int(row_id)}").get(table) or []
+        return recs[0] if recs else None
+
+    def _archive_local(self, table, row_id, kind):
+        old = self._export_one(table, row_id)
+        if old is None or old.get("deleted"):
+            return
+        old = dict(old, photos=[])          # fotoğraflar kullanıcının isteğiyle silinir
+        with self.conn:
+            self.conn.execute("INSERT INTO arsiv(tablo, uid, tur, kaynak, zaman, ad, veri) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                              (table, old["uid"], kind, "yerel", now_utc(), _record_name(table, old),
+                               json.dumps(old, ensure_ascii=False)))
+
+    def archive_count(self):
+        return self.conn.execute("SELECT COUNT(*) FROM arsiv WHERE geri_alindi=''").fetchone()[0]
+
+    def archive_list(self, limit=50):
+        return [{"id": r["id"], "table": r["tablo"], "uid": r["uid"], "kind": r["tur"], "source": r["kaynak"],
+                 "at": r["zaman"], "name": r["ad"]}
+                for r in self.conn.execute("SELECT * FROM arsiv WHERE geri_alindi='' ORDER BY id DESC LIMIT ?", (limit,))]
+
+    def archive_restore(self, aid):
+        """Arşivdeki kaydı geri getirir: yeni bir değişiklik olarak yazılır (diğer cihazlara da gider)."""
+        r = self.conn.execute("SELECT * FROM arsiv WHERE id=?", (aid,)).fetchone()
+        if r is None:
+            raise ValueError("arsiv")
+        rec = json.loads(r["veri"])
+        rec["deleted"] = False
+        cur = self.conn.execute(f"SELECT mtime FROM {r['tablo']} WHERE uid=?", (rec["uid"],)).fetchone()
+        rec["mtime"] = _later_than(cur["mtime"] if cur else "")
+        if r["tablo"] == "items":
+            rec["trashed_at"] = ""
+            rec["photos"] = [f for f in (rec.get("photos") or []) if (self.photos_dir / f).exists()]
+        if r["tablo"] == "contacts":
+            rec["photos"] = [f for f in (rec.get("photos") or []) if (self.photos_dir / f).exists()]
+        self.apply_remote(r["tablo"], [rec], keep_dirty=True)
+        with self.conn:
+            self.conn.execute("UPDATE arsiv SET geri_alindi=? WHERE id=?", (now_utc(), aid))
+            for f in rec.get("photos") or []:
+                self.conn.execute("DELETE FROM photo_sync WHERE filename=? AND state='delete'", (f,))
+        return rec["uid"]
 
     # ------------------------------------------------------------------ yedek
     def backup(self, target_zip: Path):
