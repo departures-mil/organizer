@@ -101,6 +101,8 @@ class Controller:
             self.win.showMaximized()
         else:
             self.win.show()
+        from . import ajan
+        ajan.pencere(self.app, self.win, old is None)
         if old is not None:
             old.hide()
             old.deleteLater()
@@ -150,6 +152,8 @@ def run():
         db.purge_old_trash()   # çöp kutusunda 30 günü dolanlar kalıcı silinir
     except Exception:
         pass
+    from . import ajan
+    ajan.kur(app)
     ctl = Controller(app, db)
     from . import common
     common.PRICES_HIDDEN = db.get_setting("prices_hidden", "0") == "1"
