@@ -1,10 +1,13 @@
 <!doctype html>
-<html lang="tr">
+<html lang="tr" data-scheme="falcon">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#1d5f74">
+<meta name="theme-color" content="#070b14">
 <title>Organizer</title>
+<script>/* görünümü ilk boyamadan önce uygula (yanıp sönmesin) */try{var g=function(k){try{return JSON.parse(localStorage.getItem('fc.'+k))}catch(e){return null}},d=document.documentElement,th=g('theme'),sc=g('scheme'),l=g('lang');if(sc)d.setAttribute('data-scheme',sc);if(th==='light'||(th==='auto'&&matchMedia('(prefers-color-scheme: light)').matches))d.classList.add('theme-light');if(l){d.lang=l;d.dir=l==='ar'?'rtl':'ltr'}}catch(e){}</script>
+<link rel="stylesheet" href="cekirdek/css/tokens.css">
+<link rel="stylesheet" href="cekirdek/css/core.css">
 <link rel="stylesheet" href="app.css">
 </head>
 <body>
@@ -12,15 +15,9 @@
   <div class="toprow">
     <img src="img/logo.png" alt="" class="logo">
     <div class="titles"><div id="appTitle"></div><div id="appSub"></div></div>
-    <div class="tbtns">
-      <button id="updBtn" class="iconbtn" aria-label="update"><span id="updIcon"></span><i id="updDot"></i></button>
-      <button id="syncBtn" class="iconbtn" aria-label="sync"><span id="syncIcon"></span><i id="syncDot"></i></button>
-      <button id="eyeBtn" class="iconbtn" aria-label="hide"></button>
-      <button id="scanBtn" class="iconbtn" aria-label="search"></button>
-    </div>
+    <span class="version-badge" id="verBadge"></span>
   </div>
-  <div class="toprow langrow"><div id="langSeg" class="tbseg"></div></div>
-  <div id="updProg" hidden><div class="upt"><span id="updTxt"></span></div><div class="upbar"><i id="updFill"></i></div></div>
+  <div id="tbHost"></div>
 </header>
 <main id="page"></main>
 <nav id="tabs"></nav>
@@ -28,18 +25,13 @@
 <div id="toast"></div>
 <input type="file" id="camInput" accept="image/*" capture="environment" hidden>
 <input type="file" id="galInput" accept="image/*" multiple hidden>
+<script src="cekirdek/fc-core.js"></script>
+<script src="kabuk.js"></script>
 <script src="i18n.js"></script>
 <script src="store.js"></script>
-<script src="kullanim.js"></script>
 <script src="sync.js"></script>
 <script src="icons.js"></script>
-<script src="updater.js"></script>
 <script src="app.js"></script>
 <script src="ekler.js"></script>
-<script src="duyuru.js"></script>
-<script>window.duyuruLinkAc=function(u){openUrl(u)};Duyuru.baslat({uygulama:"organizer",surum:goster(),dil:function(){return I18N.lang}});</script>
-<script>Kullanim.baslat({uygulama:"organizer",bulut:true,ai:false,linkAc:function(u){openUrl(u)},dil:function(){return I18N.lang},proje:function(){try{return Cloud.isConnected()?(Cloud.config()||{}).projectId:""}catch(e){return ""}}});</script>
-  <script src="fc-agent.js"></script>
-  <script src="agent-baslat.js"></script>
 </body>
 </html>

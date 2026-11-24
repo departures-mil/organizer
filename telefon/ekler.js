@@ -78,22 +78,17 @@ const Undo = {
 
 // ====================================================================== görünüm (açık / koyu)
 const Theme = {
-  mode() { return Store.get("theme", "light"); },
-  dark() {
-    const m = this.mode();
-    if (m === "dark") return true;
-    if (m === "light") return false;
-    if (NativeCall.has("isNight")) return !!Native.isNight();
-    return !!(window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches);
-  },
+  // 2.2.0: koyu / açık / otomatik ve renk şeması ortak çekirdekte (FC.look; Ayarlar → Görünüm, üst çubuktaki tema düğmesi)
+  mode() { return FC.look.theme(); },
+  dark() { return FC.look.effective() === "dark"; },
   apply() {
     const dark = this.dark();
     document.documentElement.dataset.theme = dark ? "dark" : "light";
     const meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.content = dark ? "#0f1c21" : "#1d5f74";
+    if (meta) meta.content = getComputedStyle(document.documentElement).getPropertyValue("--bg").trim() || (dark ? "#070b14" : "#eef2f7");
     if (NativeCall.has("setDark")) { try { Native.setDark(dark); } catch (e) { /* eski kabuk */ } }
   },
-  async set(mode) { await Store.set("theme", mode); this.apply(); App.render(true); },
+  async set(mode) { FC.look.setTheme(mode); },
 };
 
 // ====================================================================== sesli arama

@@ -1,0 +1,10 @@
+ortak-cekirdek fe5a3d9079d50505e3544c2d0c3ef15a9eff363f
+https://github.com/departures-mil/ortak-cekirdek/tree/fe5a3d9079d50505e3544c2d0c3ef15a9eff363f
+Kopyalanan:
+- qt/fccore → masaustu/fccore (Python/PySide6 çekirdeği; masaüstü)
+- web/dist/fc-core.js, web/css, web/fonts → telefon/cekirdek/ (telefon arayüzü)
+- delta/java/FcDelta.java, ApkPatchInstaller.java → android/src/com/departuresmil/ortak/
+Yerel düzeltmeler (çekirdeğe önerildi):
+- web/dist/fc-core.js (js/updater.js): FC.host.update.run(plan, ilerleme) varsa indirme + yama + kurulum kabukta yapılır
+  (Android: Java tarafında GitHub indirmesi — WebView'de CORS yok — + ApkPatchInstaller; kitaplik ile aynı ek).
+- delta/java/ApkPatchInstaller.java: androidx FileProvider yerine uygulamanın kendi ContentProvider'ı (Gradle'sız kabuk).
