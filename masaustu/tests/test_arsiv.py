@@ -84,3 +84,20 @@ def test_yerel_ag_birlestirme_ayni_kural(tmp_path):
     assert b.count_items() == 0
     kinds = [r["kind"] for r in b.archive_list()]
     assert "silindi" in kinds                          # B'de arşivde duruyor
+
+
+def test_kopru_isareti_ile_eski_veri_kopyalanir(tmp_path, monkeypatch):
+    """Köprü (eski taşınabilir program) eski veri klasörünü bildirir; kurulu sürüm ilk açılışta kopyalar, eskiyi silmez."""
+    from organizer import paths
+    eski = tmp_path / "Organizer-Tasinabilir" / "veri"
+    db = Database(eski)
+    _item(db, "Eski kayıt")
+    db.conn.close()
+    yeni = tmp_path / "AppData" / "Organizer"
+    yeni.mkdir(parents=True)
+    (yeni / paths.POINTER).write_text(str(eski), encoding="utf-8")
+    monkeypatch.delenv("ORGANIZER_DATA", raising=False)
+    assert paths.adopt_old_data(yeni) == eski
+    assert Database(yeni).count_items() == 1
+    assert (eski / "organizer.db").exists()
+    assert paths.adopt_old_data(yeni) is None          # ikinci açılışta tekrar kopyalanmaz
