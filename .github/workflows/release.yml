@@ -48,6 +48,9 @@ jobs:
   build-win:
     needs: test
     runs-on: windows-latest
+    env:
+      PYTHONIOENCODING: utf-8     # fcpack Türkçe çıktı yazar; Windows konsolu cp1252
+      PYTHONUTF8: '1'
     outputs:
       version: ${{ steps.ver.outputs.version }}
     steps:
