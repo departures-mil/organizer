@@ -1,10 +1,10 @@
 {
- "surum": "2.1.0.11",
- "notlar": "v.1.0.11: «Admin ile iletişime geç» düzeltildi — mesajlarınız artık yöneticiye güvenilir biçimde ulaşıyor. Kayıtlarınız olduğu gibi kalır. (Yeni imza: eski Organizer'ı silip bu sürümü bir kez elle kurun; önce eşitleme yapın.)",
- "boyut": 346525,
- "sha256": "a2c724d5540e65489f773c5e6935b8c748c1efa2eb7d34b30530fd40390ac6c0",
- "imza": "dTuW3YezD7KmH3bj65YA4cREUpVX9NKmKuo1zCrShkWFlInjOVdgUV8RuL7IKqP0dh1E/EeZixHADZk+tnkLgcULltbPFYL3omSjdBnU/XclMEqjxeGZM/cPM/75VIvDLnWSy8M+7rrNfN8ujZh0Y+pC6kHb+cAnWB+jUmPojWKlQUb14QC6LRVbrXWueWwRNCAIw9ozRnR1afMc6NpoDIQQ2bnbOgEh++HpZmaHQcQxeMuvINAnGhGDFzhw9VW24z/yS2EPbYL4I8t1xNLNJsaNHvJo5JLjr+gvE4NbEHC+cIPI4rHBLgUFEwBHiw6jvwFs4Q/5ICii5G6JHwpGGCs93lN0dG36iIxlTioD5rsk7naZrLaBoeX67HgqWEcJcOuJcA6BkBEGz6c2quWRs7isO/QexRPy/svmcbu5z0ZCRMaUgoElZbVuy10YGfS6WxuHr7a8qq8Z3/m8bpxAnLhFhyk/USrIaZjSKu1KkvMEPylvHTxx+6Ggf6XNNlPT",
- "yayin": "2026-11-22 11:27 UTC",
- "kabuk": 3,
- "dosya": "organizer-telefon-apk-2.1.0.11.apk"
+ "surum": "2.2.0",
+ "notlar": "2.2.0: yeni kurulum gerekli — Organizer 2.2.0 — yeni görünüm ve kurulum",
+ "boyut": 872428,
+ "sha256": "b9e0b1df4b2edcf9c785c662ae2ea40310646b3ab3d1d1979bafaf947593272f",
+ "imza": "P9NbmItRGxljb0NcBnuqq5FJd3zXGj3VRPdPPgcuedQbilPuODjqWhf8T0QmCg2zIsW3hSFu3vDmT/qNy3D4o+F3O+jSJt7qDvzVoaOqwNFLGFYkQga0L1PZaY7RIpYiUny6W4bWQKeR5I9Si9+XYa30V7VQdz481hDmG9dZe10y9LJOvsshnN3l5Bcl4uawVAK0GvHevSklAKV9cS1tRx8uzwG4KpXyvW8NR4+dXDauy3gfcYXg8NUAKFtHaRbMIj1+qVEcTLQBf/966FFTjTmia8trcNwhQFKbBuWUlcu1U9w5forul6N0BW00rGT8t/O1SuaU/K1P4Zj8AueX+Kfpa0D+MKWa4e0afrRnedjV93/v7dVRFG/x+MvSPPxn98GSYdCZbiVHkrQOhSBi7ZlQfcgwbdrQ8GTn4K1HiwBa2OTl3nalQ6t5A4TJEqrUDWUWoDOdV1sf/Sg3saohRpT49gDhEcWD/mVEHV5RL/8s3lpAlcBPGEatMvHx4Dk/",
+ "yayin": "2026-11-24 10:13 UTC",
+ "dosya": "organizer-telefon-apk-2.2.0.apk",
+ "kabuk": 4
 }

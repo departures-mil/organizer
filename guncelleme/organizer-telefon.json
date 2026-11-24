@@ -1,10 +1,10 @@
 {
- "surum": "2.1.0.13",
- "notlar": "Yeni: ✦ Asistan Agent — bütün programlarınızdaki çalışmanızı izler ve daha verimli çalışmanız için öneriler verir (bildirim + program içi panel). Ayarlar'dan açılıp kapatılabilir.",
- "boyut": 203252,
- "sha256": "04ec5b0dd4b03a00cb9f6bd26b1db2ebcc3d598860fbc511aa744e4d9b4ff52d",
- "imza": "AzBtMh//uNcLyNbAYlhgcEpFk1I2BMoynbLw3Etd19CZw8NwFr77jqV1yhfp5bQKHtvThUA+c7Cyd+aLEnSi5XbIgYK6N6jkVc5IYLfhAS8uSnSYMGnVgmAQWCxGghuQIeCuDWLVtGkqfOJtYEn1/AGn3SM13JyVc4yIlEcmg+S0p1dqo2MD/D+QTg9PKoO+UxhRMfsvPzL6nNJafICLOeLX/YdIKHc/UiCymAPHwvqqHxgoi9FRXmqLNVN7/6DmfR4WGJYmdfNILb7HJf5D0LDSbNy1QfnHDo3lXzWyZ8p3oa5kXsSoUBI8V5o4Ho8SgSfdMqg0lOnyQkSXyioy76/Z17x0SB5KDzMLJ6UMM2oT3BAtCA6di7nYIEw1WKXkQRWV2wJu1zICI5guk7mHvNa7bj44Wc3terwURmmud6iLy4xGYla4MKQG9Tc8xsxQ+PAZ7pNrRuZ8pCXyORMt2dmKGrYEzC6zfCaw0IphE8kIyBQ05QQfDk0guC/CMC/a",
- "yayin": "2026-11-24 09:01 UTC",
- "kabuk": 1,
- "dosya": "organizer-telefon-2.1.0.13.zip"
+ "surum": "2.2.0",
+ "notlar": "2.2.0: yeni kurulum gerekli — Organizer 2.2.0 — yeni görünüm ve kurulum",
+ "boyut": 872428,
+ "sha256": "b9e0b1df4b2edcf9c785c662ae2ea40310646b3ab3d1d1979bafaf947593272f",
+ "imza": "P9NbmItRGxljb0NcBnuqq5FJd3zXGj3VRPdPPgcuedQbilPuODjqWhf8T0QmCg2zIsW3hSFu3vDmT/qNy3D4o+F3O+jSJt7qDvzVoaOqwNFLGFYkQga0L1PZaY7RIpYiUny6W4bWQKeR5I9Si9+XYa30V7VQdz481hDmG9dZe10y9LJOvsshnN3l5Bcl4uawVAK0GvHevSklAKV9cS1tRx8uzwG4KpXyvW8NR4+dXDauy3gfcYXg8NUAKFtHaRbMIj1+qVEcTLQBf/966FFTjTmia8trcNwhQFKbBuWUlcu1U9w5forul6N0BW00rGT8t/O1SuaU/K1P4Zj8AueX+Kfpa0D+MKWa4e0afrRnedjV93/v7dVRFG/x+MvSPPxn98GSYdCZbiVHkrQOhSBi7ZlQfcgwbdrQ8GTn4K1HiwBa2OTl3nalQ6t5A4TJEqrUDWUWoDOdV1sf/Sg3saohRpT49gDhEcWD/mVEHV5RL/8s3lpAlcBPGEatMvHx4Dk/",
+ "yayin": "2026-11-24 10:13 UTC",
+ "dosya": "organizer-telefon-apk-2.2.0.apk",
+ "kabuk": 4
 }

@@ -1,10 +1,10 @@
 {
- "surum": "2.1.0.13",
- "notlar": "Yeni: ✦ Asistan Agent — bütün programlarınızdaki çalışmanızı izler ve daha verimli çalışmanız için öneriler verir (bildirim + sağ altta ✦ panel). Ayarlar'dan açılıp kapatılabilir.",
- "boyut": 227405,
- "sha256": "6af2c99613b5336ae9cdd8b0e825d79af6ae125e3365abb4484d1cb21ce46991",
- "imza": "IeyR1qZBUCOp1He78DeO2GQkuf2vZduNpPC/AQ+G96nDnkBMqVeEQe6cvHcjHzxL1N8F+W7ls1J4+94Cf+HNSNEIW4quamYVGSeOGoFA5qoOzB4qmd6RPoaeizYYDLyCW99+Cf0Sw/HPpd+FC+SkrQr9EjymXE3xoC3n5dBKBHI+qDDCQfKtCkcrSm6HPWss6Z1TjlmruMiReNpu/NEuTZZvpSz41us8LJnJP+YzrE4fsj3HlrX2RYI0FgtdkTi1Eo7jAmaYh+wxFSFr6i8uYWRgHrl58eCLKNfj42Nh3yWhBo+UNUC0x/QCONOBmlXn4x1IdTJuNnpzictB2229dFmHJAioh0qrXPV96jJTkQiKf7/+Y+tIyrCLOSc/lqRssDjuQCVBjRbkGERlWeOw+tsQSAkdZeghJxS0PvNkErdj0KBCf9nRU0qHM7iiuGa5iyp3MZIJUAy9Ip96KmUosP21E+rqjbyWk9biXEd4YrWi45IBKp4T2LBuhs/Xzb2B",
- "yayin": "2026-11-24 09:11 UTC",
- "sistem": 1,
- "dosya": "organizer-masaustu-2.1.0.13.zip"
+ "surum": "2.2.0",
+ "notlar": "2.2.0: yeni kurulum gerekli — Organizer 2.2.0 — yeni görünüm ve kurulum",
+ "boyut": 231376,
+ "sha256": "f9d9db25bea95b247cd0e7a22985f7e50ea044b5b822e2d4bb6cb103fd316960",
+ "imza": "lOqmNxe1qyY5ENQcRDfTFbmc+ebAu0MjzZ8iTNPmUWdxyOb4m6usgq3C90A7LJB9GXZ5cgA5RIrh0UVSZJdwSotAx1o0PTtR6Mut0luZGyDBVOdSqfrp6iEslbN9IUUy+n1TmeT+5fQyqIKuSP8IfVmnNUQQtdDH8r3vrslfRNpcgOu1b0Cp7BBh6R/4vy1OYAUkfPxSzQxjb4H0EuuGQh/Om5C8SgShIfWrif3yQkCl/NjJnO8VlEtkCgBwcMso6itdIBg8/Eu1YhnIofRBcfh6e96+kIk40vdkN6FJ5PxRTU16Fyt4HTm6RZHmganRzplrrjNdgO1/q6UmfuLYTyPZUwGyHuS7m+RXyLMUglSvfc2f6vpw8thBZswtvEvvHLSGDbujH8+fOCT4b3C8kLkHE0bJRgc2EDx0k+gvHNw1/sZlJo72utK6phDf184OVGxHNjNmL1i3anDqSdowKyFOrLBADj9RyCgGlzT6G9tzBB042zFo1rBJ3MaRnQWp",
+ "yayin": "2026-11-24 10:13 UTC",
+ "dosya": "organizer-masaustu-2.2.0.zip",
+ "sistem": 1
 }
