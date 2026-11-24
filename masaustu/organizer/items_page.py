@@ -487,7 +487,7 @@ class ItemsPage(QWidget):
         self.table.setWordWrap(False)
         self.table.horizontalHeader().setHighlightSections(False)
         setup_columns(self.table, db, "cols_items",
-                      {0: 62, 1: 320, 2: 70, 3: 150, 4: 150, 5: 110, 6: 110, 7: 220, 8: 200},
+                      {0: 62, 1: 200, 2: 64, 3: 130, 4: 150, 5: 110, 6: 110, 7: 220, 8: 200},  # 2.2.1: dar tabloda Kategori de görünsün
                       order=[0, 1, 2, 3, 4, 5, 7, 8, 6])
         self.header_sort = HeaderSort(self.table, labels, SORT_COLS, self.sort.currentData,
                                       lambda k: self.sort.setCurrentIndex(self.sort.findData(k)))

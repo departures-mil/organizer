@@ -26,6 +26,20 @@ LOCALES = {
 
 # "Bu sürümde neler yeni" (güncellemeden sonraki ilk açılış; latest.json notları yoksa bunlar gösterilir)
 NEWS = {
+    "2.2.1": {
+        "tr": "- Telefon: dar ekranda (Arapça dahil) üst çubuktaki hiçbir düğme ekran dışında kalmaz\n"
+              "- Masaüstü: eşya tablosunda Kategori sütunu varsayılan düzende görünür\n"
+              "- Sürüm rozeti tam sürümü gösterir (v2.2.1)\n"
+              "- Gizlilik: yönetici e-postası programda düz metin olarak tutulmaz",
+        "en": "- Phone: no top bar button goes off-screen on narrow screens (including Arabic)\n"
+              "- Desktop: the Category column is visible in the default items table layout\n"
+              "- The version badge shows the full version (v2.2.1)\n"
+              "- Privacy: the admin e-mail is no longer stored as plain text in the program",
+        "ar": "- الهاتف: لا يخرج أي زر في الشريط العلوي عن الشاشة في الشاشات الضيقة (بما فيها العربية)\n"
+              "- الحاسوب: يظهر عمود التصنيف في التخطيط الافتراضي لجدول الأغراض\n"
+              "- تعرض شارة الإصدار رقم الإصدار كاملاً (v2.2.1)\n"
+              "- الخصوصية: لم يعد البريد الإلكتروني للمشرف محفوظاً كنص صريح في البرنامج",
+    },
     "2.2.0": {
         "tr": "- Yeni görünüm: Falcon şeması, renk şeması seçici (eski görünüm \"Klasik\" olarak duruyor), koyu/açık/otomatik ve yazı boyutu\n"
               "- Program artık kurulumla gelir; güncellemeler tek tıkla iner ve yalnızca değişen kısımlar indirilir (yüzde, MB, kalan, hız)\n"

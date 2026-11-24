@@ -8,3 +8,4 @@ Yerel düzeltmeler (çekirdeğe önerildi):
 - web/dist/fc-core.js (js/updater.js): FC.host.update.run(plan, ilerleme) varsa indirme + yama + kurulum kabukta yapılır
   (Android: Java tarafında GitHub indirmesi — WebView'de CORS yok — + ApkPatchInstaller; kitaplik ile aynı ek).
 - delta/java/ApkPatchInstaller.java: androidx FileProvider yerine uygulamanın kendi ContentProvider'ı (Gradle'sız kabuk).
+- qt/fccore/window.py: sürüm rozeti tam sürüm (ortak-cekirdek 586781e ile aynı düzeltme; 2.2.1).

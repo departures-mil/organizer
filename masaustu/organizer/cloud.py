@@ -22,14 +22,20 @@ _ESKI_ORTAK = """const firebaseConfig = {
   messagingSenderId: "1059030151497",
   appId: "1:1059030151497:web:0e320562bdc00ff4a7aa98"
 };"""
-_YONETICI = "qa757939@gmail.com"
+# Yönetici e-postası depoda düz metin tutulmaz: yalnız SHA-256 özeti (küçük harf, boşluksuz) karşılaştırılır.
+_YONETICI_SHA256 = "b1acd212aa26e8d1a66302ca74cf125228fea1e0cf805377ddcaabb5278722c1"
+
+
+def _yonetici_mi(email):
+    import hashlib
+    return hashlib.sha256((email or "").strip().lower().encode("utf-8")).hexdigest() == _YONETICI_SHA256
 
 
 def ortak_projeden_tasi(db):
     """fb_config boşken eski ortak projeye bağlı kurulumları ayarlar: yönetici aynen devam eder, diğerleri kendi hesabını kurar."""
     if db.get_setting("fb_config") or not db.get_setting("fb_refresh"):
         return
-    if (db.get_setting("fb_email", "") or "").strip().lower() == _YONETICI:
+    if _yonetici_mi(db.get_setting("fb_email", "")):
         db.set_setting("fb_config", _ESKI_ORTAK)
     else:
         db.set_setting("fb_refresh", "")
