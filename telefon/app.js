@@ -2,7 +2,7 @@
  * tarih, not), sınıflandırma ağaçları, arama, sıralama, toplu taşıma/silme, ustalar ve dükkanlar, ayarlar, yedek, bulut. */
 "use strict";
 
-const APP_VERSION = "2.2.2";   // semver (2.2.0'dan beri ekranda da aynı); eski 2.1.0.x güncelleyicileri bunu "daha yeni" görür
+const APP_VERSION = "2.2.3";   // semver (2.2.0'dan beri ekranda da aynı); eski 2.1.0.x güncelleyicileri bunu "daha yeni" görür
 function goster(v) {
   const p = String(v === undefined ? APP_VERSION : (v || "")).trim().split(".").filter(x => x !== "");
   if (!p.length) return "";
