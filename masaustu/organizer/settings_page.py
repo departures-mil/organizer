@@ -367,6 +367,12 @@ class SettingsPage(QWidget):
         from . import kullanim_sayac
         gl.addWidget(kullanim_sayac.KullanimKarti(self))
 
+        # ---- Asistan Agent (admin iletişimin önünde)
+        from . import ajan as _ajan
+        if _ajan.AJAN is not None:
+            gl.addSpacing(14)
+            gl.addWidget(_ajan.AJAN.card(self))
+
         # ---- v.1.0.8: admin ile iletişim (öneri / hata bildirimi)
         gl.addSpacing(14)
         at = QLabel(t("✉  Admin ile iletişime geç"))

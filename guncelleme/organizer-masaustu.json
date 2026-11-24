@@ -1,10 +1,10 @@
 {
- "surum": "2.1.0.12",
- "notlar": "Admin duyuruları: yeni duyurular programda görünür, 🔔 düğmesinden tekrar okunur.",
- "boyut": 211114,
- "sha256": "9c7fc29f0d2b2fe80f621eccc2e63a4e8b2fbf5b5f6005259ef9fbef2f3fae24",
- "imza": "074CuBQCCiYCNPjw/I1RIwbHlA8O8S7zvubIUAlkYNV9Je8mqFp7LQouzuTD+R27Uq62JRtcDu5B+CxYI0Qmt9pQ/ByoirQtmgnUuSr4l4PvUktZzMtT5PTQI+kPIK+1EJNXu356HUGdHAzSBLfJgzTj0I5aVegnvrSppr/Xjs7Q8ct89rBga8ypeIOoA4P3UuHjS0Aiau+li5w7o1O//PEzo9y9a+gZCUmwKVE/YCvYv8vqjdJleNON+aMogrP3yXC42sNhsflZUIarAnszSvvixi5bVsorK0QvkfVX1wF4UhNNC3jhoUe4fVO71ZTOnmElomgdzLWdnwupXHJz6l9MwnAXSp475J/NENaJtUKyG4c891PnUa3Thb1OtdV0MvqJaW5/aJaYgOaMfyJ8IPvyvKscmoD/6s4A5u6feFpwiHxbYjQqyhS84UuhGvcr8XX0HzUpLKA+1TT4k239t2wfgzlVH/9sl3eZRQ3Zo07GbFIJq3JbG834PstaXnhK",
- "yayin": "2026-11-22 13:42 UTC",
+ "surum": "2.1.0.13",
+ "notlar": "Yeni: ✦ Asistan Agent — bütün programlarınızdaki çalışmanızı izler ve daha verimli çalışmanız için öneriler verir (bildirim + sağ altta ✦ panel). Ayarlar'dan açılıp kapatılabilir.",
+ "boyut": 227405,
+ "sha256": "6af2c99613b5336ae9cdd8b0e825d79af6ae125e3365abb4484d1cb21ce46991",
+ "imza": "IeyR1qZBUCOp1He78DeO2GQkuf2vZduNpPC/AQ+G96nDnkBMqVeEQe6cvHcjHzxL1N8F+W7ls1J4+94Cf+HNSNEIW4quamYVGSeOGoFA5qoOzB4qmd6RPoaeizYYDLyCW99+Cf0Sw/HPpd+FC+SkrQr9EjymXE3xoC3n5dBKBHI+qDDCQfKtCkcrSm6HPWss6Z1TjlmruMiReNpu/NEuTZZvpSz41us8LJnJP+YzrE4fsj3HlrX2RYI0FgtdkTi1Eo7jAmaYh+wxFSFr6i8uYWRgHrl58eCLKNfj42Nh3yWhBo+UNUC0x/QCONOBmlXn4x1IdTJuNnpzictB2229dFmHJAioh0qrXPV96jJTkQiKf7/+Y+tIyrCLOSc/lqRssDjuQCVBjRbkGERlWeOw+tsQSAkdZeghJxS0PvNkErdj0KBCf9nRU0qHM7iiuGa5iyp3MZIJUAy9Ip96KmUosP21E+rqjbyWk9biXEd4YrWi45IBKp4T2LBuhs/Xzb2B",
+ "yayin": "2026-11-24 09:11 UTC",
  "sistem": 1,
- "dosya": "organizer-masaustu-2.1.0.12.zip"
+ "dosya": "organizer-masaustu-2.1.0.13.zip"
 }
