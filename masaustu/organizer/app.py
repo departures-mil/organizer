@@ -26,6 +26,11 @@ LOCALES = {
 
 # "Bu sürümde neler yeni" (güncellemeden sonraki ilk açılış; latest.json notları yoksa bunlar gösterilir)
 NEWS = {
+    "2.2.2": {
+        "tr": "- Güncellemeler artık tamamen kendiliğinden: yeni sürüm arka planda sessizce indirilir, program kapanınca pencere açmadan kurulur; bir sonraki açılışta yeni sürüm gelir. Hemen kurmak için Güncelle → «Şimdi kur ve yeniden aç». Kurulum gereken güncellemeler de sessiz yapılır. Kayıtlara dokunulmaz.",
+        "en": "- Updates are now fully automatic: the new version downloads quietly in the background and installs without any window when the program closes; the next start opens the new version. To install right away: Update → «Install now and reopen». Updates that need the installer also run silently. Records are not touched.",
+        "ar": "- أصبحت التحديثات تلقائية بالكامل: يُنزَّل الإصدار الجديد بهدوء في الخلفية ويُثبَّت دون أي نافذة عند إغلاق البرنامج، ويُفتح الإصدار الجديد في المرة التالية. للتثبيت فوراً: تحديث ← «ثبّت الآن وأعد الفتح». التحديثات التي تحتاج إلى برنامج التثبيت تتم بصمت أيضاً. لا تُمَسّ السجلات.",
+    },
     "2.2.1": {
         "tr": "- Telefon: dar ekranda (Arapça dahil) üst çubuktaki hiçbir düğme ekran dışında kalmaz\n"
               "- Masaüstü: eşya tablosunda Kategori sütunu varsayılan düzende görünür\n"
@@ -199,7 +204,7 @@ def run():
     theme.register_klasik()
     whatsnew.cfg["notes"] = lambda v: NEWS.get(str(v))
     core = fccore.init(app, app_id="organizer", repo="organizer", version=__version__, data_dir=core_dir,
-                       announcements=True, onboarding=None)
+                       announcements=True, onboarding=None, agent=False)   # kendi Asistan Agent bağlantısı: organizer/ajan.py
 
     from . import ajan
     ajan.kur(app)
