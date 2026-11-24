@@ -39,5 +39,7 @@
 <script src="duyuru.js"></script>
 <script>window.duyuruLinkAc=function(u){openUrl(u)};Duyuru.baslat({uygulama:"organizer",surum:goster(),dil:function(){return I18N.lang}});</script>
 <script>Kullanim.baslat({uygulama:"organizer",bulut:true,ai:false,linkAc:function(u){openUrl(u)},dil:function(){return I18N.lang},proje:function(){try{return Cloud.isConnected()?(Cloud.config()||{}).projectId:""}catch(e){return ""}}});</script>
+  <script src="fc-agent.js"></script>
+  <script src="agent-baslat.js"></script>
 </body>
 </html>

@@ -26,3 +26,7 @@ kullanıcının Firebase hesabı üzerinden eşitlenir; **kayıtlar bu depoda bu
   (rehber: duyurular/firebase-kurulum.md). Eski ortak projeye bağlı kurulumlardan yalnız yönetici hesabı (yonetici@example.invalid)
   ayarı kendine kaydedilip devam eder; diğerlerinin bağlantısı kesilir ve kendi hesabını bağlaması istenir.
 - Yayınlamak için: `ANAHTAR=... python3 araclar/yayinla.py masaustu masaustu "notlar"` + `... telefon telefon "notlar" --kabuk 1`.
+
+## Asistan Agent (hazır, yayın bekliyor — 2026-11-24)
+✦ Asistan Agent eklendi: `fc-agent.js` (= ortak-cekirdek/web/dist/fc-agent.js) + `agent-baslat.js` arayüz klasöründe. Bütün programlardaki
+çalışmayı sayılarla izler, öneri verir (bildirim + ✦ panel), Ayarlar'da admin iletişim kartının önünde. Sonraki sürüm yayınlanınca kullanıcılara gider.
