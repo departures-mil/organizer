@@ -32,7 +32,7 @@ function serve() {
     const [lang, scheme, mode0, page0] = n.split('-');
     const mode = mode0 === 'light' || mode0 === 'dark' ? mode0 : (scheme === 'klasik' ? 'light' : 'dark');
     const page = (mode0 === 'ayarlar' || page0 === 'ayarlar') ? 'ayarlar' : 'esyalar';
-    const ctx = await browser.newContext({ viewport: { width: 412, height: (mode0 === 'ayarlar' || page0 === 'ayarlar') ? 4200 : 860 }, deviceScaleFactor: 2, locale: lang });
+    const ctx = await browser.newContext({ viewport: { width: Number(process.env.EKRAN_GENISLIK || 412), height: (mode0 === 'ayarlar' || page0 === 'ayarlar') ? 4200 : 860 }, deviceScaleFactor: 2, locale: lang });
     const p = await ctx.newPage();
     p.on('pageerror', e => errors.push(n + ': ' + e.message));
     await p.route(/github\.com|githubusercontent|firestore|googleapis|formsubmit/, r => r.fulfill({ status: 404, body: '' }));
