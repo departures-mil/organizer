@@ -10,6 +10,15 @@ kullanıcının kendi Firebase hesabı üzerinden (ve aynı Wi‑Fi'de yerel ağ
 - `kurulum/organizer.nsi` — Windows kurulumu. `masaustu/organizer.spec` — PyInstaller (one-dir).
 - `guncelleme/` — YALNIZ eski (2.1.0.x) kurulumlar için RSA imzalı köprü bildirgeleri (`araclar/kopru.py`).
 
+## 2.3.0 modülleri
+- Masaüstü: `panel_page.py` (Ana sayfa), `filtre.py` (gelişmiş + kayıtlı filtre, garanti / son kullanma durumu), `disa_aktar.py`
+  (xlsx / csv, kütüphanesiz), `report.py` `build_insurance` (sigorta envanteri), `yedek.py` (otomatik + AES-256-GCM şifreli `.ozb`
+  yedek, kayıt silmeyen geri yükleme), `ceviri.py` + `sozluk.py` (çevrim içi / çevrim dışı çeviri), `zeka.py` (kullanıcının KENDİ
+  anahtarıyla Gemini / OpenAI / Claude / Groq; anahtar yoksa çevrim dışı cevap), `ek_arayuz.py` (pencereler), `i18n_230.py` (çeviriler).
+- Eşya alanları: `warranty_until`, `expires_on`, `changelog` (değişiklik geçmişi; cihazlar arasında birleşerek eşitlenir, `db.track`).
+- Telefon: `telefon/ek230.js` (aynı özellikler), `telefon/sozluk.js` (üretilir: `python3 araclar/export_i18n.py`).
+  Android: `Native.saveBackup / listBackups / readBackup` → `Android/data/com.organizer.app/files/Yedekler`.
+
 ## Sürüm ve yayın (2.2.0'dan beri)
 - Sürüm semver `X.Y.Z`, etiket `vX.Y.Z`; ekranda da aynı. Tek kaynak `masaustu/organizer/__init__.py`;
   `telefon/app.js` `APP_VERSION` aynı olmalı (test denetler). `release-notes.json` (tr/en/ar) + `masaustu/organizer/app.py` NEWS.

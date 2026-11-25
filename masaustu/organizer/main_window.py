@@ -32,19 +32,22 @@ PATHS.setdefault("archive", '<rect x="3" y="4" width="18" height="4" rx="1"/><pa
 
 # fccore sözlüğüne kabuk metinleri (kenar çubuğu, sayfa başlıkları, üst çubuk düğmeleri)
 fci.add({
-    "tr": {"org.name": "Organizer", "org.tag": "Evdeki her şey yerli yerinde", "org.nav": "Ev",
+    "tr": {"org.panel": "Ana sayfa", "org.panel.sub": "Özet: toplam değer, azalanlar, ödünçtekiler, garanti ve son değişiklikler",
+           "org.name": "Organizer", "org.tag": "Evdeki her şey yerli yerinde", "org.nav": "Ev",
            "org.items": "Eşyalarım", "org.items.sub": "Eşyalar, yerler, kategoriler, fotoğraflar ve fiyatlar",
            "org.contacts": "Ustalar ve Dükkanlar", "org.contacts.sub": "Usta, dükkan ve telefon numaraları",
            "org.sys": "Sistem", "org.settings": "Ayarlar",
            "org.settings.sub": "Yerler, kategoriler, bulut, yerel ağ, görünüm, güncelleme ve iletişim",
            "org.eye": "Fiyatları gizle / göster", "org.scan": "Hızlı ara / barkod okuyucu (Ctrl+F)"},
-    "en": {"org.name": "Organizer", "org.tag": "Everything at home in its place", "org.nav": "Home",
+    "en": {"org.panel": "Dashboard", "org.panel.sub": "Overview: total value, running low, on loan, warranties and recent changes",
+           "org.name": "Organizer", "org.tag": "Everything at home in its place", "org.nav": "Home",
            "org.items": "My items", "org.items.sub": "Items, places, categories, photos and prices",
            "org.contacts": "Craftsmen & Shops", "org.contacts.sub": "Craftsmen, shops and phone numbers",
            "org.sys": "System", "org.settings": "Settings",
            "org.settings.sub": "Places, categories, cloud, local network, appearance, updates and contact",
            "org.eye": "Hide / show prices", "org.scan": "Quick search / barcode reader (Ctrl+F)"},
-    "ar": {"org.name": "المنظِّم", "org.tag": "كل شيء في البيت في مكانه", "org.nav": "البيت",
+    "ar": {"org.panel": "الرئيسية", "org.panel.sub": "ملخص: القيمة الإجمالية، النواقص، المُعار، الضمانات وآخر التغييرات",
+           "org.name": "المنظِّم", "org.tag": "كل شيء في البيت في مكانه", "org.nav": "البيت",
            "org.items": "أغراضي", "org.items.sub": "الأغراض والأماكن والتصنيفات والصور والأسعار",
            "org.contacts": "الحرفيون والمحلات", "org.contacts.sub": "الحرفيون والمحلات وأرقام الهواتف",
            "org.sys": "النظام", "org.settings": "الإعدادات",
@@ -102,13 +105,15 @@ class MainWindow(FcWindow):
         self.items_host = PageHost(lambda: ItemsPage(self.db))
         self.contacts_host = PageHost(lambda: ContactsPage(self.db))
         self.settings_host = PageHost(self._settings_page, margins=(28, 22, 28, 28))
+        self.panel_host = PageHost(self._panel_page, margins=(28, 22, 28, 28))
         sh.nav_group("org.nav")
+        sh.page("panel", "org.panel", "gauge", self.panel_host, sub="org.panel.sub", scroll=False)
         sh.page("items", "org.items", "box", self.items_host, sub="org.items.sub", scroll=False)
         sh.page("contacts", "org.contacts", "wrench", self.contacts_host, sub="org.contacts.sub", scroll=False)
         sh.nav_group("org.sys")
         sh.page("settings", "org.settings", "settings", self.settings_host, sub="org.settings.sub", scroll=False)
         sh.page_changed.connect(self._page_changed)
-        self.keys = ["items", "contacts", "settings"]
+        self.keys = ["items", "contacts", "settings", "panel"]   # sıra show_page(i) içindir; menüde Ana sayfa en üstte
 
         # saat (kenar çubuğunun altında)
         self.clock = QLabel(alignment=Qt.AlignCenter)
@@ -146,7 +151,7 @@ class MainWindow(FcWindow):
         QShortcut(QKeySequence.Undo, self, activated=self._undo)
         QShortcut(QKeySequence.New, self, activated=self._new)
         QShortcut(QKeySequence.Print, self, activated=lambda: (self.show_page(0), self.items_page.open_report()))
-        self.show_page(0)
+        self.shell.show_page("panel" if self.db.get_setting("start_page", "panel") == "panel" else "items")
 
     # ------------------------------------------------------------ sayfalar
     @property
@@ -162,8 +167,34 @@ class MainWindow(FcWindow):
         return self.settings_host.page
 
     @property
+    def panel_page(self):
+        return self.panel_host.page
+
+    @property
     def pages(self):
-        return [self.items_page, self.contacts_page, self.settings_page]
+        return [self.items_page, self.contacts_page, self.settings_page, self.panel_page]
+
+    def _panel_page(self):
+        from .panel_page import PanelPage
+        p = PanelPage(self.db)
+        p.open_item.connect(self.open_item)
+        p.open_filter.connect(self.open_filter)
+        return p
+
+    def open_item(self, item_id):
+        """Panelden: Eşyalarım'da filtreleri temizleyip eşyayı seçer."""
+        self.show_page(0)
+        page = self.items_page
+        page.set_filter({})
+        page.reload_items(keep_id=item_id)
+        for r in range(page.table.rowCount()):
+            if page._row_id(r) == item_id:
+                page.table.scrollToItem(page.table.item(r, 1))
+                break
+
+    def open_filter(self, f):
+        self.show_page(0)
+        self.items_page.set_filter(f)
 
     def _settings_page(self):
         from .settings_page import SettingsPage
@@ -186,7 +217,7 @@ class MainWindow(FcWindow):
 
     def rebuild_pages(self):
         """Dil ya da etiketler değişince sayfa içeriklerini yeni yazılarla yeniden kurar (aynı sayfada kalır)."""
-        for h in (self.items_host, self.contacts_host, self.settings_host):
+        for h in (self.items_host, self.contacts_host, self.settings_host, self.panel_host):
             h.build()
         self.setWindowTitle(t("Organizer"))
         self._page_changed(self.shell.current or "items")

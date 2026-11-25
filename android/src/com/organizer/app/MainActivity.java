@@ -305,6 +305,75 @@ public class MainActivity extends Activity {
             }
         }
 
+        // ---- 2.3.0: otomatik yedekler (Android/data/com.organizer.app/files/Yedekler — izin gerektirmez)
+        private File backupDir() {
+            File d = getExternalFilesDir("Yedekler");
+            if (d == null) d = new File(getFilesDir(), "Yedekler");
+            d.mkdirs();
+            return d;
+        }
+
+        private File backupFile(String name) {
+            String safe = (name == null ? "" : name).replaceAll("[\\\\/:*?\"<>|]", "_");
+            return new File(backupDir(), safe);
+        }
+
+        @JavascriptInterface
+        public String saveBackup(String name, String b64, int keep) {
+            try {
+                File f = backupFile(name);
+                File tmp = new File(f.getPath() + ".tmp");
+                try (OutputStream o = new FileOutputStream(tmp)) { o.write(Base64.decode(b64, Base64.DEFAULT)); }
+                if (f.exists()) f.delete();
+                if (!tmp.renameTo(f)) return "rename";
+                File[] all = backupDir().listFiles();
+                if (all != null && keep > 0) {
+                    List<File> mine = new ArrayList<>();
+                    for (File x : all) if (x.isFile() && x.getName().startsWith("Organizer-otomatik-")) mine.add(x);
+                    Collections.sort(mine, new java.util.Comparator<File>() {
+                        public int compare(File a, File b) { return b.getName().compareTo(a.getName()); }
+                    });
+                    for (int i = keep; i < mine.size(); i++) mine.get(i).delete();
+                }
+                return "ok";
+            } catch (Exception e) {
+                return "error:" + e.getMessage();
+            }
+        }
+
+        @JavascriptInterface
+        public String listBackups() {
+            JSONArray out = new JSONArray();
+            try {
+                File[] all = backupDir().listFiles();
+                if (all != null) for (File x : all) {
+                    if (!x.isFile() || x.getName().endsWith(".tmp")) continue;
+                    JSONObject o = new JSONObject();
+                    o.put("name", x.getName());
+                    o.put("size", x.length());
+                    o.put("time", x.lastModified());
+                    out.put(o);
+                }
+            } catch (Exception e) { /* boş liste */ }
+            return out.toString();
+        }
+
+        @JavascriptInterface
+        public String readBackup(String name) {
+            try (InputStream in = new java.io.FileInputStream(backupFile(name))) {
+                ByteArrayOutputStream bo = new ByteArrayOutputStream();
+                byte[] buf = new byte[65536];
+                int n;
+                while ((n = in.read(buf)) > 0) bo.write(buf, 0, n);
+                return Base64.encodeToString(bo.toByteArray(), Base64.NO_WRAP);
+            } catch (Exception e) {
+                return "";
+            }
+        }
+
+        @JavascriptInterface
+        public String backupFolder() { return backupDir().getAbsolutePath(); }
+
         @JavascriptInterface
         public void printPage(final String title) {
             runOnUiThread(new Runnable() {

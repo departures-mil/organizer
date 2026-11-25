@@ -31,7 +31,7 @@ function serve() {
   for (const n of names) {
     const [lang, scheme, mode0, page0] = n.split('-');
     const mode = mode0 === 'light' || mode0 === 'dark' ? mode0 : (scheme === 'klasik' ? 'light' : 'dark');
-    const page = (mode0 === 'ayarlar' || page0 === 'ayarlar') ? 'ayarlar' : 'esyalar';
+    const page = [mode0, page0].includes('ayarlar') ? 'ayarlar' : [mode0, page0].includes('panel') ? 'panel' : 'esyalar';
     const ctx = await browser.newContext({ viewport: { width: Number(process.env.EKRAN_GENISLIK || 412), height: (mode0 === 'ayarlar' || page0 === 'ayarlar') ? 4200 : 860 }, deviceScaleFactor: 2, locale: lang });
     const p = await ctx.newPage();
     p.on('pageerror', e => errors.push(n + ': ' + e.message));
@@ -45,11 +45,13 @@ function serve() {
     await p.evaluate(async () => {
       if (Store.liveItems().length) return;
       const loc = Store.treeRows('locations')[0], cat = Store.treeRows('categories')[0];
-      for (const [name, q, pr] of [['Akülü matkap', 1, 2450], ['Su terazisi', 2, 380], ['Uzatma kablosu 10 m', 3, 210], ['LED ampul E27', 12, 45]])
-        await Store.saveItem({ name, quantity: q, location: loc ? loc.uid : '', category: cat ? cat.uid : '', price: pr, currency: 'TRY', notes: '' }, []);
+      const soon = new Date(Date.now() + 12 * 86400000).toISOString().slice(0, 10);
+      for (const [name, q, pr, x] of [['Akülü matkap', 1, 120, { warranty_until: soon }], ['Su terazisi', 2, 18, {}], ['Uzatma kablosu 10 m', 3, 9.5, {}],
+        ['LED ampul E27', 12, 2, {}], ['Kombi filtresi', 1, 4.5, { min_qty: 3 }]])
+        await Store.saveItem({ name, quantity: q, location: loc ? loc.uid : '', category: cat ? cat.uid : '', price: pr, currency: 'USD', notes: '', ...x }, []);
       App.render();
     });
-    if (page === 'ayarlar') await p.evaluate(() => { App.tab = 2; App.render(); });
+    await p.evaluate(pg => { App.tab = { ayarlar: 2, panel: 3, esyalar: 0 }[pg]; App.render(); }, page);
     await p.waitForTimeout(700);
     await p.screenshot({ path: path.join(out, n + '.png'), fullPage: false });
     console.log('kaydedildi', path.join(out, n + '.png'));

@@ -1,6 +1,6 @@
 """Masaüstü ekran görüntüleri (offscreen Qt; internete çıkmaz).
     QT_QPA_PLATFORM=offscreen python3 araclar/ekran.py <klasör> [tr-falcon-dark ar-falcon-light tr-klasik ...]
-Her ad: <dil>-<şema>-<mod>[-<sayfa>] (mod yoksa dark; klasik için light). Sayfa: items | contacts | settings.
+Her ad: <dil>-<şema>-<mod>[-<sayfa>] (mod yoksa dark; klasik için light). Sayfa: items | contacts | settings | panel.
 Geçici bir veri klasöründe örnek kayıtlarla açılır; gerçek kullanıcı verisine dokunmaz."""
 import json
 import os
@@ -23,7 +23,7 @@ AN.Announcements.refresh = lambda self: None
 def go(ctl):
     w = ctl.win
     w.showNormal(); w.resize(1440, 900)
-    w.show_page({"items": 0, "contacts": 1, "settings": 2}[page])
+    w.show_page({"items": 0, "contacts": 1, "settings": 2, "panel": 3}[page])
     if page == "items":
         it = w.items_page
         try:
@@ -52,11 +52,14 @@ def sample(db_dir):
     cats = {n: nid for nid, n, *_ in db.tree_ordered("categories")}
     loc = next(iter(locs.values()), None)
     cat = next(iter(cats.values()), None)
-    for name, qty, price in (("Akülü matkap", 1, 2450.0), ("Su terazisi", 2, 380.0), ("Uzatma kablosu 10 m", 3, 210.0),
-                             ("Kombi filtresi", 4, 95.5), ("LED ampul E27", 12, 45.0), ("Silikon tabancası", 1, 160.0)):
+    from datetime import date, timedelta
+    soon = (date.today() + timedelta(days=12)).isoformat()
+    for name, qty, price, extra in (("Akülü matkap", 1, 120.0, {"warranty_until": soon}), ("Su terazisi", 2, 18.0, {}),
+                                    ("Uzatma kablosu 10 m", 3, 9.5, {}), ("Kombi filtresi", 1, 4.5, {"min_qty": 3}),
+                                    ("LED ampul E27", 12, 2.0, {}), ("İlk yardım çantası", 1, 25.0, {"expires_on": "2026-01-10"})):
         try:
             db.save_item({"name": name, "quantity": qty, "location_id": loc, "category_id": cat, "price": price,
-                          "currency": "TRY", "notes": "", "created_at": "2026-11-20 10:00"})
+                          "currency": "USD", "notes": "", "created_at": "2026-11-20 10:00:00", **extra})
         except Exception as e:  # noqa: BLE001
             print("örnek kayıt:", e)
             break
@@ -70,7 +73,7 @@ def main():
         p = n.split("-")
         lang, scheme = p[0], p[1]
         mode = p[2] if len(p) > 2 and p[2] in ("dark", "light") else ("light" if scheme == "klasik" else "dark")
-        page = p[-1] if p[-1] in ("items", "contacts", "settings") else "items"
+        page = p[-1] if p[-1] in ("items", "contacts", "settings", "panel") else "items"
         d = tempfile.mkdtemp(prefix="organizer-ekran-")
         sample(d)
         os.makedirs(os.path.join(d, "fccore"), exist_ok=True)

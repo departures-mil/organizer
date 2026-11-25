@@ -8,7 +8,8 @@ from PySide6.QtWidgets import (QAbstractItemView, QComboBox, QGridLayout, QHBoxL
 
 from .common import Card, ThumbCache, confirm, fmt_date, fmt_price, load_image, setup_columns, HeaderSort
 from .db import Database, parse_voice
-from . import extras
+from . import extras, filtre
+from .ek_arayuz import AskDialog, FilterDialog, HistoryDialog, fmt_day, saved_menu, status_text
 from .extras import loan_text, overdue_days
 from .i18n import t
 from .item_dialog import ItemDialog, PhotoViewer
@@ -170,7 +171,8 @@ class ItemDetail(Card):
         for row, (key, label) in enumerate([("quantity", "Adet"), ("category", "Kategori"),
                                             ("location", "Yer"), ("price", "Fiyat"),
                                             ("created", "Eklenme"), ("shop", "Satın alındığı yer"),
-                                            ("loan", "Ödünç"), ("receipts", "Fatura / fiş")]):
+                                            ("loan", "Ödünç"), ("receipts", "Fatura / fiş"),
+                                            ("warranty", "Garanti bitişi"), ("expiry", "Son kullanma tarihi")]):
             l = QLabel(t(label))
             l.setObjectName("FieldName")
             v = QLabel()
@@ -226,6 +228,11 @@ class ItemDetail(Card):
         extra.addWidget(self.buy_btn, 1)
         outer.addLayout(extra)
 
+        self.hist_btn = QPushButton(t("🕘  Değişiklik geçmişi"))
+        self.hist_btn.setObjectName("Tool")
+        self.hist_btn.clicked.connect(lambda: self.item and HistoryDialog(self.db, self.item["id"], self).exec())
+        outer.addWidget(self.hist_btn)
+
         btns = QHBoxLayout()
         self.edit_btn = QPushButton(t("✎  Düzenle"))
         self.edit_btn.setObjectName("Primary")
@@ -250,7 +257,7 @@ class ItemDetail(Card):
     def show_item(self, item_id):
         self.item = self.db.get_item(item_id) if item_id else None
         has = self.item is not None
-        for w in (self.edit_btn, self.del_btn, self.strip, self.lend_btn, self.buy_btn):
+        for w in (self.edit_btn, self.del_btn, self.strip, self.lend_btn, self.buy_btn, self.hist_btn):
             w.setEnabled(has)
         self.strip.clear()
         if not has:
@@ -296,6 +303,14 @@ class ItemDetail(Card):
             self.fields["price"].setText(price_text(it) if it["price"] is not None else "—")
             self.fields["price"].setStyleSheet("")
         self.fields["created"].setText(fmt_date(it["created_at"]))
+        for key, field in (("warranty", "warranty_until"), ("expiry", "expires_on")):   # 2.3.0
+            day = it.get(field) or ""
+            st = filtre.day_status(day)
+            self.fields[key].setText(f"{fmt_day(day)}   {status_text(day)}" if day else "—")
+            self.fields[key].setStyleSheet("color: #c0392b; font-weight: 700;" if st == "over" else
+                                           f"color: {LOW_COLOR}; font-weight: 700;" if st == "soon" else "")
+        n_log = len(it.get("changelog") or [])
+        self.hist_btn.setText(t("🕘  Değişiklik geçmişi ({n})", n=n_log) if n_log else t("🕘  Değişiklik geçmişi"))
         self.notes.setText(it["notes"])
         self._show_shop(it)
         for f in it["photos"]:
@@ -357,6 +372,7 @@ class ItemsPage(QWidget):
         self.thumbs = ThumbCache(db)
         self.items = []
         self.undo_stack = []   # [(açıklama, anlık görüntü)] — v.1.0.8 "Geri al"
+        self.adv = {}          # 2.3.0 gelişmiş filtre
 
         root = QVBoxLayout(self)
         root.setContentsMargins(0, 0, 0, 0)
@@ -394,7 +410,20 @@ class ItemsPage(QWidget):
         report_btn = QPushButton(t("🖨  Döküm"))
         report_btn.setToolTip(t("Seçili kategori ya da yerdeki bütün eşyaların listesi (yazdır / PDF)"))
         report_btn.clicked.connect(lambda: self.open_report())
-        header.addWidget(report_btn)
+        # 2.3.0: Döküm, „Dışa aktar ▾“ menüsünde (Ctrl+P de açar)
+        # ---- 2.3.0: gelişmiş filtre · dışa aktar · Asistan
+        self.filter_btn = QPushButton(t("⚙  Filtre ▾"))
+        self.filter_btn.setToolTip(t("Fiyat aralığı, tarih, dükkan, garanti, durum… · kayıtlı filtreler"))
+        self.filter_btn.clicked.connect(self._filter_menu)
+        export_btn = QPushButton(t("⬇  Dışa aktar ▾"))
+        export_btn.setToolTip(t("Listede görünen eşyaları Excel / CSV olarak kaydet ya da sigorta envanteri (PDF) hazırla"))
+        export_btn.clicked.connect(lambda: self._export_menu(export_btn))
+        ask_btn = QPushButton(t("✦  Asistan"))
+        ask_btn.setToolTip(t("Eşyalarınız hakkında soru sorun: „Kışlık montlar nerede?“ (çevrim içi ve çevrim dışı)"))
+        ask_btn.clicked.connect(lambda: AskDialog(self.db, self, self.search.text().strip() if "?" in self.search.text() else "").exec())
+        header.addWidget(self.filter_btn)
+        header.addWidget(export_btn)
+        header.addWidget(ask_btn)
         header.addWidget(new_btn)
         root.addLayout(header)
 
@@ -536,6 +565,13 @@ class ItemsPage(QWidget):
         selected = {selected} if isinstance(selected, int) else set(selected)
         cat_ids, loc_ids = self.cat_tree.filter_ids(), self.loc_tree.filter_ids()
         self.items = self.db.list_items(self.search.text(), cat_ids, loc_ids, self.sort.currentData())
+        if filtre.is_active(self.adv):
+            self.items = filtre.apply(self.items, self.adv, days=self.warn_days())
+        n_adv = filtre.count_active(self.adv)
+        self.filter_btn.setText(t("⚙  Filtre ({n}) ▾", n=n_adv) if n_adv else t("⚙  Filtre ▾"))
+        self.filter_btn.setObjectName("Primary" if n_adv else "")
+        self.filter_btn.style().unpolish(self.filter_btn)
+        self.filter_btn.style().polish(self.filter_btn)
         n_auto = sum(1 for d in self.items if d["price_auto"] and d["price"] is not None)
         self.auto_btn.setText(t("⚡ Kontrol edilmemiş fiyatlar ({n})", n=n_auto))
         if self.auto_btn.isChecked():
@@ -566,6 +602,16 @@ class ItemsPage(QWidget):
             name.setFont(f)
             if d["notes"]:
                 name.setToolTip(d["notes"])
+            wst = filtre.day_status(d.get("warranty_until"), days=self.warn_days())
+            est = filtre.day_status(d.get("expires_on"), days=self.warn_days())
+            if "over" in (wst, est) or "soon" in (wst, est):
+                name.setText("⏳ " + d["name"])
+                name.setForeground(QColor("#c0392b" if "over" in (wst, est) else LOW_COLOR))
+                tips = [t("Garanti bitişi") + f": {fmt_day(d['warranty_until'])} · {status_text(d['warranty_until'])}"
+                        if wst in ("soon", "over") else "",
+                        t("Son kullanma tarihi") + f": {fmt_day(d['expires_on'])} · {status_text(d['expires_on'])}"
+                        if est in ("soon", "over") else "", d["notes"]]
+                name.setToolTip("\n".join(x for x in tips if x))
             if d["loan_to"]:
                 name.setText("🤝 " + d["name"])
                 name.setToolTip(loan_text(d) + ("\n" + d["notes"] if d["notes"] else ""))
@@ -642,6 +688,8 @@ class ItemsPage(QWidget):
             it = tree.currentItem()
             if it and tree.selected_id() is not ALL:
                 parts.append(f"{t(label)}: {it.text(0).split('  (')[0]}")
+        if n_adv:
+            parts.append(t("Gelişmiş filtre: {n} koşul", n=n_adv))
         self.filter_info.setText(t("Etkin filtre — ") + ", ".join(parts) if parts else "")
         self._selection_changed()
 
@@ -673,6 +721,7 @@ class ItemsPage(QWidget):
         menu.exec(tree.viewport().mapToGlobal(pos))
 
     def clear_filters(self):
+        self.adv = {}
         self.search.clear()
         self.cat_tree.select_all()
         self.loc_tree.select_all()
@@ -834,6 +883,7 @@ class ItemsPage(QWidget):
         menu = QMenu(self)
         if len(ids) == 1:
             menu.addAction(t("✎  Düzenle"), lambda: self.edit_item(ids[0]))
+            menu.addAction(t("🕘  Değişiklik geçmişi"), lambda: HistoryDialog(self.db, ids[0], self).exec())
             menu.addSeparator()
         for table, field, label in (("categories", "category_id", "Kategoriye taşı"),
                                     ("locations", "location_id", "Yere taşı")):
@@ -870,3 +920,74 @@ class ItemsPage(QWidget):
         self.cat_tree.reload()
         self.loc_tree.reload()
         self.reload_items(keep_id=ids)
+
+    # ------------------------------------------------------------------ 2.3.0
+    def warn_days(self):
+        try:
+            return max(1, int(self.db.get_setting("warn_days", str(filtre.WARN_DAYS)) or filtre.WARN_DAYS))
+        except ValueError:
+            return filtre.WARN_DAYS
+
+    def set_filter(self, f, reset_tree=True):
+        """Panelden / kayıtlı filtreden gelen gelişmiş filtreyi uygular."""
+        if reset_tree:
+            self.search.blockSignals(True)
+            self.search.clear()
+            self.search.blockSignals(False)
+            self.cat_tree.select_all()
+            self.loc_tree.select_all()
+            self.loan_btn.setChecked(False)
+            self.auto_btn.setChecked(False)
+        self.adv = filtre.clean(f)
+        self.reload_items()
+
+    def _open_filter(self):
+        dlg = FilterDialog(self.db, self.adv, self)
+        if dlg.exec():
+            self.adv = dlg.value()
+            self.reload_items()
+
+    def _filter_menu(self):
+        m = saved_menu(self.db, self, lambda f: self.set_filter(f, reset_tree=False), self._open_filter)
+        if filtre.is_active(self.adv):
+            m.addSeparator()
+            m.addAction(t("✕  Gelişmiş filtreyi kaldır"), lambda: self.set_filter({}, reset_tree=False))
+        m.exec(self.filter_btn.mapToGlobal(self.filter_btn.rect().bottomLeft()))
+
+    def _export_menu(self, btn):
+        m = QMenu(self)
+        m.addAction(t("📊  Excel dosyası (.xlsx)…"), lambda: self.export("xlsx"))
+        m.addAction(t("📄  CSV dosyası (.csv)…"), lambda: self.export("csv"))
+        m.addSeparator()
+        m.addAction(t("🛡  Sigorta envanteri (fotoğraflı PDF / yazdır)…"), self.insurance)
+        m.addAction(t("🖨  Döküm (kategori / yer)…"), lambda: self.open_report())
+        m.exec(btn.mapToGlobal(btn.rect().bottomLeft()))
+
+    def export(self, kind):
+        from pathlib import Path
+        from PySide6.QtWidgets import QFileDialog
+        from . import disa_aktar, i18n
+        from .common import info
+        if not self.items:
+            info(self, t("Dışa aktar"), t("Listede eşya yok."))
+            return
+        default = str(Path.home() / disa_aktar.default_name(kind))
+        filt = "Excel (*.xlsx)" if kind == "xlsx" else "CSV (*.csv)"
+        target, _ = QFileDialog.getSaveFileName(self, t("Dışa aktar"), default, filt)
+        if not target:
+            return
+        head, rows, widths = disa_aktar.table(self.items, t)
+        try:
+            if kind == "xlsx":
+                disa_aktar.write_xlsx(target, head, rows, widths, sheet=t("Eşyalarım"), rtl=i18n.is_rtl(),
+                                      title=t("Organizer — {n} eşya", n=len(rows)))
+            else:
+                disa_aktar.write_csv(target, head, rows)
+        except OSError as e:
+            info(self, t("Dışa aktar"), str(e))
+            return
+        info(self, t("Dışa aktar"), t("{n} eşya kaydedildi:\n{path}", n=len(rows), path=target))
+
+    def insurance(self):
+        from .report import InsuranceDialog
+        InsuranceDialog(self.db, list(self.items), self).exec()

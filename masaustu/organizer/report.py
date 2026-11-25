@@ -198,3 +198,100 @@ class ReportDialog(QDialog):
             info(self, t("Döküm"), t("PDF kaydedildi:\n{path}", path=target))
         return target
 
+
+
+# ---------------------------------------------------------------------- 2.3.0: sigorta envanteri
+def build_insurance(db, items, max_photos=2):
+    """Fotoğraflı ev eşyası envanteri (sigorta / hasar dosyası için): her eşya fotoğrafı, yeri, alış fiyatı ve tarihi,
+    satın alındığı yer, garanti bitişi ve fatura sayısıyla. Fotoğraflar ortalanır. (başlık, html, resimler)"""
+    from .db import is_receipt
+    from .ek_arayuz import fmt_day
+    rtl = i18n.is_rtl()
+    title = t("Ev eşyası envanteri (sigorta için)")
+    totals = db.totals_by_currency(items)
+    order = ["USD"] + [c for c, *_ in CURRENCIES if c != "USD"]
+    value = " + ".join(fmt_price(totals[c], c) for c in order if c in totals) or "—"
+    images = {}
+    align = "right" if rtl else "left"
+    h = [f'<html dir="{"rtl" if rtl else "ltr"}"><head><style>'
+         'body { font-family: "Segoe UI", "Noto Sans", "Noto Sans Arabic", "DejaVu Sans", sans-serif; color: #20323a; }'
+         'h1 { color: #1d5f74; font-size: 20pt; margin: 0; text-align: center; }'
+         'h2 { color: #1d5f74; font-size: 12.5pt; margin: 14px 0 4px 0; }'
+         '.muted { color: #6b8590; }'
+         f'td {{ padding: 3px 6px; vertical-align: top; text-align: {align}; }}'
+         'th { background: #e6f3f1; color: #1d5f74; padding: 5px; }'
+         '.box { border: 1px solid #d5e2e5; }'
+         '</style></head><body>',
+         f'<h1>{escape(title)}</h1>',
+         f'<p class="muted" style="text-align:center">{escape(t("Organizer"))} · {datetime.now():%d.%m.%Y %H:%M} · '
+         f'{escape(t("{n} eşya · toplam {q} adet", n=len(items), q=sum(d["quantity"] for d in items)))} · '
+         f'{escape(t("Toplam değer"))}: <b>{escape(value)}</b></p>']
+    # özet: kategoriye göre
+    groups = {}
+    for d in items:
+        g = groups.setdefault((d.get("category_path") or t("Belirtilmemiş")).split(" › ")[0], [0, {}])
+        g[0] += 1
+        if d["price"] is not None:
+            g[1][d["currency"]] = g[1].get(d["currency"], 0) + d["price"]
+    h.append(f'<h2>{escape(t("Özet: kategoriye göre"))}</h2><table width="100%" cellspacing="0">'
+             f'<tr><th>{escape(t("Kategori"))}</th><th>{escape(t("Eşya"))}</th><th>{escape(t("Değer:").rstrip(":"))}</th></tr>')
+    for name, (n, v) in sorted(groups.items(), key=lambda x: -x[1][0]):
+        h.append(f'<tr><td>{escape(name)}</td><td>{n}</td><td>'
+                 f'{escape(" + ".join(fmt_price(v[c], c) for c in order if c in v) or "—")}</td></tr>')
+    h.append("</table>")
+    h.append(f'<h2>{escape(t("Eşyalar"))}</h2>')
+    for d in items:
+        full = db.get_item(d["id"]) or d
+        pics = [p for p in full.get("photos") or [] if not is_receipt(p)][:max_photos]
+        recs = full.get("receipts") or []
+        cells = []
+        for p in pics:
+            img = load_image(db.photos_dir / p, 360)
+            if not img.isNull():
+                images[p] = img
+                cells.append(f'<img src="foto://{escape(p)}" height="120">')
+        facts = [(t("Adet"), str(d["quantity"])), (t("Yer"), d.get("location_path") or "—"),
+                 (t("Kategori"), d.get("category_path") or "—"),
+                 (t("Alış fiyatı:").rstrip(":"), fmt_price(d["price"], d["currency"])),
+                 (t("Ekleme tarihi:").rstrip(":"), fmt_date(d["created_at"]))]
+        shop = " · ".join(x for x in (d.get("shop_name"), d.get("shop_place"), d.get("shop_phone")) if x)
+        if shop:
+            facts.append((t("Satın alındığı yer"), shop))
+        if d.get("warranty_until"):
+            facts.append((t("Garanti bitişi"), fmt_day(d["warranty_until"])))
+        if recs:
+            facts.append((t("Fatura / fiş"), t("🧾 {n} belge", n=len(recs))))
+        if d.get("notes"):
+            facts.append((t("Notlar"), d["notes"]))
+        rows = "".join(f'<tr><td class="muted" width="34%">{escape(k)}</td><td>{escape(v).replace(chr(10), "<br>")}</td></tr>'
+                       for k, v in facts)
+        photo_html = (f'<p align="center">{"&nbsp;&nbsp;".join(cells)}</p>' if cells else "")
+        h.append(f'<table width="100%" cellspacing="0" class="box" style="margin-bottom:10px">'
+                 f'<tr><td colspan="2"><b style="font-size:12pt">{escape(d["name"])}</b></td></tr>'
+                 f'<tr><td colspan="2">{photo_html}</td></tr>{rows}</table><br>')
+    if not items:
+        h.append(f'<p>{escape(t("Bu bölümde kayıtlı eşya yok."))}</p>')
+    h.append("</body></html>")
+    return title, "".join(h), images
+
+
+class InsuranceDialog(ReportDialog):
+    """Sigorta envanteri: Döküm penceresinin yazdır / PDF düğmeleriyle aynı."""
+
+    def __init__(self, db, items, parent=None):
+        self._ins_items = items
+        super().__init__(db, "categories", None, parent)
+        self.setWindowTitle(t("Ev eşyası envanteri (sigorta için)"))
+        for w in (self.kind, self.node):
+            w.hide()
+        for lab in self.findChildren(QLabel):
+            if lab.text() in (t("Döküm türü:"), t("Döküm, seçilen bölümdeki ve altındaki bütün eşyaları gösterir.")):
+                lab.setText(t("Listede görünen eşyalar (arama ve filtreler geçerli). Fotoğraflar, alış fiyatı ve tarihi, "
+                              "garanti ve fatura bilgisiyle.") if lab.objectName() == "Muted" else "")
+
+    def render(self):
+        if not hasattr(self, "_ins_items"):
+            return
+        self.title, html, images = build_insurance(self.db, self._ins_items, 2 if self.photos.isChecked() else 0)
+        self.doc = make_document(html, images)
+        self.view.setDocument(self.doc)

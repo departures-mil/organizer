@@ -325,3 +325,30 @@ textarea.in { min-height: 84px; resize: vertical; }
 #toast button { border: 0; background: var(--sand); color: var(--ink); font-weight: 700; border-radius: 9px; padding: 7px 12px; flex: none; }
 
 
+
+/* ---- 2.3.0: Ana sayfa paneli, gelişmiş filtre, geçmiş, sigorta envanteri */
+.tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 10px 0 14px; }
+.card.tile { padding: 12px 14px; }
+.card.tile.link { cursor: pointer; }
+.tile .tt { color: var(--muted); font-size: 13px; }
+.tile .tv { font-size: 24px; font-weight: 700; margin: 2px 0; word-break: break-word; }
+.tile .ts { color: var(--muted); font-size: 12.5px; }
+.panelcard { margin-bottom: 12px; }
+.prow { display: block; width: 100%; text-align: start; background: none; border: 0; border-bottom: 1px solid var(--border); padding: 9px 2px; color: inherit; font: inherit; }
+.prow b { display: block; }
+.prow span { display: block; color: var(--muted); font-size: 13px; }
+.prow span.lowtxt, .lowtxt { color: #d97706; }
+.prow span.latetxt { color: var(--danger); }
+.catrow { padding: 6px 0; font-size: 13.5px; }
+.catbar { height: 6px; border-radius: 3px; background: var(--accent); margin-top: 4px; }
+.flaggrid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.histrow { padding: 12px 14px; margin-bottom: 8px; }
+.histrow div { font-size: 13.5px; padding-top: 3px; }
+.answer { margin-top: 14px; line-height: 1.55; }
+.answer > b { display: block; margin-bottom: 6px; }
+.tbtn { flex: none; min-width: 46px; }
+.insitem { border: 1px solid #d5e2e5; border-radius: 10px; padding: 10px 12px; margin: 12px 0; break-inside: avoid; }
+.insitem h2 { margin: 0 0 6px; font-size: 16px; }
+.insphotos { display: flex; justify-content: center; gap: 8px; margin: 6px 0; }
+.insphotos img { max-height: 150px; max-width: 48%; object-fit: contain; border-radius: 6px; }
+.tiles .tile:last-child:nth-child(odd) { grid-column: span 2; }

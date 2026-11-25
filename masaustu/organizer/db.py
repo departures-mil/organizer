@@ -4,6 +4,7 @@ import shutil
 import sqlite3
 import tempfile
 import uuid
+from contextlib import contextmanager
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -85,6 +86,9 @@ CREATE TABLE IF NOT EXISTS items(
     loan_date TEXT NOT NULL DEFAULT '',
     loan_due TEXT NOT NULL DEFAULT '',
     loan_history TEXT NOT NULL DEFAULT '[]',
+    warranty_until TEXT NOT NULL DEFAULT '',
+    expires_on TEXT NOT NULL DEFAULT '',
+    changelog TEXT NOT NULL DEFAULT '[]',
     {SYNC_COLS}
 );
 CREATE TABLE IF NOT EXISTS item_photos(
@@ -150,7 +154,16 @@ ITEM_EXTRA = {
     "loan_date": ("TEXT NOT NULL DEFAULT ''", "", "s"),
     "loan_due": ("TEXT NOT NULL DEFAULT ''", "", "s"),
     "loan_history": ("TEXT NOT NULL DEFAULT '[]'", [], "j"),
+    # 2.3.0: garanti bitişi ve son kullanma tarihi (YYYY-AA-GG) + değişiklik geçmişi (kim, hangi cihaz, ne değişti)
+    "warranty_until": ("TEXT NOT NULL DEFAULT ''", "", "s"),
+    "expires_on": ("TEXT NOT NULL DEFAULT ''", "", "s"),
+    "changelog": ("TEXT NOT NULL DEFAULT '[]'", [], "j"),
 }
+CHANGELOG_MAX = 40
+# değişiklik geçmişinde izlenen alanlar (ortak biçimdeki adlarıyla)
+TRACKED = ("name", "quantity", "category", "location", "price", "currency", "notes", "shop_name", "shop_place",
+           "shop_phone", "min_qty", "to_buy", "loan_to", "loan_due", "trashed_at", "warranty_until", "expires_on",
+           "photos", "price_auto")
 CONTACT_EXTRA = {
     "jobs": ("TEXT NOT NULL DEFAULT '[]'", [], "j"),
 }
@@ -190,6 +203,48 @@ def _extra_from_db(kind, v):
     if kind == "b":
         return bool(v)
     return v or ""
+
+
+def _short(v):
+    """Değişiklik geçmişinde gösterilecek kısa değer."""
+    if v is None:
+        return ""
+    if isinstance(v, bool):
+        return "1" if v else "0"
+    if isinstance(v, float):
+        return ("%.2f" % v).rstrip("0").rstrip(".")
+    if isinstance(v, list):
+        return str(len(v))
+    return str(v).replace("\n", " ").strip()[:80]
+
+
+def merge_changelog(a, b):
+    """İki cihazın değişiklik geçmişini birleştirir (aynı kayıt bir kez), zamana göre sıralar, son CHANGELOG_MAX kalır."""
+    out, seen = [], set()
+    for e in sorted([x for x in list(a or []) + list(b or []) if isinstance(x, dict)], key=lambda e: str(e.get("t", ""))):
+        k = (e.get("t"), e.get("d"), e.get("a"), json.dumps(e.get("c"), ensure_ascii=False, sort_keys=True))
+        if k in seen:
+            continue
+        seen.add(k)
+        out.append(e)
+    return out[-CHANGELOG_MAX:]
+
+
+def norm_day(v) -> str:
+    """'2026-12-31', '31.12.2026' → '2026-12-31'; geçersizse boş."""
+    v = str(v or "").strip()
+    m = re.match(r"^(\d{4})-(\d{1,2})-(\d{1,2})", v) or None
+    if m:
+        y, mo, d = m.groups()
+    else:
+        m = re.match(r"^(\d{1,2})[./-](\d{1,2})[./-](\d{4})$", v)
+        if not m:
+            return ""
+        d, mo, y = m.groups()
+    try:
+        return datetime(int(y), int(mo), int(d)).strftime("%Y-%m-%d")
+    except ValueError:
+        return ""
 
 
 def today_str() -> str:
@@ -603,6 +658,69 @@ class Database:
                                               (default_name(tr_name, new_lang), r["id"]))
                             break
 
+    # ------------------------------------------------------------------ değişiklik geçmişi (2.3.0)
+    def device_name(self):
+        import platform
+        return (self.get_setting("device_name") or "").strip() or platform.node() or "PC"
+
+    def _uid_paths(self, table):
+        paths = self.tree_paths(table)
+        return {uid: paths.get(i, "") for uid, i in self._id_map(table).items()}
+
+    def _state(self, ids):
+        cats, locs = self._uid_paths("categories"), self._uid_paths("locations")
+        out = {}
+        for i in ids:
+            r = self._export_one("items", i)
+            if r is not None:
+                r["category"], r["location"] = cats.get(r["category"], ""), locs.get(r["location"], "")
+                out[i] = r
+        return out
+
+    @contextmanager
+    def track(self, ids, action=""):
+        """with db.track([id], "eylem"): ... — bloktan önceki ve sonraki hal karşılaştırılıp geçmişe yazılır."""
+        before = self._state([i for i in ids if i])
+        yield
+        self._log(before, action)
+
+    def _log(self, before, action=""):
+        if not before:
+            return
+        after = self._state(list(before))
+        ts, dev, who = now_utc(), self.device_name(), self.get_setting("fb_email", "") or ""
+        with self.conn:
+            for i, old in before.items():
+                new = after.get(i)
+                if new is None:
+                    continue
+                ch = [[f, _short(old.get(f)), _short(new.get(f))] for f in TRACKED
+                      if _short(old.get(f)) != _short(new.get(f))]
+                if not ch and not action:
+                    continue
+                entry = {"t": ts, "d": dev, "c": ch}
+                if who:
+                    entry["u"] = who
+                if action:
+                    entry["a"] = action
+                log = merge_changelog(new.get("changelog"), [entry])
+                self.conn.execute("UPDATE items SET changelog=? WHERE id=?", (json.dumps(log, ensure_ascii=False), i))
+
+    def _log_created(self, item_id):
+        e = {"t": now_utc(), "d": self.device_name(), "c": [], "a": "eklendi"}
+        who = self.get_setting("fb_email", "") or ""
+        if who:
+            e["u"] = who
+        row = self.conn.execute("SELECT changelog FROM items WHERE id=?", (item_id,)).fetchone()
+        if row is not None:
+            with self.conn:
+                self.conn.execute("UPDATE items SET changelog=? WHERE id=?", (json.dumps(
+                    merge_changelog(_extra_from_db("j", row["changelog"]), [e]), ensure_ascii=False), item_id))
+
+    def changelog(self, item_id):
+        row = self.conn.execute("SELECT changelog FROM items WHERE id=?", (item_id,)).fetchone()
+        return list(reversed(_extra_from_db("j", row["changelog"]))) if row else []
+
     # ------------------------------------------------------------------ eşyalar
     def count_items(self):
         return self.conn.execute("SELECT COUNT(*) FROM items WHERE deleted=0 AND trashed_at=''").fetchone()[0]
@@ -685,6 +803,15 @@ class Database:
                ("contact_photos", "contact_id", self.contact_photos)
 
     def save_item(self, data, photos=None, item_id=None):
+        """Eşyayı kaydeder; değişiklik geçmişine yazar (2.3.0)."""
+        if item_id is None:
+            new_id = self._save_item(data, photos, None)
+            self._log_created(new_id)
+            return new_id
+        with self.track([item_id]):
+            return self._save_item(data, photos, item_id)
+
+    def _save_item(self, data, photos=None, item_id=None):
         """data: name, quantity, location_id, category_id, price, currency, notes, created_at,
         shop_name, shop_place, shop_phone, shop_whatsapp, shop_telegram.
         photos: [("existing", dosya_adı) | ("new", kaynak_yol)] ya da None (dokunma)."""
@@ -695,6 +822,10 @@ class Database:
         if "min_qty" in data:
             fields += ("min_qty",)
             values.append(_extra_to_db("i", data.get("min_qty")))
+        for f in ("warranty_until", "expires_on"):     # 2.3.0
+            if f in data:
+                fields += (f,)
+                values.append(norm_day(data.get(f)))
         for i, f in enumerate(fields):
             if f in SHOP_TEXT:
                 values[i] = (values[i] or "").strip()
@@ -748,6 +879,10 @@ class Database:
             self.conn.execute("INSERT OR REPLACE INTO photo_sync VALUES (?, 'delete')", (fname,))
 
     def update_items_field(self, item_ids, field, value):
+        with self.track(item_ids, ""):
+            return self._update_items_field(item_ids, field, value)
+
+    def _update_items_field(self, item_ids, field, value):
         if field not in ("category_id", "location_id", "price_auto", "to_buy", "min_qty"):
             raise ValueError(field)
         with self.conn:
@@ -756,6 +891,10 @@ class Database:
                 [(value, now_str(), now_utc(), i) for i in item_ids])
 
     def change_quantity(self, item_id, delta):
+        with self.track([item_id], ""):
+            return self._change_quantity(item_id, delta)
+
+    def _change_quantity(self, item_id, delta):
         with self.conn:
             self.conn.execute(
                 "UPDATE items SET quantity=MAX(0, quantity+?), updated_at=?, mtime=?, dirty=1 WHERE id=?",
@@ -763,6 +902,10 @@ class Database:
 
     # ------------------------------------------------------------------ çöp kutusu (v.1.0.8)
     def trash_items(self, item_ids):
+        with self.track(item_ids, "silindi"):
+            return self._trash_items(item_ids)
+
+    def _trash_items(self, item_ids):
         """Silinen eşyalar 30 gün çöp kutusunda kalır (fotoğraflarıyla birlikte), sonra kendiliğinden silinir."""
         ts = now_utc()
         with self.conn:
@@ -772,6 +915,10 @@ class Database:
     delete_items = trash_items   # eski adla çağıranlar da çöp kutusuna atar
 
     def restore_items(self, item_ids):
+        with self.track(item_ids, "geri_yuklendi"):
+            return self._restore_items(item_ids)
+
+    def _restore_items(self, item_ids):
         ts = now_utc()
         with self.conn:
             self.conn.executemany("UPDATE items SET trashed_at='', mtime=?, dirty=1 WHERE id=?",
@@ -805,6 +952,10 @@ class Database:
 
     # ------------------------------------------------------------------ ödünç (v.1.0.8)
     def lend_item(self, item_id, to, phone="", date="", due=""):
+        with self.track([item_id], ""):
+            return self._lend_item(item_id, to, phone, date, due)
+
+    def _lend_item(self, item_id, to, phone="", date="", due=""):
         with self.conn:
             self.conn.execute("UPDATE items SET loan_to=?, loan_phone=?, loan_date=?, loan_due=?, updated_at=?, "
                               "mtime=?, dirty=1 WHERE id=?",
@@ -812,6 +963,10 @@ class Database:
                                now_str(), now_utc(), item_id))
 
     def return_item(self, item_id):
+        with self.track([item_id], ""):
+            return self._return_item(item_id)
+
+    def _return_item(self, item_id):
         """Ödünç verilen eşya geri geldi: kayıt geçmişe eklenir."""
         import json
         row = self.conn.execute("SELECT loan_to, loan_phone, loan_date, loan_due, loan_history FROM items WHERE id=?",
@@ -843,6 +998,10 @@ class Database:
         return [d for d in items if d["to_buy"] or self.is_low(d)]
 
     def bought(self, item_id, qty):
+        with self.track([item_id], ""):
+            return self._bought(item_id, qty)
+
+    def _bought(self, item_id, qty):
         """Alındı: adet artar, elle eklenmişse listeden çıkar."""
         with self.conn:
             self.conn.execute("UPDATE items SET quantity=quantity+?, to_buy=0, updated_at=?, mtime=?, dirty=1 WHERE id=?",
@@ -883,9 +1042,13 @@ class Database:
         return out
 
     def restore_snapshot(self, snap):
+        with self.track([d['id'] for d in snap], "geri_alindi"):
+            return self._restore_snapshot(snap)
+
+    def _restore_snapshot(self, snap):
         """Kaydedilen hali geri yükler; değişiklik yeni bir düzenleme olarak eşitlenir."""
         ts = now_utc()
-        skip = {"id", "uid", "mtime", "dirty", "_photos"}
+        skip = {"id", "uid", "mtime", "dirty", "_photos", "changelog"}
         with self.conn:
             for d in snap:
                 cols = [c for c in d if c not in skip]
@@ -1051,6 +1214,11 @@ class Database:
         if missing and exists:
             old = self.conn.execute(f"SELECT {', '.join(missing)} FROM {table} WHERE uid=?", (rec["uid"],)).fetchone()
             rec = {**rec, **{f: _extra_from_db(extra[f][2], old[f]) for f in missing}}
+        if table == "items" and exists and "changelog" in rec and "changelog" not in missing:
+            # 2.3.0: iki cihazın değişiklik geçmişi birleşir (biri ötekini silmez)
+            old = self.conn.execute("SELECT changelog FROM items WHERE uid=?", (rec["uid"],)).fetchone()
+            if old is not None:
+                rec = {**rec, "changelog": merge_changelog(_extra_from_db("j", old["changelog"]), rec.get("changelog"))}
         return [(f, _extra_to_db(k, rec.get(f, dv))) for f, (_ddl, dv, k) in extra.items()]
 
     def _set_extras(self, table, uid, pairs):

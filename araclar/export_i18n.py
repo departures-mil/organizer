@@ -35,3 +35,11 @@ lines.append(' "professions": ' + json.dumps(data["professions"], ensure_ascii=F
 out = src[:head] + "\n".join(lines) + src[tail:]
 open(JS, "w", encoding="utf-8").write(out)
 print(f"{len(strings)} çeviri yazıldı → telefon/i18n.js")
+
+# 2.3.0: çevrim dışı çeviri sözlüğü → telefon/sozluk.js
+from organizer import sozluk  # noqa: E402
+SJS = os.path.join(REPO, "telefon", "sozluk.js")
+with open(SJS, "w", encoding="utf-8") as f:
+    f.write("/* ÜRETİLDİ — düzenlemeyin: masaustu/organizer/sozluk.py → araclar/export_i18n.py */\n"
+            "const SOZLUK = " + json.dumps([list(w) for w in sozluk.WORDS], ensure_ascii=False) + ";\n")
+print(f"{len(sozluk.WORDS)} sözlük kelimesi → telefon/sozluk.js")

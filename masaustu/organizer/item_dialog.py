@@ -153,7 +153,11 @@ class ItemDialog(QDialog):
 
         self.name = QLineEdit()
         self.name.setPlaceholderText(t("Örn. 4x40 sunta vidası"))
-        form.addRow(t("Adı:"), self.name)
+        from .ek_arayuz import DateField, translate_button
+        nrow = QHBoxLayout()
+        nrow.addWidget(self.name, 1)
+        nrow.addWidget(translate_button(self.name, self))
+        form.addRow(t("Adı:"), nrow)
 
         self.qty = QSpinBox()
         self.qty.setRange(0, 1_000_000)
@@ -238,11 +242,21 @@ class ItemDialog(QDialog):
         self.created.setDisplayFormat("dd.MM.yyyy  HH:mm")
         self.created.setMinimumWidth(180)
         form.addRow(t("Ekleme tarihi:"), self.created)
+        # 2.3.0: garanti bitişi ve son kullanma tarihi (yaklaşınca uyarı)
+        self.warranty = DateField(t("var"))
+        self.warranty.on.setToolTip(t("Garanti bitiş tarihini girin; yaklaşınca program hatırlatır."))
+        form.addRow(t("Garanti bitişi:"), self.warranty)
+        self.expiry = DateField(t("var"))
+        self.expiry.on.setToolTip(t("İlaç, gıda, yangın tüpü, pil gibi eşyalarda son kullanma tarihi; yaklaşınca program hatırlatır."))
+        form.addRow(t("Son kullanma tarihi:"), self.expiry)
 
         self.notes = QPlainTextEdit()
         self.notes.setPlaceholderText(t("Ölçü, marka, nereden alındığı gibi notlar…"))
         self.notes.setFixedHeight(80)
-        form.addRow(t("Notlar:"), self.notes)
+        notes_row = QHBoxLayout()
+        notes_row.addWidget(self.notes, 1)
+        notes_row.addWidget(translate_button(self.notes, self), 0, Qt.AlignTop)
+        form.addRow(t("Notlar:"), notes_row)
         lay.addLayout(form)
 
         self.photos = PhotoEditor(thumbs, title=False)
@@ -250,6 +264,17 @@ class ItemDialog(QDialog):
         self.ptabs = QTabWidget()
         self.ptabs.addTab(self.photos, t("📷  Fotoğraflar"))
         self.ptabs.addTab(self.receipts, t("🧾  Fatura / fiş"))
+        ai_row = QHBoxLayout()
+        self.ai_btn = QPushButton(t("✦  Fotoğraftan doldur (yapay zeka)"))
+        self.ai_btn.setToolTip(t("İlk fotoğrafa bakarak ad, kategori, yer ve not önerir. Kendi yapay zeka anahtarınız gerekir "
+                                 "(Ayarlar → Yapay zeka); internet olmadan çalışmaz."))
+        self.ai_btn.clicked.connect(self._ai_fill)
+        self.ai_msg = QLabel()
+        self.ai_msg.setObjectName("Muted")
+        self.ai_msg.setWordWrap(True)
+        ai_row.addWidget(self.ai_btn)
+        ai_row.addWidget(self.ai_msg, 1)
+        lay.addLayout(ai_row)
         lay.addWidget(self.ptabs, 1)
 
         buttons = QDialogButtonBox()
@@ -282,6 +307,8 @@ class ItemDialog(QDialog):
             self.shop_place.setText(item.get("shop_place") or "")
             self.shop_phone.setText(item.get("shop_phone") or "")
             self.channels.set_values(item)
+            self.warranty.set_value(item.get("warranty_until") or "")
+            self.expiry.set_value(item.get("expires_on") or "")
         else:
             self.category.set_current_id(defaults.get("category_id"))
             self.location.set_current_id(defaults.get("location_id"))
@@ -354,7 +381,67 @@ class ItemDialog(QDialog):
             **self.channels.values(),
             "price_auto": not self.price_auto.isHidden() and self.price_auto.isChecked() and price > 0,
             "min_qty": self.min_qty.value(),
+            "warranty_until": self.warranty.value(),
+            "expires_on": self.expiry.value(),
         }
+
+    # ---- 2.3.0: fotoğraftan öneri (çevrim içi yapay zeka)
+    def _ai_fill(self):
+        from . import i18n, zeka
+        from .ek_arayuz import ai_error_text, run_async
+        if not zeka.cfg():
+            self.ai_msg.setText(ai_error_text(zeka.AiError("nokey")))
+            return
+        entries = self.photos.entries()
+        if not entries:
+            self.ai_msg.setText(t("Önce bir fotoğraf ekleyin."))
+            return
+        kind, value = entries[0]
+        path = (self.db.photos_dir / value) if kind == "existing" else Path(value)
+        img = load_image(path, 1024)
+        if img.isNull():
+            self.ai_msg.setText(t("Fotoğraf açılamadı"))
+            return
+        from PySide6.QtCore import QBuffer, QIODevice
+        buf = QBuffer()
+        buf.open(QIODevice.WriteOnly)
+        img.save(buf, "JPEG", 85)
+        data = bytes(buf.data())
+        cats = [p for _i, _n, _d, p in self.db.tree_ordered("categories")]
+        locs = [p for _i, _n, _d, p in self.db.tree_ordered("locations")]
+        self.ai_btn.setEnabled(False)
+        self.ai_msg.setText(t("Düşünüyor…"))
+
+        def done(res):
+            try:
+                self.ai_btn.setEnabled(True)
+                filled = []
+                if res.get("name") and not self.name.text().strip():
+                    self.name.setText(res["name"])
+                    filled.append(t("ad"))
+                elif res.get("name"):
+                    filled.append(t("öneri: {x}", x=res["name"]))
+                for key, combo, table in (("category", self.category, "categories"), ("location", self.location, "locations")):
+                    if res.get(key) and combo.current_id() is None:
+                        nid = next((i for i, _n, _d, p in self.db.tree_ordered(table) if p == res[key]), None)
+                        if nid is not None:
+                            combo.set_current_id(nid)
+                            filled.append(t("kategori") if key == "category" else t("yer"))
+                if res.get("notes") and not self.notes.toPlainText().strip():
+                    self.notes.setPlainText(res["notes"])
+                    filled.append(t("not"))
+                self.ai_msg.setText(t("✦ Dolduruldu: {x} — kontrol edip kaydedin.", x=", ".join(filled)) if filled
+                                    else t("✦ Öneri bulunamadı."))
+            except RuntimeError:
+                pass
+
+        def failed(e):
+            try:
+                self.ai_btn.setEnabled(True)
+                self.ai_msg.setText(ai_error_text(e))
+            except RuntimeError:
+                pass
+        run_async(zeka.suggest_from_photo, done, failed, data, cats, locs, i18n.LANG)
 
     def photo_entries(self):
         return self.photos.entries() + self.receipts.entries()
