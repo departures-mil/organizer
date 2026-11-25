@@ -40,6 +40,33 @@ const MIME = { '.html': 'text/html', '.js': 'application/javascript', '.css': 't
     await Store.applyRemote('items', [{ ...c2, name: 'Uzak', mtime: '2099-02-01T00:00:00.000Z' }]);
     out.conflict = Store.archiveList()[0].kind + ':' + Store.archiveList()[0].name;
     out.newName = Store.t.items.get(uid).name;
+    // ---- 2.3.0: değişiklik geçmişi, garanti, filtre, panel, dışa aktarma, şifreli yedek, çeviri, Asistan
+    const u2 = await Store.saveItem({ name: 'Kışlık mont', quantity: 2, location: loc.uid, category: '', price: 40, currency: 'USD', notes: '',
+      warranty_until: todayStr(), expires_on: '' }, []);
+    await Store.changeQuantity(u2, 1);
+    out.log = Store.t.items.get(u2).changelog.map(e => (e.a || '') + ':' + (e.c || []).map(c => c.join('>')).join(','));
+    ItemsPage.adv = { flags: ['warranty_soon'] };
+    out.filtered = ItemsPage.items().map(d => d.name);
+    ItemsPage.adv = {};
+    App.tab = 3; App.render();
+    out.panel = document.querySelectorAll('.tiles .tile').length;
+    const [head, rows] = exportTable(Store.listItems({}));
+    const x = xlsxBytes(head, rows, 'T');
+    out.xlsx = x[0] === 0x50 && x[1] === 0x4b && rows.length;
+    const enc = await ozbEncrypt(new TextEncoder().encode('merhaba'), 'pw');
+    out.ozb = isOzb(enc) && new TextDecoder().decode(await ozbDecrypt(enc, 'pw'));
+    try { await ozbDecrypt(enc, 'yanlis'); out.wrong = false; } catch (e) { out.wrong = e.kind; }
+    out.tr = Ceviri.offline('Şarjlı matkap ve uç seti', 'tr', 'en');
+    out.ask = Zeka.askOffline('Kışlık montlar nerede?', Store.listItems({})).join(' | ');
+    // geri yükleme: hiçbir şey silinmez
+    const backup = JSON.parse(await Store.exportAll());
+    await Store.changeQuantity(u2, 5);
+    const u3 = await Store.saveItem({ name: 'Sonra', quantity: 1, location: '', category: '', price: null, currency: 'USD', notes: '' }, []);
+    window.ask = async () => true;
+    await restoreBackup(new TextEncoder().encode(JSON.stringify(backup)));
+    out.restoreQty = Store.t.items.get(u2).quantity;
+    out.restoreKeeps = !!Store.t.items.get(u3) && !Store.t.items.get(u3).deleted;
+    out.restoreLog = Store.t.items.get(u2).changelog.slice(-1)[0].a;
     App.tab = 2; App.render();
     const cards = [...document.querySelectorAll('.org-settings > *')];
     out.lastCard = cards[cards.length - 1].getAttribute('data-card') || cards[cards.length - 1].className + '|' + cards[cards.length - 1].textContent.slice(0, 40);
@@ -62,6 +89,14 @@ const MIME = { '.html': 'text/html', '.js': 'application/javascript', '.css': 't
   assert.ok(/Admin|contact|iletişim/i.test(r.lastCard), 'Admin ile iletişim EN SON: ' + r.lastCard);
   assert.ok(/Görünüm/.test(r.firstCard), 'Görünüm başta: ' + r.firstCard);
   assert.strictEqual(r.dir, 'rtl'); assert.strictEqual(r.lang, 'ar');
+  assert.deepStrictEqual(r.log, ['eklendi:', ':quantity>2>3'], 'değişiklik geçmişi');
+  assert.deepStrictEqual(r.filtered, ['Kışlık mont'], 'gelişmiş filtre');
+  assert.strictEqual(r.panel, 5, 'Ana sayfa kutucukları');
+  assert.ok(r.xlsx, 'xlsx');
+  assert.strictEqual(r.ozb, 'merhaba'); assert.strictEqual(r.wrong, 'wrong');
+  assert.strictEqual(r.tr, 'cordless drill and bit set');
+  assert.ok(/Kışlık mont/.test(r.ask), 'Asistan: ' + r.ask);
+  assert.strictEqual(r.restoreQty, 3); assert.ok(r.restoreKeeps, 'geri yükleme silmez'); assert.strictEqual(r.restoreLog, 'yedekten');
   assert.deepStrictEqual(errors, [], 'sayfa hataları');
   await browser.close(); srv.close();
   console.log('telefon testi: TAMAM');

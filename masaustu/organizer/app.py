@@ -26,6 +26,32 @@ LOCALES = {
 
 # "Bu sürümde neler yeni" (güncellemeden sonraki ilk açılış; latest.json notları yoksa bunlar gösterilir)
 NEWS = {
+    "2.3.0": {
+        "tr": "- Ana sayfa paneli: toplam eşya ve değer ($), azalanlar, ödünçtekiler, garantisi / son kullanması yaklaşanlar, son eklenen ve değişenler\n"
+              "- Garanti bitişi ve son kullanma tarihi: yaklaşınca açılışta hatırlatılır\n"
+              "- Gelişmiş filtre (fiyat aralığı, tarih, dükkan, durum) ve kayıtlı filtreler\n"
+              "- Dışa aktar: Excel (.xlsx), CSV ve fotoğraflı sigorta envanteri (PDF / yazdır)\n"
+              "- Otomatik yedek (günlük / haftalık, istediğiniz klasöre — Google Drive klasörü dahil), şifreli yedek ve tek tuşla geri yükleme\n"
+              "- Değişiklik geçmişi: her eşyada kim, hangi cihazdan, neyi değiştirdi\n"
+              "- Çeviri: eşya adı ve notlar Türkçe · İngilizce · Arapça (internet yoksa çevrim dışı sözlük)\n"
+              "- Asistan: „Kışlık montlar nerede?“ gibi sorular; kendi yapay zeka anahtarınızla çevrim içi, yoksa çevrim dışı. Fotoğraftan ad / kategori önerisi",
+        "en": "- Dashboard: total items and value ($), running low, on loan, warranties / expiry dates coming up, recently added and changed\n"
+              "- Warranty end and expiry date: reminded at start-up when they are near\n"
+              "- Advanced filter (price range, date, shop, status) and saved filters\n"
+              "- Export: Excel (.xlsx), CSV and an insurance inventory with photos (PDF / print)\n"
+              "- Automatic backup (daily / weekly, to any folder — including your Google Drive folder), encrypted backups and one-click restore\n"
+              "- Change history: who changed what on each item, from which device\n"
+              "- Translation: item names and notes in Turkish · English · Arabic (offline dictionary when there is no internet)\n"
+              "- Assistant: questions like “Where are the winter coats?”; online with your own AI key, offline otherwise. Name / category suggestion from a photo",
+        "ar": "- لوحة رئيسية: إجمالي الأغراض والقيمة ($)، النواقص، المُعار، الضمانات وتواريخ انتهاء الصلاحية القريبة، آخر ما أُضيف وما تغيّر\n"
+              "- تاريخ انتهاء الضمان وتاريخ انتهاء الصلاحية: يُذكَّر بهما عند بدء التشغيل حين يقتربان\n"
+              "- تصفية متقدمة (نطاق السعر، التاريخ، المحل، الحالة) وتصفيات محفوظة\n"
+              "- تصدير: Excel ‏(.xlsx) وCSV وجرد للتأمين مع الصور (PDF / طباعة)\n"
+              "- نسخ احتياطي تلقائي (يومي / أسبوعي، إلى أي مجلد — بما فيه مجلد Google Drive)، نسخ احتياطية مشفّرة واستعادة بنقرة واحدة\n"
+              "- سجل التغييرات: من غيّر ماذا في كل غرض ومن أي جهاز\n"
+              "- الترجمة: أسماء الأغراض والملاحظات بالتركية · الإنجليزية · العربية (قاموس دون اتصال عند انقطاع الإنترنت)\n"
+              "- المساعد: أسئلة مثل «أين المعاطف الشتوية؟»؛ عبر الإنترنت بمفتاح الذكاء الاصطناعي الخاص بك، ودون اتصال بخلاف ذلك. اقتراح الاسم / التصنيف من الصورة",
+    },
     "2.2.3": {
         "tr": "- Eski sürümlerden bu sürüme geçiş bir kez tam kurulumla yapılır (eski güncelleyicideki siyah pencere sorunu yaşanmaz). Sonraki güncellemeler yine arka planda, kendiliğinden. Kayıtlar korunur.",
         "en": "- Moving from older versions to this one is done once with a full install (avoids the black-window problem of the old updater). Later updates again run by themselves in the background. Records are kept.",
@@ -146,6 +172,49 @@ class Controller:
             self.win.show_page(2)
             QTimer.singleShot(300, self.win.settings_page.open_account)
 
+    # ---- 2.3.0: hatırlatmalar ve otomatik yedek
+    def reminders(self):
+        """Garantisi / son kullanması yaklaşanlar: günde bir kez açılışta kısa bildirim."""
+        from datetime import date
+        from . import filtre
+        from fccore.widgets import toast
+        today = date.today().isoformat()
+        if self.db.get_setting("reminder_day") == today:
+            return
+        try:
+            days = max(1, int(self.db.get_setting("warn_days", "30") or 30))
+        except ValueError:
+            days = 30
+        rem = filtre.reminders(self.db.list_items(), days=days)
+        self.db.set_setting("reminder_day", today)
+        if not rem:
+            return
+        names = ", ".join(d["name"] for d, _k, _n in rem[:3]) + (" …" if len(rem) > 3 else "")
+        toast(i18n.t("⏳ {n} eşyanın garantisi / son kullanma tarihi yaklaştı ya da geçti: {x}", n=len(rem), x=names),
+              "warn", 9000)
+
+    def auto_backup(self):
+        from datetime import datetime
+        from . import yedek
+        from .ek_arayuz import run_async
+        if getattr(self, "_ab_busy", False) or not yedek.due(self.db):
+            return
+        self._ab_busy = True
+        st = yedek.settings(self.db)
+
+        def done(path):
+            self._ab_busy = False
+            self.db.set_setting("auto_backup_last", datetime.now().isoformat(timespec="seconds"))
+
+        def failed(e):
+            self._ab_busy = False
+            try:
+                from fccore.widgets import toast
+                toast(i18n.t("Otomatik yedek alınamadı: {m}", m=e), "warn", 8000)
+            except Exception:
+                pass
+        run_async(yedek.run, done, failed, self.db, None, st)
+
     # ---- pencere
     def build_window(self):
         from .main_window import MainWindow
@@ -230,6 +299,11 @@ def run():
         QTimer.singleShot(700, lambda: onboarding.maybe_start(**ctl.onboarding_opts()))
     QTimer.singleShot(1500, ctl.sync.sync_now)  # açılışta buluttan son hali al
     QTimer.singleShot(2500, ctl.lan.start)      # yerel ağ eşitlemesi (internetsiz) için bekle
+    QTimer.singleShot(4000, ctl.reminders)      # 2.3.0: garanti / son kullanma hatırlatması (günde bir)
+    QTimer.singleShot(90_000, ctl.auto_backup)  # 2.3.0: otomatik yedek (zamanı geldiyse, arka planda)
+    ab_timer = QTimer(app, interval=30 * 60 * 1000)
+    ab_timer.timeout.connect(ctl.auto_backup)
+    ab_timer.start()
     # 2.1'den kalan, gönderilemeyen eski iletişim mesajları (varsa) bir kez daha denenir
     from .extras import outbox_flush
     QTimer.singleShot(20000, lambda: outbox_flush(db))

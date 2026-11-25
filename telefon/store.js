@@ -43,7 +43,9 @@ function sameRecord(a, b) {
 
 // ------------------------------------------------------------------ v.1.0.8: yeni alanlar
 // Eski sürümden gelen kayıtta bu alanlar yoksa eldeki değer korunur (applyRemote).
-const ITEM_EXTRA = { trashed_at: "", min_qty: 0, to_buy: false, loan_to: "", loan_phone: "", loan_date: "", loan_due: "", loan_history: [] };
+const ITEM_EXTRA = { trashed_at: "", min_qty: 0, to_buy: false, loan_to: "", loan_phone: "", loan_date: "", loan_due: "", loan_history: [],
+  // 2.3.0: garanti bitişi, son kullanma tarihi (YYYY-AA-GG) ve değişiklik geçmişi (ek230.js)
+  warranty_until: "", expires_on: "", changelog: [] };
 const CONTACT_EXTRA = { jobs: [] };
 const TRASH_DAYS = 30;
 const RECEIPT_PREFIX = "fis-";   // fatura / fiş fotoğrafları (eşitlemede sıradan fotoğraf gibi gider)

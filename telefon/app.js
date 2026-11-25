@@ -2,7 +2,7 @@
  * tarih, not), sınıflandırma ağaçları, arama, sıralama, toplu taşıma/silme, ustalar ve dükkanlar, ayarlar, yedek, bulut. */
 "use strict";
 
-const APP_VERSION = "2.2.3";   // semver (2.2.0'dan beri ekranda da aynı); eski 2.1.0.x güncelleyicileri bunu "daha yeni" görür
+const APP_VERSION = "2.3.0";   // semver (2.2.0'dan beri ekranda da aynı); eski 2.1.0.x güncelleyicileri bunu "daha yeni" görür
 function goster(v) {
   const p = String(v === undefined ? APP_VERSION : (v || "")).trim().split(".").filter(x => x !== "");
   if (!p.length) return "";
@@ -285,7 +285,7 @@ function sortBar(cols, cur, onPick) {
 }
 
 const ItemsPage = {
-  search: "", cat: null, loc: null, sort: null, sel: new Set(), scroll: 0, onlyAuto: false, onlyLoan: false,
+  search: "", cat: null, loc: null, sort: null, sel: new Set(), scroll: 0, onlyAuto: false, onlyLoan: false, adv: {},
 
   render(root) {
     const paths = { categories: Store.treePaths("categories"), locations: Store.treePaths("locations") };
@@ -310,8 +310,10 @@ const ItemsPage = {
       el("button.chip" + (this.cat !== null ? ".on" : ""), { text: label("categories", this.cat), onclick: () => this.pickFilter("categories") }),
       el("button.chip" + (this.loc !== null ? ".on" : ""), { text: label("locations", this.loc), onclick: () => this.pickFilter("locations") }),
       el("button.chip", { text: "⇅  " + sortLabel, onclick: () => menu(t("Sırala:"), SORTS.map(([l, k]) => [(k === this.sort ? "✓  " : "") + t(l), () => setSort(k)])) }),
-      el("button.chip", { text: t("🖨  Döküm"), onclick: () => reportPage(this.cat !== null || this.loc === null ? "categories" : "locations",
-        this.cat !== null || this.loc === null ? this.cat : this.loc) }),
+      el("button.chip" + (filterCount(this.adv) ? ".on" : ""), { text: filterCount(this.adv) ? t("⚙  Filtre ({n}) ▾", { n: filterCount(this.adv) }) : t("⚙  Filtre ▾"),
+        onclick: () => filterMenu() }),
+      el("button.chip", { text: t("⬇  Dışa aktar ▾"), onclick: () => exportMenu() }),
+      el("button.chip", { text: t("✦  Asistan"), onclick: () => askPage(/[?؟]/.test(this.search) ? this.search : "") }),
       el("button.chip" + (this.onlyAuto ? ".on" : ""), { text: t("⚡ Kontrol edilmemiş fiyatlar ({n})",
         { n: fmtNum(Store.liveItems().filter(isAutoPrice).length) }), onclick: () => { this.onlyAuto = !this.onlyAuto; if (this.onlyAuto) this.onlyLoan = false; App.render(); } }),
       el("button.chip", { text: t("🛒 Alışveriş listesi ({n})", { n: fmtNum(Store.shoppingList().length) }), onclick: () => shoppingPage() }),
@@ -319,7 +321,8 @@ const ItemsPage = {
         return el("button.chip" + (this.onlyLoan ? ".on" : "") + (late ? ".late" : ""), { text: t("🤝 Ödünçtekiler ({n})", { n: loans.length }) + (late ? t(" · ⚠ {n} gecikti", { n: late }) : ""),
           onclick: () => { this.onlyLoan = !this.onlyLoan; if (this.onlyLoan) this.onlyAuto = false; App.render(); } }); })(),
       el("button.chip", { text: t("🗑 Çöp kutusu ({n})", { n: fmtNum(Store.trashItemsList().length) }), onclick: () => trashPage() }),
-      this.cat !== null || this.loc !== null ? el("button.chip.x", { text: "✕  " + t("Filtreleri temizle"), onclick: () => { this.cat = this.loc = null; App.render(); } }) : null,
+      this.cat !== null || this.loc !== null || filterCount(this.adv) ? el("button.chip.x", { text: "✕  " + t("Filtreleri temizle"),
+        onclick: () => { this.cat = this.loc = null; this.adv = {}; App.render(); } }) : null,
     ]));
     this.summary = el("div.summary");
     this.list = el("div");
@@ -346,7 +349,8 @@ const ItemsPage = {
   items() {
     const all = Store.listItems({ search: this.search, sort: this.sort,
       categories: this.filterSet("categories", this.cat), locations: this.filterSet("locations", this.loc) });
-    return this.onlyAuto ? all.filter(isAutoPrice) : this.onlyLoan ? all.filter(d => d.loan_to) : all;
+    const out = this.onlyAuto ? all.filter(isAutoPrice) : this.onlyLoan ? all.filter(d => d.loan_to) : all;
+    return applyFilter(out, this.adv);   // 2.3.0 gelişmiş filtre
   },
 
   renderList() {
@@ -390,6 +394,10 @@ const ItemsPage = {
     if (d.location_path) meta.append(el("span.tag.loc", { text: "📍 " + d.location_path }));
     if (!d.category_path && !d.location_path) meta.append(t("Belirtilmemiş"));
     if (d.loan_to) meta.append(el("span.tag.loan" + (overdueDays(d) > 0 ? ".late" : ""), { text: loanText(d) }));
+    for (const [f, lab] of [["warranty_until", t("Garanti")], ["expires_on", t("Son kullanma")]]) {   // 2.3.0
+      const st = dayStatus(d[f]);
+      if (st === "soon" || st === "over") meta.append(el("span.tag.loan" + (st === "over" ? ".late" : ""), { text: `⏳ ${lab}: ${dayStatusText(d[f])}` }));
+    }
     const card = el("div.card.item" + (this.sel.has(d.uid) ? ".sel" : ""), { "data-uid": d.uid }, [
       thumb,
       el("div.body", null, [
@@ -520,6 +528,10 @@ function itemDetail(uid) {
         d.notes ? fact(t("Notlar:"), d.notes) : null,
         d.loan_to ? el("div", null, [el("span", { text: t("Ödünç:") }), el("span" + (overdueDays(d) > 0 ? ".latetxt" : ""), { text: loanText(d) + (d.loan_phone ? "\n☎ " + d.loan_phone : "") })]) : null,
         (d.loan_history || []).length ? fact(t("Geçmiş:"), d.loan_history.slice(-5).reverse().map(h => `${h.to}: ${fmtDay(h.date)} → ${fmtDay(h.returned)}`).join("\n")) : null,
+        d.warranty_until ? el("div", null, [el("span", { text: t("Garanti bitişi:") }), el("span" + ({ over: ".latetxt", soon: ".lowtxt" }[dayStatus(d.warranty_until)] || ""),
+          { text: fmtDay(d.warranty_until) + "  " + dayStatusText(d.warranty_until) })]) : null,
+        d.expires_on ? el("div", null, [el("span", { text: t("Son kullanma tarihi:") }), el("span" + ({ over: ".latetxt", soon: ".lowtxt" }[dayStatus(d.expires_on)] || ""),
+          { text: fmtDay(d.expires_on) + "  " + dayStatusText(d.expires_on) })]) : null,
       ]));
       if (recs.length) {
         box.append(el("div.formsec", { text: t("🧾  Fatura / fiş ({n})", { n: recs.length }) }));
@@ -531,6 +543,8 @@ function itemDetail(uid) {
         });
         box.append(g);
       }
+      box.append(el("button.btn.block", { text: (d.changelog || []).length ? t("🕘  Değişiklik geçmişi ({n})", { n: d.changelog.length }) : t("🕘  Değişiklik geçmişi"),
+        onclick: () => historyPage(uid), style: { marginTop: "12px" } }));
       box.append(el("div.hrow", { style: { marginTop: "16px" } }, [
         el("button.btn.primary.grow", { text: t("✎  Düzenle"), onclick: () => itemForm(uid, draw) }),
         el("button.btn.danger", { text: t("Sil"), onclick: async () => { if (await deleteItems([uid])) closeIt(); } }),
@@ -676,6 +690,8 @@ function photoEditor(names, receipts) {
       el("div.hint", { text: receipts ? t("Faturanın, fişin ya da garanti belgesinin fotoğrafını ekleyin (sürükleyip bırakabilirsiniz).").replace(/\s*\([^)]*\)/, "")
         : t("⭐ işaretli ilk fotoğraf favoridir ve listede o görünür. Bir fotoğrafa dokunarak favori yapabilirsiniz.") }),
     ]),
+    /** İlk fotoğrafın verisi (yapay zeka önerisi için): Blob ya da null */
+    first() { const p = photos[0]; return !p ? null : p.blob ? Promise.resolve(p.blob) : Store.photoBlob(p.name); },
     /** Yeni fotoğrafları küçültüp kaydeder, dosya adlarını sırasıyla döndürür */
     async commit() {
       const out = [];
@@ -725,6 +741,30 @@ function itemForm(uid, after, defaults) {
   const date = el("input.in", { type: "datetime-local", value: localInputValue(d && d.created_at) });
   const notes = el("textarea.in", { placeholder: t("Ölçü, marka, nereden alındığı gibi notlar…") });
   notes.value = d ? d.notes : "";
+  // 2.3.0: garanti bitişi ve son kullanma tarihi
+  const warranty = el("input.in", { type: "date", value: d ? d.warranty_until || "" : "" });
+  const expiry = el("input.in", { type: "date", value: d ? d.expires_on || "" : "" });
+  const aiMsg = el("div.hint");
+  const aiFill = async () => {
+    if (!Zeka.cfg()) { aiMsg.textContent = Zeka.errorText({ kind: "nokey" }); return; }
+    const first = pe.first();
+    if (!first) { aiMsg.textContent = t("Önce bir fotoğraf ekleyin."); return; }
+    aiMsg.textContent = t("Düşünüyor…");
+    try {
+      const res = await Zeka.suggest(await first);
+      const filled = [];
+      if (res.name && !name.value.trim()) { name.value = res.name; filled.push(t("ad")); } else if (res.name) filled.push(t("öneri: {x}", { x: res.name }));
+      for (const [k, table] of [["category", "categories"], ["location", "locations"]]) {
+        if (!res[k] || st[k]) continue;
+        const n = Store.treeOrdered(table).find(x => x.path === res[k]);
+        if (n) { st[k] = n.uid; filled.push(k === "category" ? t("kategori") : t("yer")); }
+      }
+      if (res.notes && !notes.value.trim()) { notes.value = res.notes; filled.push(t("not")); }
+      aiMsg.textContent = filled.length ? t("✦ Dolduruldu: {x} — kontrol edip kaydedin.", { x: filled.join(", ") }) : t("✦ Öneri bulunamadı.");
+      for (const b of nodeBtns) b.show();
+    } catch (e) { aiMsg.textContent = Zeka.errorText(e); }
+  };
+  const nodeBtns = [];
   // ---- satın alındığı yer
   const shops = Store.knownShops();
   const shopName = el("input.in", { value: d ? d.shop_name || "" : "", placeholder: t("Örn. Yıldız Hırdavat"), list: "shopList" });
@@ -767,6 +807,8 @@ function itemForm(uid, after, defaults) {
     const show = () => { b.textContent = paths()[table].get(st[key]) || t("Belirtilmedi"); };
     b.onclick = async () => { const v = await pickNode(table, st[key]); if (v !== undefined) { st[key] = v || ""; show(); } };
     show();
+    b.show = show;
+    nodeBtns.push(b);
     return b;
   };
 
@@ -783,7 +825,8 @@ function itemForm(uid, after, defaults) {
         await Store.saveItem({ name: name.value, quantity: qty.value, category: st.category, location: st.location,
           price: price.value === "" ? null : parseFloat(price.value), currency: cur.value, notes: notes.value, created_at: dv,
           shop_name: shopName.value, shop_place: shopPlace.value, shop_phone: shopPhone.value, ...chan,
-          price_auto: !!autoRow && autoChk.checked, min_qty: parseInt(minQty.value, 10) || 0 }, names, uid);
+          price_auto: !!autoRow && autoChk.checked, min_qty: parseInt(minQty.value, 10) || 0,
+          warranty_until: warranty.value || "", expires_on: expiry.value || "" }, names, uid);
         Cloud.soon();
         close();
         toast(t("Kaydedildi"));
@@ -796,7 +839,8 @@ function itemForm(uid, after, defaults) {
     },
     build: () => el("div", null, [
       pe.node,
-      el("label.f", { text: t("Adı:") }), name,
+      el("button.btn.block", { text: t("✦  Fotoğraftan doldur (yapay zeka)"), onclick: aiFill }), aiMsg,
+      el("label.f", { text: t("Adı:") }), el("div.hrow", null, [name, translateButton(name)]),
       el("label.f", { text: t("Adet:") }),
       el("div.stepper", null, [el("button", { text: "−", onclick: () => step(-1) }), qty, el("button", { text: "+", onclick: () => step(1) })]),
       el("label.f", { text: t("En az adet:") }), minQty,
@@ -810,7 +854,11 @@ function itemForm(uid, after, defaults) {
       el("label.f", { text: t("İletişim numarası:") }), shopPhone,
       el("div.chtoggles", null, toggles), chanStatus,
       el("label.f", { text: t("Ekleme tarihi:") }), date,
-      el("label.f", { text: t("Notlar:") }), notes,
+      el("label.f", { text: t("Garanti bitişi:") }), warranty,
+      el("div.hint", { text: t("Garanti bitiş tarihini girin; yaklaşınca program hatırlatır.") }),
+      el("label.f", { text: t("Son kullanma tarihi:") }), expiry,
+      el("div.hint", { text: t("İlaç, gıda, yangın tüpü, pil gibi eşyalarda son kullanma tarihi; yaklaşınca program hatırlatır.") }),
+      el("label.f", { text: t("Notlar:") }), el("div.hrow", { style: { alignItems: "flex-start" } }, [notes, translateButton(notes)]),
       re.node,
       err,
     ]) });
@@ -1217,6 +1265,7 @@ const SettingsPage = {
       el("button.btn.block", { text: t("💾  Yedek al (.json) ve paylaş"), onclick: backup }),
       el("button.btn.block", { text: t("🗑 Çöp kutusu ({n})", { n: Store.trashItemsList().length }), onclick: trashPage }),
     ]));
+    cards.push(prefsCard(), backupCard(), aiCard());   // 2.3.0
     cards.push(Kabuk.arsivKarti());
     // Görünüm (tema, şema, yazı boyutu, dil) · uygulama kartları · Asistan Agent · Kullanım Limitleri · Otomatik hata raporu ·
     // Hakkında (güncelleme) · Admin ile iletişim (EN SON)
@@ -1271,6 +1320,7 @@ const App = {
       await Store.set("price_auto_v1", "1");
     }
     TopBar.init();
+    if (Store.get("start_page", "panel") === "panel") this.tab = 3;   // 2.3.0: açılışta Ana sayfa
     Cloud.listeners.push(text => this.syncState(text));
     Store.listeners.push(what => { if (what === "sync") this.render(true); });
     this.render();
@@ -1283,13 +1333,14 @@ const App = {
       else if (Object.values(Store.dirtyRecords()).some(a => a.length) || Store.photosToUpload().length) Cloud.syncNow();
     });
     window.onBack = () => this.back();
+    startupExtras();   // 2.3.0: garanti / son kullanma hatırlatması + otomatik yedek
     if (Native && Native.bootOk) Native.bootOk();   // açılış sağlam (eski web paketi düzeninin geri dönüş işareti)
   },
 
   back() {
     if (Layers.top()) { Layers.close(); return true; }
     if (this.tab === 0 && ItemsPage.sel.size) { ItemsPage.clearSel(); return true; }
-    if (this.tab !== 0) { this.tab = 0; this.render(); return true; }
+    if (this.tab !== 0 && this.tab !== 3) { this.tab = 0; this.render(); return true; }
     return false;
   },
 
@@ -1303,7 +1354,7 @@ const App = {
     const y = window.scrollY;
     const tabs = $("#tabs");
     tabs.innerHTML = "";
-    [["📦", t("Eşyalarım")], ["🔧", t("Ustalar")], ["⚙", t("Ayarlar")]].forEach(([icon, label], i) => {
+    [[3, "🏠", t("Ana sayfa")], [0, "📦", t("Eşyalarım")], [1, "🔧", t("Ustalar")], [2, "⚙", t("Ayarlar")]].forEach(([i, icon, label]) => {
       tabs.append(el("button" + (i === this.tab ? ".on" : ""), { onclick: () => {
         if (this.tab !== i) { this.tab = i; this.render(); window.scrollTo(0, 0); }
       } }, [el("b", { text: icon }), label]));

@@ -186,12 +186,12 @@ class SettingsPage(QScrollArea):
             cards.append(self._cloud_card())
         if lan is not None:
             cards.append(self._lan_card())
-        cards += [self._data_card(), self._archive_card()]
+        cards += [self._data_card(), self._ai_card(), self._archive_card()]
         core = getattr(ctl, "core", None)
         about = {"version": __version__}
         if core is not None and core.updates is not None:
             about["on_check"] = lambda: core.updates.check()
-        self.grid = fcsettings.build(cards=cards, usage={"firebase": True, "ai": False}, about=about,
+        self.grid = fcsettings.build(cards=cards, usage={"firebase": True, "ai": True}, about=about,
                                      onboarding=ctl.onboarding_opts() if ctl is not None else None)
         from . import ajan as _ajan
         if _ajan.AJAN is not None:
@@ -235,8 +235,100 @@ class SettingsPage(QScrollArea):
         lbtn.setProperty("fc", "btn small")
         lbtn.clicked.connect(self._edit_labels)
         c.add(lbtn, 8)
+        # ---- 2.3.0: hatırlatma süresi · cihaz adı · açılış sayfası
+        from PySide6.QtWidgets import QSpinBox
+        self.warn = QSpinBox()
+        self.warn.setRange(1, 365)
+        self.warn.setSuffix(t(" gün"))
+        self.warn.setValue(int(db.get_setting("warn_days", "30") or 30))
+        self.warn.setMaximumWidth(140)
+        self.warn.valueChanged.connect(lambda v: (db.set_setting("warn_days", str(v)), self.changed.emit()))
+        c.add(field(t("Garanti / son kullanma hatırlatması:"), self.warn,
+                    t("Bitişine bu kadar gün kala Ana sayfada ve açılışta hatırlatılır.")))
+        self.devname = QLineEdit(db.device_name())
+        self.devname.setMaximumWidth(260)
+        self.devname.editingFinished.connect(lambda: db.set_setting("device_name", self.devname.text().strip()))
+        c.add(field(t("Bu cihazın adı:"), self.devname, t("Değişiklik geçmişinde „kim, hangi cihazdan“ olarak görünür.")))
+        self.start = QComboBox()
+        self.start.addItem(fci_t("org.panel"), "panel")
+        self.start.addItem(t("Eşyalarım"), "items")
+        self.start.setCurrentIndex(max(0, self.start.findData(db.get_setting("start_page", "panel"))))
+        self.start.currentIndexChanged.connect(lambda _: db.set_setting("start_page", self.start.currentData()))
+        self.start.setMaximumWidth(260)
+        c.add(field(t("Açılışta gösterilecek sayfa:"), self.start))
         c.add(label(t("F11: tam ekran aç / kapat · Ctrl+F: ara · Ctrl+N: yeni kayıt · Ctrl+P: döküm"), "field-hint", wrap=True), 14)
         return c
+
+    # ------------------------------------------------------------ 2.3.0: yapay zeka
+    def _ai_card(self):
+        from fccore.widgets import field, hbox, label
+        from . import zeka
+        c = self._card(t("Yapay zeka (çevrim içi + çevrim dışı)"), "sparkles",
+                       t("Asistan, fotoğraftan doldurma ve daha iyi çeviri için KENDİ ücretsiz anahtarınızı girin; "
+                         "programı dağıtan kişinin limitleri kullanılmaz. Anahtar yalnızca bu cihazda saklanır. "
+                         "İnternet ya da anahtar yoksa Asistan cihazdaki kayıtlardan, çeviri çevrim dışı sözlükten çalışır."))
+        cur = zeka.cfg() or {}
+        try:
+            from fccore import storage
+            raw = storage.get("ai") or {}
+        except Exception:
+            raw = {}
+        self.ai_prov = QComboBox()
+        for pid, name, *_ in zeka.PROVIDERS:
+            self.ai_prov.addItem(name, pid)
+        self.ai_prov.setCurrentIndex(max(0, self.ai_prov.findData(raw.get("provider") or "gemini")))
+        c.add(field(t("Sağlayıcı:"), self.ai_prov, t("Google Gemini'nin ücretsiz kotası çoğu kullanım için yeterlidir.")))
+        self.ai_key = QLineEdit(raw.get("key") or "")
+        self.ai_key.setEchoMode(QLineEdit.Password)
+        self.ai_key.setPlaceholderText(t("API anahtarı"))
+        self.ai_key.setLayoutDirection(Qt.LeftToRight)
+        get = QPushButton(t("Anahtar al ↗"))
+        get.setProperty("fc", "btn small")
+        get.clicked.connect(lambda: QDesktopServices.openUrl(QUrl(zeka.provider_info(self.ai_prov.currentData())[4])))
+        c.add(field(t("Anahtar:"), hbox(self.ai_key, get)))
+        self.ai_model = QLineEdit(raw.get("model") or "")
+        self.ai_model.setPlaceholderText(t("boş = varsayılan ({m})", m=zeka.provider_info(self.ai_prov.currentData())[2]))
+        self.ai_model.setLayoutDirection(Qt.LeftToRight)
+        self.ai_prov.currentIndexChanged.connect(lambda _: self.ai_model.setPlaceholderText(
+            t("boş = varsayılan ({m})", m=zeka.provider_info(self.ai_prov.currentData())[2])))
+        c.add(field(t("Model (isteğe bağlı):"), self.ai_model))
+        self.ai_status = label(t("Durum: anahtar girilmiş ✓") if cur else t("Durum: anahtar yok — çevrim dışı çalışır"), "muted", wrap=True)
+        save = QPushButton(t("Kaydet"))
+        save.setProperty("fc", "btn small primary")
+        save.clicked.connect(self._ai_save)
+        test = QPushButton(t("Dene"))
+        test.setProperty("fc", "btn small")
+        test.clicked.connect(self._ai_test)
+        c.add(hbox(save, test, None), 12)
+        c.add(self.ai_status, 8)
+        c.add(label(t("Günlük yapay zeka çağrıları „Kullanım Limitleri“ kartında görünür."), "field-hint", wrap=True), 6)
+        return c
+
+    def _ai_save(self):
+        from . import zeka
+        zeka.set_cfg(self.ai_prov.currentData(), self.ai_key.text(), self.ai_model.text())
+        self.ai_status.setText(t("Durum: anahtar girilmiş ✓") if zeka.cfg() else t("Durum: anahtar yok — çevrim dışı çalışır"))
+
+    def _ai_test(self):
+        from . import zeka
+        from .ek_arayuz import ai_error_text, run_async
+        self._ai_save()
+        if not zeka.cfg():
+            return
+        self.ai_status.setText(t("Deneniyor…"))
+
+        def ok(text):
+            try:
+                self.ai_status.setText(t("✓ Çalışıyor: {x}", x=text[:80]))
+            except RuntimeError:
+                pass
+
+        def bad(e):
+            try:
+                self.ai_status.setText("⚠ " + ai_error_text(e))
+            except RuntimeError:
+                pass
+        run_async(zeka.call, ok, bad, "Reply with just the word: OK", None, "image/jpeg", 10)
 
     def _cloud_card(self):
         from fccore.widgets import hbox, label
@@ -305,7 +397,139 @@ class SettingsPage(QScrollArea):
         backup_btn.clicked.connect(self._backup)
         c.add(open_btn, 10)
         c.add(backup_btn, 8)
+        restore_btn = QPushButton(t("♻  Yedekten geri yükle…"))
+        restore_btn.setProperty("fc", "btn small")
+        restore_btn.clicked.connect(self._restore_backup)
+        c.add(restore_btn, 8)
+        # ---- 2.3.0: otomatik yedek
+        from fccore.widgets import field, hbox
+        from . import yedek
+        st = yedek.settings(db)
+        c.add(label(t("Otomatik yedek"), "fc-sub"), 18)
+        self.ab_freq = QComboBox()
+        for k, v in (("off", t("Kapalı")), ("daily", t("Her gün")), ("weekly", t("Her hafta"))):
+            self.ab_freq.addItem(v, k)
+        self.ab_freq.setCurrentIndex(max(0, self.ab_freq.findData(st["freq"])))
+        self.ab_freq.currentIndexChanged.connect(lambda _: (yedek.save_settings(db, freq=self.ab_freq.currentData()),
+                                                            self._ab_draw()))
+        c.add(field(t("Sıklık:"), self.ab_freq))
+        self.ab_dir = label(st["dir"], "muted", wrap=True)
+        self.ab_dir.setTextInteractionFlags(Qt.TextSelectableByMouse)
+        pick = QPushButton(t("📁  Klasör seç…"))
+        pick.setProperty("fc", "btn small")
+        pick.clicked.connect(self._ab_pick)
+        reset = QPushButton(t("Varsayılan"))
+        reset.setProperty("fc", "btn small")
+        reset.clicked.connect(lambda: (yedek.save_settings(db, folder=yedek.default_dir(db)), self._ab_draw()))
+        c.add(field(t("Yedek klasörü:"), self.ab_dir,
+                    t("Google Drive'a gitsin isterseniz bilgisayarınızdaki Google Drive klasörünü seçin "
+                      "(Google Drive masaüstü uygulaması o klasörü kendiliğinden Drive'a yükler).")))
+        c.add(hbox(pick, reset, None), 6)
+        from PySide6.QtWidgets import QSpinBox
+        self.ab_keep = QSpinBox()
+        self.ab_keep.setRange(1, 100)
+        self.ab_keep.setValue(st["keep"])
+        self.ab_keep.setMaximumWidth(120)
+        self.ab_keep.valueChanged.connect(lambda v: yedek.save_settings(db, keep=v))
+        c.add(field(t("Saklanacak yedek sayısı:"), self.ab_keep, t("Daha eskileri kendiliğinden silinir.")))
+        self.ab_pw = QLineEdit(st["password"])
+        self.ab_pw.setEchoMode(QLineEdit.Password)
+        self.ab_pw.setPlaceholderText(t("boş = şifresiz"))
+        self.ab_pw.setMaximumWidth(260)
+        self.ab_pw.editingFinished.connect(lambda: yedek.save_settings(db, password=self.ab_pw.text()))
+        c.add(field(t("Yedek şifresi (isteğe bağlı):"), self.ab_pw,
+                    t("Şifreli yedek (.ozb) AES-256 ile korunur; şifreyi unutursanız yedek açılamaz.")))
+        self.ab_status = label("", "muted", wrap=True)
+        now_btn = QPushButton(t("💾  Şimdi otomatik yedek al"))
+        now_btn.setProperty("fc", "btn small primary")
+        now_btn.clicked.connect(self._ab_now)
+        c.add(now_btn, 10)
+        c.add(self.ab_status, 6)
+        self._ab_draw()
         return c
+
+    def _ab_draw(self):
+        from . import yedek
+        st = yedek.settings(self.db)
+        try:
+            self.ab_dir.setText(st["dir"])
+            files = yedek.list_backups(st["dir"])
+            last = fmt_ts_local(st["last"]) if st["last"] else t("henüz yok")
+            self.ab_status.setText(t("Son otomatik yedek: {x}", x=last) + " · " + t("{n} yedek dosyası", n=len(files)) +
+                                   ("" if st["freq"] != "off" else " · " + t("otomatik yedek kapalı")))
+        except RuntimeError:
+            pass
+
+    def _ab_pick(self):
+        from . import yedek
+        d = QFileDialog.getExistingDirectory(self, t("Yedek klasörü"), yedek.settings(self.db)["dir"])
+        if d:
+            yedek.save_settings(self.db, folder=d)
+            self._ab_draw()
+
+    def _ab_now(self):
+        from . import yedek
+        from .ek_arayuz import run_async
+        yedek.save_settings(self.db, password=self.ab_pw.text())
+        st = yedek.settings(self.db)
+        self.ab_status.setText(t("Yedek alınıyor…"))
+
+        def done(path):
+            self.db.set_setting("auto_backup_last", datetime.now().isoformat(timespec="seconds"))
+            self._ab_draw()
+            info(self, t("Yedek alındı"), t("Yedek kaydedildi:\n{path}", path=path))
+
+        def failed(e):
+            try:
+                self.ab_status.setText(t("Yedek alınamadı: {m}", m=e))
+            except RuntimeError:
+                pass
+        run_async(yedek.run, done, failed, self.db, None, st)
+
+    def _restore_backup(self):
+        from . import yedek
+        target, _ = QFileDialog.getOpenFileName(self, t("Yedekten geri yükle"), str(Path(yedek.settings(self.db)["dir"])),
+                                                t("Organizer yedeği") + " (*.zip *.ozb)")
+        if not target:
+            return
+        pw = None
+        while True:
+            try:
+                data = yedek.read(target, pw)
+                break
+            except yedek.NeedPassword:
+                pw, ok = QInputDialog.getText(self, t("Yedek şifresi"), t("Bu yedek şifreli. Şifreyi yazın:"), QLineEdit.Password)
+                if not ok:
+                    return
+            except yedek.WrongPassword:
+                pw, ok = QInputDialog.getText(self, t("Yedek şifresi"), t("Şifre yanlış. Yeniden yazın:"), QLineEdit.Password)
+                if not ok:
+                    return
+            except (yedek.BadBackup, OSError) as e:
+                info(self, t("Yedekten geri yükle"), t("Bu dosya bir Organizer yedeği değil ya da bozuk. ({m})", m=e))
+                return
+        if not confirm(self, t("Yedekten geri yükle"),
+                       t("Yedekteki kayıtlar geri getirilsin mi?\n\n• Hiçbir kayıt silinmez: şu anki farklı haller Arşiv'e alınır, "
+                         "yedekte olmayan kayıtlar yerinde kalır.\n• Başlamadan önce şu anki halin yedeği alınır.\n"
+                         "• Bulut bağlıysa geri gelen kayıtlar öbür cihazlara da gider."), yes=t("Geri yükle")):
+            return
+        from PySide6.QtWidgets import QApplication
+        QApplication.setOverrideCursor(Qt.WaitCursor)
+        try:
+            counts = yedek.restore(self.db, data)
+        except Exception as e:  # noqa: BLE001
+            QApplication.restoreOverrideCursor()
+            info(self, t("Yedekten geri yükle"), t("Geri yüklenemedi: {m}", m=e))
+            return
+        QApplication.restoreOverrideCursor()
+        self.changed.emit()
+        self.refresh()
+        win = self.window()
+        if hasattr(win, "_remote_data"):
+            win._remote_data()
+        info(self, t("Yedekten geri yükle"), t("Geri yüklendi.") + "\n" + yedek.summary(counts, t))
+        if self.sync is not None and self.sync.is_connected():
+            self.sync.sync_now()
 
     def _archive_card(self):
         """Başka cihazda silinen kayıtlar ve çakışma yedekleri (eşitleme kuralı: hiçbir şey kalıcı silinmez)."""
@@ -336,7 +560,8 @@ class SettingsPage(QScrollArea):
         if not rows:
             lay.addWidget(label(t("Arşivde kayıt yok."), "muted"))
             return
-        kinds = {"silindi": t("başka cihazda silindi"), "cakisma": t("çakışma yedeği"), "temizlendi": t("çöp kutusundan temizlendi")}
+        kinds = {"silindi": t("başka cihazda silindi"), "cakisma": t("çakışma yedeği"), "temizlendi": t("çöp kutusundan temizlendi"),
+                 "yedek_oncesi": t("yedekten geri yüklemeden önceki hali")}
         tables = {"items": t("Eşya"), "contacts": t("Usta / dükkan"), "locations": t("Yer"), "categories": t("Kategori")}
         for r in rows:
             name = r["name"] or "—"
@@ -516,6 +741,19 @@ class SettingsPage(QScrollArea):
         self.locations.reload()
         self.categories.reload()
         self.refresh_archive()
+
+
+def fci_t(key):
+    from fccore import i18n as fci
+    return fci.t(key)
+
+
+def fmt_ts_local(v):
+    """Yerel ISO zaman → 'gg.aa.yyyy ss:dd'."""
+    try:
+        return datetime.fromisoformat(str(v)).strftime("%d.%m.%Y %H:%M")
+    except ValueError:
+        return str(v or "")
 
 
 def fmt_ts(v):

@@ -780,3 +780,8 @@ def default_name(name, lang):
         return name
     en, ar = DEFAULT_NAMES[name]
     return en if lang == "en" else ar
+
+# 2.3.0 çevirileri (ayrı dosyada; telefon için export_i18n.py hepsini birlikte aktarır)
+from .i18n_230 import EK as _EK_230  # noqa: E402
+for _k, _v in _EK_230.items():
+    STRINGS.setdefault(_k, _v)

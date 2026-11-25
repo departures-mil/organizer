@@ -14,7 +14,7 @@
       'org.eye': 'Fiyatları gizle / göster', 'org.scan': 'Hızlı ara',
       'org.arsiv': 'Arşiv ve çakışma yedekleri', 'org.arsiv.desc': 'Başka cihazda silinen kayıtlar bu telefonda silinmez, burada arşivlenir. Eşitlemede üstüne yazılan değişikliklerinizin eski hali de burada durur. İstediğinizi geri alabilirsiniz.',
       'org.arsiv.bos': 'Arşivde kayıt yok.', 'org.arsiv.geri': 'Geri al', 'org.arsiv.geriAlindi': 'Geri alındı: {s}', 'org.arsiv.fazla': '… ve {n} kayıt daha',
-      'org.arsiv.silindi': 'başka cihazda silindi', 'org.arsiv.cakisma': 'çakışma yedeği', 'org.arsiv.temizlendi': 'çöp kutusundan temizlendi',
+      'org.arsiv.silindi': 'başka cihazda silindi', 'org.arsiv.cakisma': 'çakışma yedeği', 'org.arsiv.temizlendi': 'çöp kutusundan temizlendi', 'org.arsiv.yedek_oncesi': 'yedekten geri yüklemeden önceki hali',
       'org.tablo.items': 'Eşya', 'org.tablo.contacts': 'Usta / dükkan', 'org.tablo.locations': 'Yer', 'org.tablo.categories': 'Kategori',
       'org.fb.doldur': 'Firebase bilgileri yazıldı. Şimdi e-posta ve şifrenizle hesaba bağlanın.'
     },
@@ -22,7 +22,7 @@
       'org.eye': 'Hide / show prices', 'org.scan': 'Quick search',
       'org.arsiv': 'Archive and conflict backups', 'org.arsiv.desc': 'Records deleted on another device are not deleted on this phone; they are archived here. Older versions of your changes overwritten during sync are kept here too. You can restore any of them.',
       'org.arsiv.bos': 'The archive is empty.', 'org.arsiv.geri': 'Restore', 'org.arsiv.geriAlindi': 'Restored: {s}', 'org.arsiv.fazla': '… and {n} more',
-      'org.arsiv.silindi': 'deleted on another device', 'org.arsiv.cakisma': 'conflict backup', 'org.arsiv.temizlendi': 'emptied from the trash',
+      'org.arsiv.silindi': 'deleted on another device', 'org.arsiv.cakisma': 'conflict backup', 'org.arsiv.temizlendi': 'emptied from the trash', 'org.arsiv.yedek_oncesi': 'version before restoring from backup',
       'org.tablo.items': 'Item', 'org.tablo.contacts': 'Craftsman / shop', 'org.tablo.locations': 'Place', 'org.tablo.categories': 'Category',
       'org.fb.doldur': 'The Firebase details were filled in. Now sign in with your e-mail and password.'
     },
@@ -30,7 +30,7 @@
       'org.eye': 'إخفاء / إظهار الأسعار', 'org.scan': 'بحث سريع',
       'org.arsiv': 'الأرشيف والنسخ الاحتياطية للتعارضات', 'org.arsiv.desc': 'السجلات المحذوفة على جهاز آخر لا تُحذف على هذا الهاتف بل تُؤرشف هنا. وتبقى هنا أيضاً النسخ القديمة من تغييراتك التي استُبدلت أثناء المزامنة. يمكنك استعادة أيٍّ منها.',
       'org.arsiv.bos': 'الأرشيف فارغ.', 'org.arsiv.geri': 'استعادة', 'org.arsiv.geriAlindi': 'تمت الاستعادة: {s}', 'org.arsiv.fazla': '… و{n} سجلات أخرى',
-      'org.arsiv.silindi': 'حُذف على جهاز آخر', 'org.arsiv.cakisma': 'نسخة احتياطية للتعارض', 'org.arsiv.temizlendi': 'أُفرغ من سلة المحذوفات',
+      'org.arsiv.silindi': 'حُذف على جهاز آخر', 'org.arsiv.cakisma': 'نسخة احتياطية للتعارض', 'org.arsiv.temizlendi': 'أُفرغ من سلة المحذوفات', 'org.arsiv.yedek_oncesi': 'النسخة قبل الاستعادة من النسخة الاحتياطية',
       'org.tablo.items': 'غرض', 'org.tablo.contacts': 'حرفي / محل', 'org.tablo.locations': 'مكان', 'org.tablo.categories': 'تصنيف',
       'org.fb.doldur': 'تمت كتابة بيانات Firebase. سجّل الدخول الآن ببريدك الإلكتروني وكلمة المرور.'
     }
@@ -198,7 +198,7 @@
       var grid = document.createElement('div');
       grid.className = 'settings-grid org-settings';
       root.appendChild(grid);
-      FC.settings.build(grid, { cards: kartlar, usage: { firebase: true, ai: false, project: function () { try { return Cloud.isConnected() ? (Cloud.config() || {}).projectId : ''; } catch (e) { return ''; } } },
+      FC.settings.build(grid, { cards: kartlar, usage: { firebase: true, ai: true, project: function () { try { return Cloud.isConnected() ? (Cloud.config() || {}).projectId : ''; } catch (e) { return ''; } } },
         about: { version: APP_VERSION }, onboarding: ob() });
       return grid;
     },
