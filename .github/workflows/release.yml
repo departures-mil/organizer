@@ -75,7 +75,19 @@ jobs:
           Pop-Location
           $mk = (Get-Command makensis -ErrorAction SilentlyContinue).Source
           if (-not $mk) { $mk = "${env:ProgramFiles(x86)}\NSIS\makensis.exe" }
-          if (-not (Test-Path $mk)) { choco install nsis -y --no-progress | Out-Null; $mk = "${env:ProgramFiles(x86)}\NSIS\makensis.exe" }
+          if (-not (Test-Path $mk)) {
+            # 2026-11: windows-latest imajında NSIS hazır gelmeyebiliyor → choco; o da olmazsa taşınabilir NSIS zip
+            choco install nsis -y --no-progress
+            $c = @("${env:ProgramFiles(x86)}\NSIS\makensis.exe", "$env:ProgramFiles\NSIS\makensis.exe")
+            if ($env:ChocolateyInstall) { $c += (Get-ChildItem "$env:ChocolateyInstall\lib" -Recurse -Filter makensis.exe -ErrorAction SilentlyContinue | ForEach-Object FullName) }
+            $mk = $c | Where-Object { $_ -and (Test-Path $_) } | Select-Object -First 1
+            if (-not $mk) {
+              Invoke-WebRequest -Uri "https://downloads.sourceforge.net/project/nsis/NSIS%203/3.10/nsis-3.10.zip" -OutFile nsis.zip -UserAgent "Wget"
+              Expand-Archive nsis.zip -DestinationPath "$env:RUNNER_TEMP\nsis" -Force
+              $mk = (Get-ChildItem "$env:RUNNER_TEMP\nsis" -Recurse -Filter makensis.exe | Select-Object -First 1).FullName
+            }
+            Write-Host "makensis: $mk"
+          }
           & $mk -V2 "-DVERSION=$v" "-DSRC=$PWD\masaustu\dist\Organizer" "-DOUT=$PWD\release\Organizer-Setup-$v.exe" "-DICON=$PWD\masaustu\assets\logo.ico" kurulum\organizer.nsi
           if ($LASTEXITCODE -ne 0) { throw 'makensis başarısız' }
           Get-ChildItem release | Format-Table Name, Length
