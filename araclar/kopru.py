@@ -16,7 +16,7 @@ Kullanım (release YAYINLANDIKTAN SONRA, RSA anahtarının olduğu bilgisayarda 
   python araclar/kopru.py --gonder          imzala, guncelleme/ yaz, commit + push
   python araclar/kopru.py                   yalnız imzala ve yaz (gönderme)
   python araclar/kopru.py --kuru            anahtarsız/ağsız: köprü paketini kurup denetler (CI)
-Anahtar: ANAHTAR=<guncelleme-imza.pem> ya da sırayla C:\\Claude Programlarım\\_Anahtarlar\\Organizer\\guncelleme-imza.pem,
+Anahtar: ANAHTAR=<guncelleme-imza.pem> ya da sırayla geliştiricinin bilgisayarındaki anahtar klasörü,
   ../anahtarlar/guncelleme-imza.pem. Anahtarın açık kısmı 2.1'deki PUB_N ile aynı olmalı (denetlenir).
 """
 import base64

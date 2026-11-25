@@ -7,7 +7,7 @@
 - Sürüm semver X.Y.Z, etiket tam `vX.Y.Z`. Her güncellemede: `masaustu/organizer/__init__.py`, `telefon/app.js` APP_VERSION,
   `release-notes.json`, `masaustu/organizer/app.py` NEWS. Testler tutarlılığı denetler.
 - Yayın yalnız GitHub Releases (CI, bkz. README). Eski `guncelleme/` kanalı yalnız 2.1.0.x köprüsü içindir (RSA anahtarı
-  CI'da YOK: `python araclar/kopru.py --gonder` geliştiricinin bilgisayarında).
+  CI'da YOK: `python araclar/kopru.py --gonder` kullanıcının bilgisayarında).
 - Görünüm: varsayılan Falcon şeması + şema seçici; eski renkler `klasik` (masaüstü `theme.py`, telefon `kabuk.js`).
   Sağ üst: [Fiyatları gizle · Hızlı ara · Duyurular] · Eşitle · Wi‑Fi · Güncelle · Tema · Dil | Küçült · Orta · Tam ekran · Kapat.
   Ayarlar'da "Admin ile iletişim" EN SONDA. Masaüstü her açılışta tam ekran.

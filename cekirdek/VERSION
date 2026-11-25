@@ -10,3 +10,5 @@ Yerel düzeltmeler (çekirdeğe önerildi):
 - delta/java/ApkPatchInstaller.java: androidx FileProvider yerine uygulamanın kendi ContentProvider'ı (Gradle'sız kabuk).
 - qt/fccore/window.py: sürüm rozeti tam sürüm (ortak-cekirdek 586781e ile aynı düzeltme; 2.2.1).
 - organizer kendi Asistan Agent bağlantısını kullanır (organizer/ajan.py): fccore.init(agent=False).
+
+Yerel düzeltme (2026-11-25): contact — kişisel e-posta yedeği (FormSubmit) kaldırıldı; ortak-cekirdek c3ccfb6 ile aynı.

@@ -3,7 +3,7 @@
 "use strict";
 
 /* Yöneticinin adresi programda görünmez; mesaj FormSubmit üzerinden doğrudan iletilir. */
-const adminEmail = () => atob("").split("").reverse().join("");
+// Programda hiçbir kişisel e-posta adresi bulunmaz: mesajlar yalnız yöneticinin isimsiz mesaj kutusuna gider.
 
 // ====================================================================== Android kabuğu ile eşzamansız çağrılar (kabuk 3)
 const NativeCall = {
@@ -523,21 +523,11 @@ async function inboxPost(body) {
   } catch (x) { return false; }
 }
 
-/** Önce mesaj kutusuna, sonra e-posta kopyası olarak FormSubmit'e gönderir; biri kabul ederse "ok",
- *  değilse FormSubmit sonucu: "activation" (yönetici formu henüz etkinleştirmedi) | "fail". */
+/** Yöneticinin mesaj kutusuna gönderir → "ok" | "fail" (fail: giden kutusunda bekler). */
 async function feedbackPost(body) {
-  const [a, b] = await Promise.all([inboxPost(body), feedbackMail(body)]);
-  return a ? "ok" : b;
+  return (await inboxPost(body)) ? "ok" : "fail";
 }
-async function feedbackMail(body) {
-  try {
-    const r = await fetch("https://formsubmit.co/ajax/" + adminEmail(), { method: "POST",
-      headers: { "Content-Type": "application/json", Accept: "application/json" }, body: JSON.stringify(body) });
-    const j = await r.json().catch(() => ({}));
-    if (String(j.success) === "true") return "ok";
-    return /activat/i.test(j.message || "") ? "activation" : "fail";
-  } catch (x) { return "fail"; }
-}
+async function feedbackMail() { return "fail"; }
 
 /** Gönderilemeyen mesajlar kaybolmaz: burada bekler, bağlantı gelince kendiliğinden gönderilir. */
 const Outbox = {
@@ -591,10 +581,6 @@ function feedbackPage() {
     el("label.f", { text: t("Size ulaşma:") }), who,
     el("label.f", { text: t("Mesajınız…").replace("…", ":") }), msg,
     sendBtn,
-    el("button.btn.block", { text: t("✉  E-posta uygulamasıyla gönder"), onclick: () => {
-      if (ready()) openUrl(`mailto:${adminEmail()}?subject=${encodeURIComponent(subject())}&body=${encodeURIComponent(body())}`); } }),
-    el("button.btn.block", { text: t("Gmail ile gönder (tarayıcı)"), onclick: () => {
-      if (ready()) openUrl(`https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(adminEmail())}&su=${encodeURIComponent(subject())}&body=${encodeURIComponent(body())}`); } }),
     el("button.btn.block", { text: t("📋  Kopyala"), onclick: async () => {
       if (ready()) { await copyText(`${subject()}\n\n${body()}`); toast(t("Mesaj kopyalandı.")); } } }),
   ]) });
