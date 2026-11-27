@@ -121,6 +121,61 @@ final class FcBridge {
         incomingOut = null;
     }
 
+    // ---------- Ağ köprüsü (ortak-cekirdek 1c11eb0): WebView GitHub'a fetch yapamaz (CORS, "Failed to fetch") ----------
+    // httpGet(id, url) → yalnız https, en çok 2 MB metin (latest.json); sonuç window.__fcHttp(id, {status, body} | {error}).
+    @JavascriptInterface
+    public void httpGet(final String id, final String url) {
+        new Thread(new Runnable() {
+            public void run() {
+                String res;
+                java.net.HttpURLConnection c = null;
+                try {
+                    if (url == null || !url.startsWith("https://")) throw new IOException("ONLY_HTTPS");
+                    String u = url;
+                    int status = 0;
+                    for (int hop = 0; hop < 6; hop++) {   // github.com yönlendirmeleri elle izlenir (yalnız https)
+                        c = (java.net.HttpURLConnection) new java.net.URL(u).openConnection();
+                        c.setInstanceFollowRedirects(false);
+                        c.setConnectTimeout(15000);
+                        c.setReadTimeout(30000);
+                        c.setRequestProperty("User-Agent", "Organizer/" + appVersion());
+                        c.setRequestProperty("Accept", "application/json, */*");
+                        status = c.getResponseCode();
+                        if (status >= 300 && status < 400) {
+                            String loc = c.getHeaderField("Location");
+                            c.disconnect();
+                            c = null;
+                            if (loc == null || !loc.startsWith("https://")) throw new IOException("BAD_REDIRECT");
+                            u = loc;
+                            continue;
+                        }
+                        break;
+                    }
+                    if (c == null) throw new IOException("TOO_MANY_REDIRECTS");
+                    String body = "";
+                    if (status == 200) {
+                        java.io.InputStream in = c.getInputStream();
+                        java.io.ByteArrayOutputStream bo = new java.io.ByteArrayOutputStream();
+                        byte[] buf = new byte[16384];
+                        int n;
+                        while ((n = in.read(buf)) > 0) {
+                            bo.write(buf, 0, n);
+                            if (bo.size() > 2 * 1024 * 1024) throw new IOException("TOO_LARGE");
+                        }
+                        in.close();
+                        body = new String(bo.toByteArray(), "UTF-8");
+                    }
+                    res = "{\"status\":" + status + ",\"body\":" + JSONObject.quote(body) + "}";
+                } catch (Exception e) {
+                    res = "{\"error\":" + JSONObject.quote(String.valueOf(e.getMessage())) + "}";
+                } finally {
+                    if (c != null) c.disconnect();
+                }
+                a.js("window.__fcHttp && window.__fcHttp(" + JSONObject.quote(String.valueOf(id)) + "," + res + ")");
+            }
+        }).start();
+    }
+
     // ---------- YEREL EK: Java tarafında indirme + ApkPatchInstaller ----------
     @JavascriptInterface
     public void apkUpdate(final String planJson) {

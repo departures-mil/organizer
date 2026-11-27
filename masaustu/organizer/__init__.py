@@ -2,7 +2,7 @@
 
 # Sürüm: semver X.Y.Z (2.2.0'dan beri; ekranda ve içeride aynı). 2.1.0.x dizisinin (ekranda v.1.0.x) devamıdır:
 # eski güncelleyiciler sayıları sırayla karşılaştırır, 2.2.0 > 2.1.0.13 olduğu için eski kurulumlar bunu "yeni" görür.
-__version__ = "2.3.0"
+__version__ = "2.3.1"
 
 
 def goster(v=None):
